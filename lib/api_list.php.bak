@@ -1,0 +1,34 @@
+<?
+$api_signup				= "woolari.cafe24.com/api/api_signup.php";
+$api_login				= "woolari.cafe24.com/api/api_login.php";
+$api_findpass			= "woolari.cafe24.com/api/api_find_pass.php";
+$api_balance			= "woolari.cafe24.com/api/api_get_balance.php";
+
+$api_history			= "woolari.cafe24.com/api/api_history.php";
+
+$api_pass_change		= "woolari.cafe24.com/api/api_pass_change.php";	
+$api_finpass_change		= "woolari.cafe24.com/api/api_finpass_change.php";	
+$api_find_logpass		= "woolari.cafe24.com/api/api_find_logpass.php";	
+$api_profile			= "woolari.cafe24.com/api/api_profile.php";
+
+$api_purchase			= "woolari.cafe24.com/api/api_purchase.php";
+$api_purchase2			= "woolari.cafe24.com/api/api_purchase2.php";
+$api_purchase3			= "woolari.cafe24.com/api/api_purchase3.php";
+
+$api_tree_c				= "woolari.cafe24.com/api/api_tree_c.php";
+$api_tree_h				= "woolari.cafe24.com/api/api_tree_h.php";
+
+$api_pfcex				= "woolari.cafe24.com/api/api_expfc.php";
+$api_withdrawal			= "woolari.cafe24.com/api/api_withdrawal.php";
+$api_withdrawalms		= "woolari.cafe24.com/api/api_withdrawalms.php";
+$api_withdrawal2		= "woolari.cafe24.com/api/api_withdrawal2.php";
+
+$api_check_id			= "woolari.cafe24.com/api/api_check_id.php";
+
+$api_masternode			= "woolari.cafe24.com/api/api_master_node.php";
+
+$api_lanx_balance		= "woolari.cafe24.com/api/api_lanx_balance.php";
+$api_lanx_send			= "woolari.cafe24.com/api/api_lanx_send.php";
+$api_sell_cancle		= "woolari.cafe24.com/api/api_sell_cancle.php";
+
+?>

@@ -1,0 +1,122 @@
+<?
+header( "Content-type: application/vnd.ms-excel" ); 
+header( "Content-Disposition: attachment; filename=골드회원.xls" );  //엑셀 파일이름 지정
+header( "Content-Description: PHP4 Generated Data" );
+?>
+<?
+#####################################################################
+
+include "../common/user_function.php";
+include "../common/dbconn.php";
+
+
+$encoded_key = urlencode($key);
+$query = "SELECT id,name,passwd,email,signdate,dis1,company,member_cnt,tel,handphone,zip,address from $member_table ";
+
+
+$query = $query."where dis=1 ORDER BY member_cnt";	
+
+
+
+$DB->get($query,$rs,$rn);
+
+if ($page=="") $page=1;
+$num_per_page = 10;
+$page_per_block = 10;
+
+if(!$total_record) {
+ 	$first = 1;
+ 	$last = 0;   
+} else {
+ 	$first = $num_per_page*($page-1);
+ 	$last = $num_per_page*$page;
+ 
+ 	$IsNext = $total_record - $last;
+ 	if($IsNext > 0) {
+ 		$last -= 1;
+ 	} else {
+ 		$last = $total_record - 1;
+ 	}      
+}
+ 
+$total_page = ceil($total_record/$num_per_page);
+$article_num = $total_record - $num_per_page*($page-1);
+$mode="keyfield=$keyfield&key=$encoded_key&sex=$sex&job=$job&dis=$dis&member_count=$member_count";
+
+#####################################################################
+?>
+<html>
+<head>
+<title>웹주인 관리자 모드</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+
+<head>
+
+
+
+								<table border='1' cellspacing='0' cellpadding='0'>
+									<tr align="center"> 
+										<td width="100" height="30">아이디</td>
+										<td width="100" height="30">이름</td>
+										<td height="30">주소</td>
+										<td height="30">연락처</td>
+										<td height="30">핸드폰</td>
+									</tr>
+<?
+#####################################################################
+
+$ii=0;
+for($i = 0; $i < $total_record; $i++) { 
+	$id =$rs[$i][0];
+	$name =$rs[$i][1];
+	$passwd =$rs[$i][2];
+	$email =$rs[$i][3];
+	$signdate =$rs[$i][4];
+	$dis1 =$rs[$i][5];
+	$company =$rs[$i][6];
+	$member_cnt =$rs[$i][7];
+	$tel=$rs[$i][8];
+	$handphone=$rs[$i][9];
+	$zip=$rs[$i][10];
+	$address=$rs[$i][11];
+	$signdate = date("Y-m-d",$signdate);
+
+	if(($i+1)%2==0){
+		$kk_bgcolor="#FFFFFF";
+	}else{
+		$kk_bgcolor="#F6F6F6";
+	}
+
+	
+#####################################################################
+?>
+								<tr align="center"> 
+									<td height="30"><?=$id?></td>
+									<td height="30"><?=$name?>[<?=$company?>]</td>
+				
+									<td>[<?=$zip?>] <?=$address?></td>
+									<td><?=$tel?></td>
+									<td><?=$handphone?></td>
+								
+								
+							
+								</td>
+								
+								
+								</tr>
+
+<?
+				
+	
+   $article_num--;
+   $ii++;
+        
+}              
+$chk_num = $last-$first+1;
+?>
+							</table>
+						</td>
+					</tr>
+				</table> 
+				

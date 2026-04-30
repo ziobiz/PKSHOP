@@ -1,0 +1,123 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=euc-kr">
+<META HTTP-EQUIV="Pragma" CONTENT="No-Cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<title>글꼴</title>
+<STYLE>
+td {font-size :9pt;color :#666666;}
+a {text-decoration: none;color:#333333}
+.input {font-family: "dotum";font-size: 12px;color: #333333;border: 1px solid #CCCCCC;}
+</STYLE>
+
+<script language="javascript">
+<!--
+function createFont(val){
+	if(window.open){
+		var os;
+		var ostmp = navigator.appName.charAt(0);
+		// 브라우저 확인
+		if(ostmp=='M') os = '';
+		else if(ostmp=='N') os = 1;
+		else os = 2;
+
+		if(!os) window.returnValue = val;
+		else window.opener.htmltrue('fontname',val,false);
+		self.close();
+	}
+}
+//-->
+</script>
+
+<BODY scroll=no leftmargin="1" marginwidth="1" topmargin="1" marginheight="1">
+
+<table border="0" cellpadding="8" cellspacing="5" width="100%" height="100%" bgcolor="#E6E8EB">
+	<tr><td>
+	<table border="0" cellpadding="5" cellspacing="0" width="100%">
+		<tr>
+		<td bgcolor="white">
+		글꼴 선택
+		</td>
+		</tr>
+		<tr>
+		<td bgcolor="white">
+		<table border="1" cellpadding="6" cellspacing="0" width="99%" bordercolor="#CCCCCC" bordercolordark="white" bordercolorlight="black">
+			<tr>
+			<td>
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr><td colspan="4" height="7" width="294"></td></tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('굴림')"><font face="굴림">가나다라바사 (굴림)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('바탕')"><font face="바탕">가나다라바사 (바탕)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('돋음')"><font face="돋음">가나다라바사 (돋음)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('궁서')"><font face="궁서">가나다라바사 (궁서)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('arial')"><font face="arial">ABCDEFGHIJK (Arial)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('arial black')"><font face="arial black">ABCDEFGHIJK (Arial Black)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('Arial Narrow')"><font face="Arial Narrow">ABCDEFGHIJK (Arial Narrow)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('Comic Sans MS')"><font face="Comic Sans MS">ABCDEFGHIJK (Comic Sans MS)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('System')"><font face="System">ABCDEFGHIJK (System)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('Tahoma')"><font face="Tahoma">ABCDEFGHIJK (Tahoma)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('Times New Roman')"><font face="Times New Roman">ABCDEFGHIJK (Times New Roman)</a></font>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont('Verdana')"><font face="Verdana">ABCDEFGHIJK (Verdana)</a></font>
+					</td>
+				</tr>
+			</table>
+			</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+		<td align="center">
+			<input type="button" onClick="window.close();" value=" 닫기 " class="input">
+		</td>
+	</tr>
+</table>
+
+</BODY>
+</HTML>

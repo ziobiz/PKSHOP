@@ -1,0 +1,93 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=euc-kr">
+<META HTTP-EQUIV="Pragma" CONTENT="No-Cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<title>글자 크기</title>
+<STYLE>
+td {font-size :9pt;color :#666666;}
+a {text-decoration: none;color:#333333}
+.input {font-family: "dotum";font-size: 12px;color: #333333;border: 1px solid #CCCCCC;}
+</STYLE>
+
+<script language="javascript">
+<!--
+function createFont(val){
+	if(window.open){
+		var os;
+		var ostmp = navigator.appName.charAt(0);
+		// 브라우저 확인
+		if(ostmp=='M') os = '';
+		else if(ostmp=='N') os = 1;
+		else os = 2;
+
+		if(!os) window.returnValue = val;
+		else window.opener.htmltrue('fontsize',val,false);
+		self.close();
+	}
+}
+//-->
+</script>
+
+<BODY scroll=no leftmargin="1" marginwidth="1" topmargin="1" marginheight="1">
+
+<table border="0" cellpadding="8" cellspacing="5" width="100%" height="100%" bgcolor="#E6E8EB">
+	<tr><td>
+	<table border="0" cellpadding="5" cellspacing="0" width="100%">
+		<tr>
+		<td bgcolor="white">
+		글자크기 선택
+		</td>
+		</tr>
+		<tr>
+		<td bgcolor="white">
+		<table border="1" cellpadding="6" cellspacing="0" width="99%" bordercolor="#CCCCCC" bordercolordark="white" bordercolorlight="black">
+			<tr>
+			<td>
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr><td colspan="4" height="7" width="294"></td></tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont(1)"><FONT size=1>가나다라바사 (1)</FONT></a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont(2)"><FONT size=2>가나다라바사 (2)</FONT></a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont(3)"><FONT size=3>가나다라바사 (3)</FONT></a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont(4)"><FONT size=4>가나다라바사 (4)</FONT></a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont(5)"><FONT size=5>가나다라바사 (5)</FONT></a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a style="cursor:hand;cursor:pointer;" onclick="createFont(6)"><FONT size=6>가나다라바사 (6)</FONT></a>
+					</td>
+				</tr>
+			</table>
+			</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+		<td align="center">
+			<input type="button" onClick="window.close();" value=" 닫기 " class="input">
+		</td>
+	</tr>
+</table>
+
+</BODY>
+</HTML>

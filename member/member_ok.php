@@ -1,0 +1,172 @@
+<?
+include "../include/get_balance.php";
+include "../../Adm/common/dbconn.php";
+?>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<?
+
+// 오류나서 주석처리
+/*
+if(ereg("([^[:space:]]+)", $email) && (!ereg("(^[_0-9a-zA-Z-]+(\.[_0-9a-zA-Z-]+)*@[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*$)", $email))  ) {
+   error("INVALID_EMAIL");   
+   exit;
+}
+
+
+if(!ereg("(^[0-9a-zA-Z]{4,}$)", $passwd) && $passwd!="") {
+   error("INVALID_PASSWD");
+   exit;
+}
+*/
+
+//$oldpass=trim($oldpass);
+$passwd=trim($passwd);
+$passwd2=trim($passwd2);
+$signdate = time();
+$cip=$_SERVER["REMOTE_ADDR"];
+$dis1="0";
+
+if($passwd!="") {
+	
+	if($passwd!=$passwd2) {
+		echo "<script language=javascript> alert('비밀번호가 동일하지 않습니다.'); </script>";
+		echo "<script language=javascript> history.back(); </script>";
+		exit;
+	}
+	$query = "SELECT '$passwd'";
+	$result = mysql_query($query);
+	$row = mysql_fetch_row($result);
+	$newpasswd = $row[0];
+	
+} else {
+	$newpasswd = $real_pass;
+}
+
+$address=$address." ".$address1;
+
+$tel=$tel1."-".$tel2."-".$tel3;
+$handphone=$handphone1."-".$handphone2."-".$handphone3;
+
+
+
+$c_c_id		= $_POST['c_c_id'];
+
+
+$s_center	= $_POST['s_center'];
+
+	$c_qry = "select * from $member_table where id='$c_c_id'";
+	
+
+	$result_c = mysql_query($c_qry);
+	$rowc = mysql_fetch_array($result_c);
+
+if ($rowc['c_code'] == "")
+{
+		echo "<script language=javascript> alert('추천인 아이디가 틀립니다.'); </script>";
+		echo "<script language=javascript> location.href='http://GP.kr/shop/member/agree.php' </script>";
+		exit;
+
+}
+
+$c_c_code = $rowc['c_code'];
+
+if ($c_c_code == "") $c_c_code = "1000000";
+
+
+//데이터베이스에 입력값을 삽입한다
+	$query="INSERT INTO $member";
+	$query=$query."(";
+	$query=$query."id,passwd,name,jumin,solar,sex,job,email";
+	$query=$query.",tel,handphone,zip,address,info,signdate,point,dis,dis1,company,recommend,comnum,etc1,etc2,c_c_code,c_jisa";
+	$query=$query.")";
+	$query=$query."VALUES";
+	$query=$query."(";
+	$query=$query."'$id','$passwd','$name','$jumin','$solar','$sex','$job','$email','$tel'";
+	$query=$query.",'$handphone','$zipcorde','$address','$info','$signdate','$point','$dis','$dis1','$company','$c_c_id','$comnum','$etc1','$etc2','$c_c_code','$s_center'";
+	$query=$query.")";
+
+$result = mysql_query($query);
+
+
+
+//데이터베이스에 입력값을 삽입한다
+	$query="INSERT INTO $member_table";
+	$query=$query."(";
+	$query=$query."C_ID,C_NAME,C_C_CODE,C_DATE,C_JISA";
+	$query=$query.")";
+	$query=$query."VALUES";
+	$query=$query."(";
+	$query=$query."'$id','$name','$c_c_code','".date("Y-m-d")."','$s_center'";
+	$query=$query.")";
+
+$result = mysql_query($query);
+
+
+$sql = "update $member set c_org_code =c_code where id='$id'";
+$result = mysql_query($sql);
+$sql = "update $member_table set C_ORG_CODE =C_CODE where C_ID='$id'";
+$result = mysql_query($sql);
+
+/*
+//문자 발송
+
+include "../class.http.php";
+include "../class.EmmaSMS.php";
+
+
+$sms_id = "psjpsj1234";
+$sms_passwd = "bbong4585!";
+$sms_type = "L";
+$sms_to = $handphone;
+$sms_from = "042-255-0108";
+$sms_date = 0;
+$sms_msg = $name."님 회원 가입을 축하드립니다.
+-LANX MALL-";
+
+$sms = new EmmaSMS();
+$sms->login($sms_id, $sms_passwd);
+$ret = $sms->send($sms_to, $sms_from, $sms_msg, $sms_date, $sms_type);
+*/
+//print_r($ret);
+
+
+if($point_dis_setting=="Y"){
+	if($point_c_setting!="" && $point_c_setting>0){
+		### 가입포인트 입력 ##############################
+		$Comm_Wdate=time();	
+
+		$Result="insert into $shop_point values";
+		$Result=$Result."(";
+		$Result=$Result."''"; #no 값이 들어 간다...자동 증가.
+		$Result=$Result.",'$id'";
+		$Result=$Result.",'회원가입포인트'";
+		$Result=$Result.",'$point_c_setting'";
+		$Result=$Result.",$Comm_Wdate";
+		$Result=$Result.",'$Signdate'";
+		$Result=$Result.")";
+		//echo "$Result";
+		//exit;
+		//$Rs_table= mysql_query($Result,$DBconn);
+		#####################################################
+	}
+}
+
+if($result) {
+// 리스트 출력화면으로 이동한다
+?>
+<script type="text/javascript">
+<!--
+	alert("회원가입이 완료되었습니다");
+	location="../main/main.html";
+//-->
+</script>
+<?
+} else {
+   	error("QUERY_ERROR");
+	exit;
+}
+
+
+mysql_close($DBconn);
+?>

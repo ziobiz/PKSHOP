@@ -1,0 +1,416 @@
+<?
+	
+	$login_alert1 = "Please id your account.";
+	$login_alert2 = "Please enter your password.";
+
+	$login_1 ="Welcome into";
+	$login_2 ="MLM";
+	$login_3 ="Not a member? sign up now!";
+	$login_4 ="Sign in";
+	$login_5 ="to access your account";
+	$login_6 ="ID";
+	$login_7 ="Password";
+	$login_8 ="Forgot your password?";
+	$login_9 ="Sign in";
+	$login_10 ="Sign Up";
+
+	$footer_1 ="MLM Holdings PTE. LTD";
+	$footer_2 ="Company Registration : No. 202121917E";
+	$footer_3 ="73 UPPER PAYA LEBAR ROAD #06-01C CENTRO BIANCO SINGAPORE";
+
+	$find_1 ="Welcome into";
+	$find_2 ="MLM";
+	$find_3 ="< Back";
+	$find_4 ="Restore a password";
+	$find_5 ="Email";
+	$find_6 ="Send";
+
+	$find_alert1 = "Enter userid";
+	$find_alert2 = "Please check your ID";
+	$find_alert3 = "Please check the Email message.";
+	$find_alert4 = "Please try again in three minutes.";
+	$find_alert5 = "Please check your ID";
+	$find_alert6 = "Please check the text message.";
+	$find_alert7 = "Please try again in three minutes.";
+	$find_alert8 = "Enter userid";
+
+	$join_alert1 ="Please enter a name.";
+	$join_alert2 ="Please enter a name.";
+	$join_alert3 ="Please id your account.";
+	$join_alert4 ="Please enter your phone number";
+	$join_alert5 ="Please enter your phone number";
+	$join_alert6 ="Please enter your phone number";
+	$join_alert7 ="Please enter an email.";
+	$join_alert8 ="Please id is more than 4 or more digits, including English numbers";
+	$join_alert9 ="Please enter the email verification code";
+	$join_alert10 ="Please enter your Password.";
+	$join_alert11 ="The password is more than 8 characters.";
+	$join_alert12 ="Please enter the captcha code.";
+	$join_alert13 ="Password check input, please.";
+	$join_alert14 ="Passwords do not match";
+	$join_alert15 ="Please enter the pin number.";
+	$join_alert16 ="Pin number is 4 digits";
+	$join_alert17 ="Please enter pin number confirmation.";
+	$join_alert18 ="Incorrect pin number.";
+	$join_alert19 ="Please enter a recommendation ID.";
+	$join_alert20 ="Please check a recommendation name.";
+	$join_alert21 ="Please check your ID.";
+	$join_alert22 ="Please enter an email.";
+	$join_alert23 ="Email Address Check";
+	$join_alert24 ="Enter the Email";
+	$join_alert25 ="Please check your Email";
+	$join_alert26 ="Please check the Email message.";
+	$join_alert27 ="Please try again in three minutes.";
+	$join_alert28 ="Email send error";
+	$join_alert29 ="Please check your Phone Number";
+	$join_alert30 ="Please check the text message.";
+	$join_alert31 ="Please try again in three minutes.";
+
+	$join_1 ="Welcome into";
+	$join_2 ="MLM";
+	$join_3 ="Already a member? Sign in now!";
+	$join_4 ="Sign in";
+	$join_5 ="to access your account";
+	$join_6 ="First name";
+	$join_7 ="Last name";
+	$join_8 ="Country code";
+	$join_9 ="Phone number";
+	$join_10 ="E-mail";
+	$join_11 ="Email Certification number";
+	$join_12 ="Request";
+	$join_13 ="ID";
+	$join_14 ="(4 or more digits, including English numbers)";
+	$join_15 ="Password";
+	$join_16 ="(Password. Min 6 symbols, at least 1 lowercase letter, at least 1 upper-case, at least 1 non-letter)";
+	$join_17 ="Password Check";
+	$join_18 ="Captcha";
+	$join_19 ="Pin number";
+	$join_20 ="Pin number Check";
+	$join_21 ="Referral sponsor ID";
+	$join_22 ="Referral sponsor Name";
+	$join_23 ="Service User Guide";
+	$join_24 ="I agree with";
+	$join_25 ="Customer Agreement";
+	$join_26 ="Continue";
+	$join_27 ="Return";
+	$join_28 ="(digits Four)";
+	$join_29 ="Certification number";
+
+	$top_alert1 = "COPY";
+
+	$top_1 = "Dashboard";
+	$top_2 = "LEVEL";
+	$top_3 = "Recommendation bonus.";
+	$top_4 = "Team development bonus.";
+	$top_5 = "Recommendation match.";
+	$top_6 = "Re-purchase bonus.";
+	$top_7 = "Position bonus.";
+
+	$menu_1 ="Dashboard";
+	$menu_2 ="My Teams";
+	$menu_3 ="Referral";
+	$menu_4 ="Mining";
+	$menu_5 ="Wallets";
+	$menu_6 ="Withdrawal";
+	$menu_7 ="Deposit";
+	$menu_8 ="MLM Wallet";
+	$menu_9 ="History";
+	$menu_10 ="Daily Mining";
+	$menu_11 ="Referral Bonus";
+	$menu_12 ="Level Bonus";
+	$menu_13 ="Profile";
+	$menu_14 ="Change Profile";
+	$menu_15 ="Change Password";
+	$menu_16 ="Change Pin number";
+	$menu_17 ="Log out";
+	$menu_18 ="customers support";
+	$menu_19 ="Close";
+
+
+	$main_1  ="Sales";
+	$main_2  ="Total allowance.";
+	$main_3  ="Recommendation bonus.";
+	$main_4  ="Team development bonus.";
+	$main_5  ="Recommendation match.";
+	$main_6  ="Re-purchase bonus.";
+	$main_7  ="Position bonus.";
+	$main_8  ="Level";
+	$main_9  ="Left and right performance.";
+	$main_10 ="The amount that can be withdrawn.";
+	$main_11 ="Sales details.";
+	$main_12 ="date";
+	$main_13 ="Quantity";
+	$main_14 ="State";
+	$main_15 ="Deposit details.";
+	$main_16 ="date";
+	$main_17 ="Quantity";
+	$main_18 ="State";
+	$main_19 ="Notice";
+
+	$main_alert1 ="COPY";
+
+	$mining_alert1 ="Enter package";
+	$mining_alert2 ="The balance is insufficient.";
+	$mining_alert3 ="Enter pin number";
+	$mining_alert4 ="The purchase time has exceeded purchase time.";
+
+
+	$mining_1 ="Estimated starting in 48 Hrs";
+	$mining_2 ="MLM Package";
+	$mining_3 ="Buy Now";
+	$mining_4 ="Provided by MLM";
+	$mining_5 ="MLM Package";
+	$mining_6 ="(BINANCE PRICE STANDARD)";
+	$mining_7 ="TIME LEFT";
+	$mining_8 ="Balance";
+	$mining_9 ="price";
+	$mining_10 ="Pin Number";
+	$mining_11 ="Please enter the pin number";
+	$mining_12 ="Provided by MLM";
+	$mining_13 ="Buy";
+	$mining_14 ="RTT Quantity";
+	$mining_15 ="Price";
+	$mining_16 ="XRP\ Amount";
+
+	$with_alert1 ="You cannot apply at the current level.";
+	$with_alert2 ="Enter qty";
+	$with_alert3 ="not enough";
+	$with_alert4 ="Enter withdrawal address";
+	$with_alert5 ="Enter pin number";
+	$with_alert6 ="only number used";
+	$with_alert7 ="Please check your ID";
+	$with_alert8 ="Please check the Email message.";
+	$with_alert9 ="Please try again in three minutes.";
+	$with_alert10 ="Please check your ID";
+	$with_alert11 ="Please check the text message.";
+	$with_alert12 ="Please try again in three minutes.";
+
+	$with_1 ="The minimum withdrawal limit to an external wallet is";
+	$with_2 ="For the security of funds, we will manually verify the withdrawal when the customer's account is abnormal.";
+	$with_3 ="Please wait until we respond to customers by email or text.";
+	$with_4 ="External wallet address withdrawal may fail due to network congestion.";
+	$with_5 ="If this occurs, please contact Customer Service to resolve it by submitting a work order.";
+	$with_23 ="Please check your security so that your computer and browser are not damaged or leaked.";
+	$with_24 ="Withdrawal request processing time is processed in batches at 5:00 PM from Monday to Friday (GMT+8).";
+	$with_25 ="";
+
+	$with_7 ="Withdrawal";
+	$with_8 ="Coin type";
+	$with_9 ="Withdrawal Balance(USDT)";
+	$with_10 ="price";
+	$with_11 ="Total Quantity(USDT)";
+	$with_12 ="Fee";
+	$with_13 ="Withdrawal Quantity";
+	$with_14 ="withdrawal address";
+	$with_15 ="Please enter your withdrawal address.";
+	$with_16 ="Pin number";
+	$with_17 ="Withdrawal";
+	$with_18 ="History";
+	$with_19 ="Date";
+	$with_20 ="Amount";
+	$with_21 ="State";
+	$with_22 ="Addr";
+
+	$depo_alert1 = "Copyd";
+	$depo_alert2 = "Enter qty";
+	$depo_alert3 = "not enough";
+	$depo_alert4 = "Enter withdrawal address";
+	$depo_alert5 = "Enter pin number";
+	$depo_alert6 = "only number used";
+	$depo_alert7 = "Please check your ID";
+	$depo_alert8 = "Please check the Email message.";
+	$depo_alert9 = "Please try again in three minutes.";
+	$depo_alert10 = "Please check your ID";
+	$depo_alert11 = "Please check the text message.";
+	$depo_alert12 = "Please try again in three minutes.";
+
+	$depo_1 = "• Deposit to the wrong address, or deposit any non-ETH, BTC, USDT assets to the above address, the assets will not be retrieved. Some assets do not support smart contract deposit via transfer and deposit.";
+	$depo_2 = "• After you deposit to the above address, it will undergo the confirmation of the entire network node. The payment time is generally 10 minutes to 30 minutes.";
+	$depo_3 = "• Minimum deposit amount: 500 USDT, deposit less than the minimum amount will not be credited to the account and cannot be refunded.";
+	$depo_4 = "• Your deposit address will not change frequently; if there is any change, we will try our best to notify you via website announcement or email.";
+	$depo_5 = "• Please make sure that your computer and browser are safe to prevent information from being tampered with or leaked.";
+	$depo_6 = "USDT (ETC-20)Deposit";
+	$depo_7 = "Please scan this QR code:";
+	$depo_8 = "Or send funds to the address provided below:";
+	$depo_9 = "Important:";
+
+	$depo_10 = "Please only send ERC-20 (USDT-Tether) to the deposit address above.";
+	$depo_25 = "{USDT-OMNI}";
+	$depo_26 = "Please note that {USDT-TRC20} cannot be deposited.";
+	$depo_11 = "If you enter the wrong address, it cannot be found.";
+
+	$depo_12 = "Copy";
+	$depo_13 = "History";
+	$depo_14 = "Date";
+	$depo_15 = "Amount";
+	$depo_16 = "History";
+	$depo_17 = "withdrawal";
+	$depo_18 = "Coin type";
+	$depo_19 = "Withdrawal Balance(MLM)";
+	$depo_20 = "withdrawal amount(MLM)";
+	$depo_21 = "withdrawal";
+	$depo_22 = "Please enter your withdrawal address.";
+	$depo_23 = "Pin number";
+	$depo_24 = "Withdrawal";
+
+	$board_1 = "Date";
+	$board_2 = "Bonus";
+	$board_3 = "Content";
+	$board_4 = "Previous";
+	$board_5 = "Next";
+
+	$board_alert1 = "The start date cannot be later than the end date.";
+
+	$change_alert1 = "Please enter an authentication code";
+	$change_alert2 = "Please check your ID";
+	$change_alert3 = "Please check the Email message.";
+	$change_alert4 = "Please try again in three minutes.";
+	$change_alert5 = "Please check the text message.";
+	$change_alert6 = "Please try again in three minutes.";
+	$change_alert7 = "Enter old password";
+	$change_alert8 = "Enter new password";
+	$change_alert9 = "login password is 8 chars is over.";
+	$change_alert10 = "Confirm password is wrong";
+	$change_alert11 = "Enter old pin number";
+	$change_alert12 = "Enter new pin number";
+	$change_alert13 = "pin number is 4 digits.";
+	$change_alert14 = "Confirm pin number is wrong";
+
+	$change_1 = "User ID";
+	$change_2 = "First name";
+	$change_3 = "Last name";
+	$change_4 = "Phone number";
+	$change_5 = "Email Certification number";
+	$change_6 = "Request";
+	$change_7 = "Continue";
+	$change_8 = "Old password";
+	$change_9 = "password";
+	$change_10 = "Confirm password";
+	$change_11 = "Email Certification number";
+	$change_12 = "Old pin number";
+	$change_13 = "New pin number";
+	$change_14 = "Confirm pin number";
+	$change_15 = "Email Certification number";
+
+	$notice_1 ="Number";
+	$notice_2 ="Date Applied";
+	$notice_3 ="Title";
+
+$ma1  =  "COPY";
+$ma2  =  "MLM Package";
+$ma3  =  "Investment period";
+$ma4  =  "Staking Remaining";
+$ma5  =  "Withdrawal possible";
+$ma6  =  "received in total";
+$ma7  =  "Recommended Link";
+$ma8  =  "Level";
+$ma9  =  "Excavation end date.";
+$ma10 =  "Notice";
+$ma11 =  "MLM";
+$ma12 =  "Welcome to<br>MLM World";
+$ma13 =  "Daily";
+$ma14 =  "Daily Matching";
+$ma15 =  "Recommended allowance";
+$ma16 =  "DooriBit Exchanges";
+$ma17 =  "Duribit Exchange";
+$ma18 =  "MLM22";
+$ma19 =  "Shopping";
+$ma20 =  "E-sports betting";
+$ma21 =  "nline T&D Group";
+$ma22 =  "Casino";
+$ma23  =   "XRP\ Balance";
+
+
+$top1   =  "Dashboards";
+$top2   =  "Notice";
+$top3   =  "Organization chart";
+$top4   =  "Recommended chart";
+$top5   =  "Package";
+$top6   =  "Withdrawal";
+$top6_1   =  "XRP\ Withdrawal";
+$top7   =  "Deposit";
+$top8   =  "p2p";
+$top9   =  "breakdown";
+$top10  =  "Daily";
+$top11  =  "Daily Matching";
+$top12  =  "Recommended allowance";
+$top13  =  "About me";
+$top14  =  "Sign out";
+$top15  =  "Wallet";
+$top16  =  "Exchange";
+$top17  =  "Mining";
+$top18  =  "Recommendation";
+$top19  =  "Sponsorship";
+$top20  =  "Recommendation matching";
+$top21  =  "Position";
+$top22  =  "Global";
+$top23  =  "CENTER";
+$top24  =  "Sponsorship chart";
+$top25  =  "Designated";
+$wi1   =   "Please enter your email code";
+$wi2   =   "Withdrawal";
+$wi3   =   "Coin";
+$wi4   =   "Possible";
+$wi5   =   "Price";
+$wi6   =   "Withdrawal quantity";
+$wi7   =   "Fee";
+$wi8   =   "Total withdrawal quantity";
+$wi9   =   "Wallet Address";
+$wi10   =  "Please enter your wallet address.";
+$wi11   =  "Pin Number";
+$wi12   =  "Email authentication number";
+$wi13   =  "Request";
+$wi14   =  "FULL";
+
+$de1  = "Deposit";
+$de2  = "Please scan this QR code";
+$de3  = "Or send funds to the address provided below";
+$de4  = "Important";
+$de5  = "Send only amount in XRP\ to this deposit address";
+$de6  = "Sending any other currency to this address may result in the loss of";
+$de7  = "your deposit";
+$de8  = "Copy";
+
+$p2p1  =   	"Please enter the receiving ID.";
+$p2p2  =   	"Please enter your email code";
+$p2p3  =   	"p2p";
+$p2p4  =   	"Coin";
+$p2p5  =   	"Transferable";
+$p2p6  =   	"Transfer quantity";
+$p2p7  =   	"Total transfer quantity";
+$p2p8  =   	"ID Received";
+$p2p9  =   	"Please enter the receiving ID.";
+$p2p10  =   "Email authentication number";
+$p2p11  =   "content";
+$p2p12  =   "Completion";
+$p2p13  =   "authentication request";
+$p2p14  =   "Check";
+
+$mma1  =  "Balance";
+$mma2  =  "Balance";
+$mma3  =  "PERFORMANCE";
+$mma4  =  "COPY";
+$mma5  =  "Volume";
+$mma6  =  "Withdrawal possible";
+$mma7  =  "Allowance";
+$mma8  =  "Detailed information";
+$mma9  =  "Investment";
+$mma10 =  "Recursive";
+$mma11 =  "Defi";
+$mma12 =  "Mining allowance.";
+$mma13 =  "Recommendation allowance.";
+$mma14 =  "Sponsorship allowance.";
+$mma15 =  "Matching allowance.";
+$mma16 =  "Position allowance.";
+$mma17 =  "Global allowance.";
+$mma18 =  "Center allowance.";
+
+
+
+$spon1 = "ID";
+$spon2 = "Sales";
+$spon3 = "Designate";
+$spon4 = "Find";
+$spon5 = "Add";
+
+?>

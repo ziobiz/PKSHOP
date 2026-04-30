@@ -1,0 +1,4 @@
+[22-Jun-2017 16:09:03 Asia/Hong_Kong] PHP Warning:  extract() expects parameter 1 to be array, null given in /home/coalcoba/mall.coalcobalt.com/Adm/common/dbconn.php on line 8
+[22-Jun-2017 16:12:29 Asia/Hong_Kong] PHP Warning:  extract() expects parameter 1 to be array, null given in /home/coalcoba/mall.coalcobalt.com/Adm/common/dbconn.php on line 8
+[23-Jun-2017 09:05:44 Asia/Hong_Kong] PHP Warning:  extract() expects parameter 1 to be array, null given in /home/coalcoba/mall.coalcobalt.com/Adm/common/dbconn.php on line 8
+[23-Jun-2017 10:56:40 Asia/Hong_Kong] PHP Warning:  extract() expects parameter 1 to be array, null given in /home/coalcoba/mall.coalcobalt.com/Adm/common/dbconn.php on line 8

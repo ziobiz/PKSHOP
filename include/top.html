@@ -1,0 +1,120 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+<script>
+	$(function(){
+		$('.dropdown').hide();
+		$('.all_category li').hover(function(){
+			$('ul', this).slideDown('fast');
+		}, function(){
+			$('ul', this).slideUp('fast');
+		});
+	});
+</script>
+
+	<div id="header">
+
+		<div class="header_top">
+			<div class="header_inner">
+				<div class="header_top_box01">
+					<a href="#">즐겨찾기</a>
+					<a href="#">바로가기</a>
+				</div>
+				<div class="header_top_box02">
+					<a href="../member/login.php">로그인</a>
+					<a href="../member/agree.php">회원가입</a>
+					<!-- 로그인 이후
+					<a href="#">로그아웃</a>
+					<a href="../member/modify.php">정보수정</a>
+					-->
+					<a href="../cart/overview.php">마이페이지</a>
+					<!-- <a href="../sub05/list.php?Sub_No=1">고객센터</a> -->
+				</div>
+			</div>
+		</div>
+
+		<div class="header_inner">
+			<div>
+				<div class="sp35"></div>
+
+				<div class="logo">
+					<a href="../main/main.html"><img src="../images/logo.png" alt="로고"></a>
+				</div>
+
+				<select class="header_select">
+					<option>제품</option>
+					<option>가격</option>
+					<option>제품+가격</option>
+				</select>
+				
+				<div class="header_input">
+				<input type="text">
+				<a href="#"><img src="../images/icon01.png"></a>
+				</div>
+
+				<div class="header_btn">
+					<!-- <div class="header_btn_box01" onclick="location.href='../sub05/list.php?Sub_No=1';">
+						<img class="header_btn_img" src="../images/icon02.png">
+						<p class="header_btn_text01"><span>NOTICE</span><br>
+						공지사항</p>
+					</div> -->
+					<div class="header_btn_box02" onclick="location.href='../cart/cart.php';">
+						<img class="header_btn_img" src="../images/icon03.png">
+						<p class="header_btn_text02"><span>MY CART</span><br>
+						0 items</p>
+					</div>
+				</div>
+
+				<div class="sp35"></div>
+			</div>
+			
+			<div>
+				<ul class="all_category">
+					<li><a href="#"><img src="../images/nav.png">전체카테고리</a>
+						<ul class="dropdown">
+<?
+		//1차분류
+		$query_tt = "SELECT code1,cate1 FROM $shop_cate where code2='00' and code3='00' and code4='00' order by order_rank";
+//		echo $query_tt;
+		$result_tt= mysql_query($query_tt,$DBconn);
+		if (!$result_tt) {
+			error("QUERY_ERROR");
+			exit;
+		}
+		$total_record_tt = mysql_num_rows($result_tt);
+//		echo $total_record_tt;
+		//echo "$total_record_tt";
+		//exit;
+
+		for($i_tt  = 0; $i_tt  < $total_record_tt ; $i_tt ++) {
+			$menu_code1 = mysql_result($result_tt ,$i_tt ,0);
+			$menu_title1 = mysql_result($result_tt ,$i_tt ,1);
+
+			$menu_code123=$menu_code1;
+
+?>
+							<li><a href="../sub04/list.php?left_code=<?=$menu_code123?>"><?=$menu_title1?></a></li>
+<?}?>
+						</ul>
+					</li>
+				</ul>
+
+				<ul class="m_nav">
+					<li><a href="../sub04/list.php?theme_str=r">BEST제품</a></li>
+					<li><a href="../sub04/list.php?theme_str=n">추천제품</a></li>
+					<li><a href="../sub04/list.php?theme_str=f">HOT제품</a></li>
+				</ul>
+				<ul class="m_dropdown">
+					<li><a href="http://cereimall.cafe24.com/pc/sub04/list.php?left_code=01000000&type=1">라이프케어</a></li>
+					<li><a href="http://cereimall.cafe24.com/pc/sub04/list.php?left_code=02000000&type=1">건강기능식품</a></li>
+					<li><a href="http://cereimall.cafe24.com/pc/sub04/list.php?left_code=03000000&type=1">엔진오일</a></li>
+					<!-- <ul class="sub_dropdown">
+						<li><a href="../sub05/list.php?Sub_No=1">- 공지사항</a></li>
+						<li><a href="../sub05/list.php?Sub_No=2">- 질문과 답변</a></li>
+						<li><a href="../sub05/list.php?Sub_No=3">- 이벤트</a></li>
+					</ul> -->
+				</ul>
+			</div>
+		</div>
+
+	</div>
+
+	<div class="clear"></div>

@@ -1,0 +1,12 @@
+<?
+include "../include/get_balance.php";
+
+$query = "DELETE from $shop_save WHERE no = '$no'";
+$result = mysql_query($query,$DBconn);
+if(!$result) {
+	error("QUERY_ERROR");
+	exit;
+}
+
+echo "<meta http-equiv='Refresh' content='0; URL=keep_sample.php'>";
+?>

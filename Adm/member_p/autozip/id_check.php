@@ -1,0 +1,93 @@
+<? 
+include "../../common/dbconn.php";
+?>
+<html>
+<head>
+<title>아이디중복확인</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="../../image/style.css" type="text/css">
+<style type="text/css">
+<!--
+-->
+</style>
+</head>
+<script language="JavaScript">
+<!--
+function id_exist(){
+	opener.document.form.id.value = ""; 
+	opener.document.form.id.focus();
+	window.close();
+}
+
+window.moveTo(300,300)
+//-->
+</script>
+<body bgcolor="EBEBEB" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width='301' border='0' cellspacing='0' cellpadding='0'>
+  <tr> 
+    <td colspan='3'><img src='images/id_img01.gif' width='301' height='55'></td>
+  </tr>
+  <tr> 
+    <td width='5' background='images/left.gif'>&nbsp;</td>
+    <td width='291' bgcolor='#FFFFFF'><table width='100%' border='0' cellspacing='0' cellpadding='0'>
+        <tr> 
+  
+<?
+
+$r=mysql_query("select * from $member_table where id='$id' ");
+if($d=mysql_fetch_array($r)) $dup="yes";
+
+
+
+if ($dup=="yes")   
+{ ?>    
+
+          <td style=padding-top:10;padding-bottom:10> <BR><BR><div align="center"><b><font color='#6699FF'><?=$id?></font></b><font color=black>는(은) 사용중인 아이디 입니다.<br> 다른 아이디를 선택하여 주십시오. </div></td>
+
+ <!--  <tr> 
+    <td><table width="100%" border="0" cellpadding="3" cellspacing="0">
+        <tr> 
+          <td width="10" height="60">&nbsp;</td>
+          <td colspan="2"><BR><BR><div align="center"><b><font color='#6699FF'><?=$ifid?></font></b><font color=black>는(은) 사용중인 아이디 입니다.<br> 다른 아이디를 선택하여 주십시오. </div></td>
+          <td width="10">&nbsp;</td>
+        </tr>
+     </table></td>
+  </tr> -->
+
+	<?	 }else{ ?>
+ 
+          <td style=padding-top:10;padding-bottom:10><BR><div align="center"><b><font color='#6699FF'><?=$id?></font></b><font color=black>는(은) 사용가능한 아이디 입니다.<BR><BR><img src="./images/join01_but01.gif" onclick="opener.document.form.passwd.focus();window.close()" style="cursor:hand"></div></td>
+
+
+	  <!-- <tr> 
+    <td><table width="100%" border="0" cellpadding="3" cellspacing="0">
+        <tr> 
+          <td width="10" height="60">&nbsp;</td>
+          <td colspan="2"><BR><div align="center"><b><font color='#6699FF'><?=$ifid?></font></b><font color=black>는(은) 사용가능한 아이디 입니다.<BR><BR><img src="./images/join01_but01.gif" onclick="opener.document.form1.pass.focus();window.close()" style="cursor:hand"></div></td>
+          <td width="10">&nbsp;</td>
+        </tr>
+     </table></td>
+  </tr> -->
+<?}?>
+</tr>
+        <tr> 
+          <td height='40'> 
+<div align='center'><img src="images/btn_close.gif" width="62" height="21" onclick="window.close()" style="cursor:hand"></div></td>
+        </tr>
+      </table></td>
+    <td width='5' background='images/right.gif' bgcolor='AEAEAE'>&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan='3'><img src='images/bot.gif' width='301' height='5'></td>
+  </tr>
+</table>
+  <!-- <tr> 
+    <td height="30"></td>
+  </tr>
+  <tr>
+    <td height="30" bgcolor="#FFB20E"><div align="center"><img src="images/search_but03.gif" width="65" height="18" onclick="window.close()" style="cursor:hand"></div></td>
+  </tr>
+</table> -->
+</body>
+</html>

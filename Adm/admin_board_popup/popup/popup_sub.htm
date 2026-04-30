@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title><!--  --></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../include/style.css" rel="stylesheet" type="text/css">
+<?
+include '../db_config/dbcon.php';
+$Popurl="../data/";  //이미지 경로 설정
+//include '../admin/admin_board_popup/db_config/dbcon.php';
+//$Popurl="../admin/admin_board_popup/data/";  //이미지 경로 설정
+$DBconn =mysql_connect("localhost", $DBid, $DBpass);
+$status = mysql_select_db("$dbname");
+$url_chk=split('/',$PATH_TRANSLATED );
+$DB_names=ucfirst("$url_chk[2]") ;
+$DBtable="admin_board_popup";  
+ 
+$Result="select * from $DBtable where No=$No";
+$Rs_table= mysql_query($Result);
+$View_d=mysql_fetch_array($Rs_table); 
+		$No = $View_d[No];	
+		$P_Name=$View_d[P_Name];
+		$P_Location=$View_d[P_Location];
+		$P_Size=$View_d[P_Size];
+		$P_Link=$View_d[P_Link];
+		$P_Target=$View_d[P_Target];
+		$P_Fname=$View_d[P_Fname];
+		$Cont=$View_d[Cont];
+
+$Cni_pop="name".$No;
+
+$size=split("-",$P_Size);
+			$Wi=$size[0];
+			$Hi=$size[1];
+?>  
+
+<script language='javascript'>
+<!--
+//↓쿠키저장 함수
+function setCookie(name,value,expiredays){ 
+	var todayDate = new Date(); 
+	todayDate.setDate( todayDate.getDate() + expiredays ); 
+	document.cookie = name + "=" + escape( value ) + "; path=/; expires=" + todayDate.toGMTString() + ";" 
+}
+//↓창닫기 함수
+function frame_cLOSe(){
+	parent.close()
+	window.close()
+	self.close()
+}
+//[cLOSe]버튼클릭시 적용 함수
+function cLOSe_win(){ 
+	if (document.all.<?=$Cni_pop?>.checked)
+		setCookie("<?=$Cni_pop?>","none",1);	//체크시 적용 = 쿠키저장 함수 호출
+	frame_cLOSe();	//창닫기 함수 호출
+} 
+
+function kk(){
+	var target="<?=$P_Target?>";
+	if(target=="_blank"){
+		var newWin = window.open('about:blank');
+		newWin.location.href="<?=$P_Link?>";
+	}else if(target=="_parent"){
+		opener.parent.location.href="<?=$P_Link?>";
+	}else if(target=="_self"){
+		opener.self.location.href="<?=$P_Link?>";
+	}else if(target=="_top"){
+		opener.top.location.href="<?=$P_Link?>";
+	}
+	window.close();
+}
+//-->
+</script>
+<style type="text/css">
+<!--
+*{
+	margin:0;
+	padding:0;
+}
+
+.text {
+	font-family: "돋움";
+	font-size: 11px;
+	color: #333333;
+}
+
+-->
+</style>
+</head>
+
+
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" scroll="no">
+
+
+<table border="0" cellspacing="0" cellpadding="0" <?if($P_Fname==""){?>width='<?=$Wi?>' height='<?=$Hi?>'<?}?>>
+	<tr bgcolor="">
+	<td  valign="top"><?if($P_Fname!=""){?><img src="<?=$Popurl?><?=$P_Fname?>" onclick="kk();" style="cursor:hand;"><?}else{?><?if($P_Link!="http://"){?><font  onclick="kk();" style="cursor:hand;"><?}?><?=$Cont?></font><?}?></td>
+	</tr>
+  <tr>
+    <td height="20" align="right" bgcolor="#d9d9d9"><table border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><input type="checkbox"  name="<?=$Cni_pop?>" onClick="cLOSe_win();" onFocus='this.blur()'><span class="text">오늘 하루는 이창을 열지 않습니다.</span></td>
+        </tr>
+      </table></td>
+  </tr>
+</table>
+</body>
+</html>

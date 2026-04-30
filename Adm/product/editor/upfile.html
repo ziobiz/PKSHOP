@@ -1,0 +1,132 @@
+<?
+if($_GET['op']==1){
+	$subtitle = '이미지 삽입';
+	$title = '이미지 업로드';
+	$subtype = '';
+}
+else{
+	$subtitle = '미디어 삽입';
+	$title = '미디어 업로드';
+	$subtype = 1;
+}
+?>
+
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=euc-kr">
+<META HTTP-EQUIV="Pragma" CONTENT="No-Cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<title><?=$subtitle?></title>
+<STYLE>
+td {font-size :9pt;color :#666666;}
+a {text-decoration: none;color:#333333}
+.input {font-family: "dotum";font-size: 12px;color: #333333;border: 1px solid #CCCCCC;}
+</STYLE>
+
+<script language="javascript">
+<!--
+	function PathUrl(){
+		document.add_form.url.value = opener.document.getElementById("ReturnUrl").value;
+	}
+//-->
+</script>
+
+</head>
+
+<BODY scroll=no leftmargin="1" marginwidth="1" topmargin="1" marginheight="1" onload="PathUrl();">
+
+<script language="javascript">
+<!--
+function imgview(){
+	var size1,size2;
+	var type = '<?=$subtype?>';
+	var tmp = new Image();
+	var key = document.getElementById('upfile').value;
+	var imgObj = document.images;
+
+	if(type==1) return false;
+
+	tmp.src = key;
+	size1 = tmp.width;
+	size2 = tmp.height;
+
+	size1 = (150>=size1) ? size1 : 150;
+	size2 = (150>=size2) ? size2 : 150;
+
+	imgObj.Pickimg.style.display = "";
+	imgObj.Pickimg.src = key;
+	imgObj.Pickimg.width = size1;
+	imgObj.Pickimg.height = size2;
+}
+//-->
+</script>
+
+<table border="0" cellpadding="8" cellspacing="5" width="100%" height="100%" bgcolor="#E6E8EB">
+	<form name="add_form" action="upfile_ok.php" method="post" enctype='multipart/form-data'>
+	<input type="hidden" name="url">
+	<input type="hidden" name="type" value="<?=$_GET['op']?>">
+	<tr><td>
+	<table border="0" cellpadding="5" cellspacing="0" width="100%">
+		<tr>
+		<td bgcolor="white">
+		<?=$title?>
+		</td>
+		</tr>
+		<tr>
+		<td bgcolor="white">
+		<table border="1" cellpadding="6" cellspacing="0" width="99%" bordercolor="#CCCCCC" bordercolordark="white" bordercolorlight="black">
+			<tr><td>
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr><td colspan="4" height="7" width="300"></td></tr>
+				<tr><td width="61"><nobr>&nbsp;업로드:</td>
+				<td width="239" colspan="3">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout:fixed"><tr><td><nobr>
+					<input type="file" name="upfile" onchange="imgview();" style="width:95%">
+					</td></tr></table>
+				</td>
+				</tr>
+				<tr><td width="300" height="7" colspan="4"></td></tr>
+				<tr><td width="61"><p>&nbsp;사이즈</p></td>
+				<td width="97"><input type="text" name="imgsize" size="4" ></td>
+				<td width="42"><p>정렬:</p></td>
+				<td width="100">
+					<select name="alignment">
+					<option value="" selected>(기본값)</option>
+					<option value="center">가운데</option>
+					<option value="left">왼쪽</option>
+					<option value="right">오른쪽</option>
+					</select>
+				</td>
+				</tr>
+			</table>
+			</td></tr>
+		</table>
+
+<?if($_GET['op']==1){?>
+		<BR>
+
+		<table border="1" cellpadding="6" cellspacing="0" width="99%" bordercolor="#CCCCCC" bordercolordark="white" bordercolorlight="black">
+			<tr><td>
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr><td height="150" align="center">
+				<img name='Pickimg' src="" onerror="this.style.display='none';">
+				</td></tr>
+			</table>
+			</td></tr>
+		</table>
+		</td>
+	</tr>
+<?}?>
+
+	<tr><td height=0></td></tr>
+	<tr>
+		<td align=center>
+		<input type="submit" value="전송" class="input"> &nbsp;&nbsp;<input type="button" onClick="window.close();" value="취소" class="input">
+		</td>
+	</tr>
+</table>
+            </td>
+        </tr>
+    </table>
+</BODY>
+</HTML>

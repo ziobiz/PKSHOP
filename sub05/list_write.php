@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus®">
+  <title>Kona Summit Platform</title>
+  <link rel="stylesheet" href="../include/reset.css">
+  <link rel="stylesheet" href="../include/style.css">
+ </head>
+ <body>
+	<div class="wrap">
+		
+		<!-- 상단 (top) -->
+
+		<? include "../include/top.html"; ?>
+		
+		<!-- 상단 (top) 끝 -->
+
+		<div class="sp50"></div>
+		<div class="sub04_container">
+			<!-- 카테고리 -->
+			
+			<? include "../include/category_contect_us.html"; ?>
+
+			<!-- 카테고리 끝 -->
+
+
+
+			<!-- 컨텐츠 시작 -->
+			<div class="content">
+					<div class="page_title">질문과 답변</div>
+					<form name='form1' method='post' enctype='multipart/form-data' action='writedo.php'>
+					<input type="hidden" name="keynum" >
+					<input type="hidden" name="Sub_No" value="">
+					<input type="hidden" name="Cont_type" value="AUTO">
+					<table class="board_write">
+						<tr>
+							<th width="15%" class="bg">제 목</th>
+							<td class="bg"><input type="text" name="Title" value="" class="input_title"></td>
+						</tr>
+						<tr>
+							<th>작성자</th>
+							<td><input type="text" name="Name" value="" class="input_writer"></td>
+						</tr>
+						<tr>
+							<th>비밀번호</th>
+							<td><input type="password" name="Pass" value="" onKeyDown="Cal_Key_num++;" class="input_writer"><input type="checkbox" name="Secret" checked value="1" class="input_writer_sc">비밀글</td>
+						</tr>
+						<tr>
+							<th>연락처</th>
+							<td><input type="text" name="Homepage" value="" class="input_writer"></td>
+						</tr>
+						<tr>
+							<th>이메일</th>
+							<td><input type="text"  name="Email" value="" class="input_writer"></td>
+						</tr>
+						<tr>
+							<th>내 용</th>
+							<td><textarea name="Cont" id="Cont" class="input_textarea"></textarea></td>
+						</tr>
+						<tr>
+							<th>첨부파일</th>
+							<td><input type="file" name="File" class="write_file"></td>
+						</tr>
+					</table>
+
+					<div class="sp20"></div>
+
+					<div class="write_btn_box">
+						<input type="button" value="확 인" class="cart_btn03" onclick="location.href='./list02.html'">
+						<input type="button" value="취 소" class="cart_btn01" onclick="location.href='./list02.html'">
+					</div>
+					</form>
+
+					<div class="sp10"></div>
+		
+					
+			</div>
+	<!-- 컨텐츠 종료 -->
+
+		</div>
+
+		<div class="sp50"></div>
+
+
+		<!--  footer 시작 -->
+
+		<? include "../include/bottom.php"; ?>
+
+		<!--  footer 끝 -->
+
+	</div>
+  
+</body>
+</html>

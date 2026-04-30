@@ -1,0 +1,7 @@
+lib/icopay_pg_secrets.local.php
+
+# Nested clone / test project (keep out of main repo)
+paytest/
+
+# Payment gateway logs (optional)
+cart/php/log/*.log

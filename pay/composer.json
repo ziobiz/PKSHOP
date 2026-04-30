@@ -1,0 +1,31 @@
+{
+  "name": "pingpong/ping-pong-pay-sdk",
+  "homepage": "https://www.pingpongx.com",
+  "description": "ping-pong-pay for php sdk. -_O",
+  "license": "GPL-2.0+",
+  "type": "library",
+  "keywords": [
+    "php",
+    "pingpong",
+    "sdk"
+  ],
+  "authors": [
+    {
+      "name": "acq-tech",
+      "email": "acq-tech@pingpongx.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "easyswoole/spl": "^1.4",
+    "easyswoole/http-client": "^1.5"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
+  },
+  "autoload": {
+    "psr-4": {
+      "PingPong\\": "./"
+    }
+  }
+}

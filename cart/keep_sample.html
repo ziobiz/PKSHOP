@@ -1,0 +1,231 @@
+<? include "../include/get_balance.php";?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Kona Summit Platform</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="../include/css/reset.css" rel="stylesheet" type="text/css" media="all"/>
+<link href="../include/css/style.css" rel="stylesheet" type="text/css" media="all"/>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kona Summit Platform">
+<meta property="og:description" content="명함, 전단지, 봉투, 스티커,리플렛,카달로그등 맞춤디자인">
+<meta property="og:image" content="http://www.whyble.net/images/logo.png">
+<meta property="og:url" content="http://www.whyble.net">
+<meta name="description" content="명함, 전단지, 봉투, 스티커, 리플렛, 카달로그등 맞춤디자인, 고급명함, 배너, 도록, 로고"><meta name="keywords" content="명함,전단지,봉투,스티커,리플렛,카다로그,대전명함,대전명함제작,저렴한명함,대전카탈로그 "/>
+<!-- Chrome, Safari, IE -->
+<link rel="shortcut icon" href="../images/webicon2.png">
+<!-- Firefox, Opera (Chrome and Safari say thanks but no thanks) -->
+<link rel="icon" href="../images/webicon2.png">
+<script type="text/javascript">
+<!--
+function go_del(No){
+	go=confirm('\n정말로 데이터를 삭제 하시겠습니까?\n')
+	if(go==true){
+	url='sample_keep_del.php?no='+No;
+	window.open(url,'_self');
+}else{return false;}
+}  
+//-->
+</script>
+<script type="text/javascript">
+<!--
+function img_big(title,code,img1) {
+	url="../product/sample_detail.php?s_title="+title+"&s_code="+code+"&s_img1="+img1;
+	window.open(url,"","width=550,height=690");
+}
+//-->
+</script>
+<? include "../include/login_check.php"; ?>
+</head>
+
+<body>
+<div id="wrap">	
+
+	<!-- 상단(Top) -->
+
+	 
+	  <? include "../include/top.php"; ?>
+	
+				
+	<!-- 상단(Top) -->
+
+	<!-- 컨텐츠 시작 -->
+	<div id="content">
+		
+		<div class="content_inner">
+
+			<div class="sp40"></div>
+
+			<? include "../include/mypage_menu.php"; ?>
+
+			<div class="sp40"></div>
+
+			<div class="page_title">
+				샘플보관함
+			</div>
+
+			<div class="sp30"></div>
+
+
+			<div class="sampleall_inner">
+<?
+#################################################################
+$query = "SELECT no,s_code FROM $shop_save where s_id='$valid_user' ORDER BY date DESC";
+//echo "$query";
+
+$result= mysql_query($query,$DBconn);
+if (!$result) {
+	error("QUERY_ERROR");
+	exit;
+}
+$total_record = mysql_num_rows($result);
+
+if($total_record !=0){
+if ($page=="") $page=1;
+$num_per_page = 12;
+$page_per_block = 10;
+
+if(!$total_record) {
+ 	$first = 1;
+ 	$last = 0;   
+} else {
+ 	$first = $num_per_page*($page-1);
+ 	$last = $num_per_page*$page;
+ 
+ 	$IsNext = $total_record - $last;
+ 	if($IsNext > 0) {
+ 		$last -= 1;
+ 	} else {
+ 		$last = $total_record - 1;
+ 	}      
+}
+ 
+$total_page = ceil($total_record/$num_per_page);
+$article_num = $total_record - $num_per_page*($page-1);
+$mode="keyfield=$keyfield&key=$encoded_key&sel_code1=$sel_code1&sel_code2=$sel_code2&sel_code3=$sel_code3&sel_code4=$sel_code4&chk_order=$chk_order&sel_cate=$sel_cate&soldout=$soldout";
+$ii=0;
+for($i = $first; $i <= $last; $i++) { 
+	$no = mysql_result($result,$i,0);
+	$s_code = mysql_result($result,$i,1);
+
+	$result_cc = mysql_query("SELECT code,title,img1 FROM $sample_goods where code='$s_code'",$DBconn);
+	if (!$result_cc){
+		error("QUERY_ERROR");
+		exit;
+	}
+
+	$row_cc = mysql_fetch_row($result_cc);	
+	$tt_code=$row_cc[0];
+	$tt_title=$row_cc[1];
+	$tt_img1=$row_cc[2];
+?>				
+				<!-- 박스 -->
+				<div class="sampleall_box">
+					<div class="sampleall_img">
+						<a href="javascript:img_big('<?=$tt_title?>','<?=$tt_code?>','<?=$tt_img1?>');" ><img src="../shop_img/<?=$tt_img1?>"></a>
+					</div>
+					
+					<div class="sp10"></div>
+					
+					<div class="sampleall_btn_inner">
+						<div class="sampleall_title">
+							<!-- 명함 --><br/><span class="font_b"><?=$tt_title?></span>
+						</div>
+						<div class="sampleall_btn">
+							<input type="button" value="삭제" class="btn_go_box" onclick="javascript:go_del('<?=$no?>')">&nbsp;&nbsp;
+							<input type="button" value="주문" class="btn_go_order" onclick="location.href='../product/sample_order.php?s_title=<?=$tt_title?>&s_code=<?=$tt_code?>&s_img1=<?=$tt_img1?>';">
+						</div>
+					</div>
+
+				</div>
+				<!-- 박스 종료 -->
+
+<?           
+#####################################################################
+   $article_num--;      
+   $ii++;
+   $theme_str="";
+}
+$chk_num = $last-$first+1;
+#####################################################################
+?> 	
+
+			</div>
+			<?}else{?>
+				<script>
+					alert("저장한 샘플이 없습니다.");
+					history.back();
+				</script>
+			<?}?>
+			<!-- sampleall_inner 종료 -->
+			<div style="clear:both;"></div>
+		<br>
+<table border="0" width="80%" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td align="center">
+			<?
+			 ####################################################################
+			 $total_block = ceil($total_page/$page_per_block);
+			 $block = ceil($page/$page_per_block);
+			 $first_page = ($block-1)*$page_per_block;
+			 $last_page = $block*$page_per_block;
+			 if($total_block <= $block) {
+				$last_page = $total_page;
+			 }
+			 $mode="keyfield=$keyfield&key=$encoded_key&sel_code1=$sel_code1&sel_code2=$sel_code2&sel_code3=$sel_code3&sel_code4=$sel_code4&chk_order=$chk_order&sel_cate=$sel_cate";
+			  if ($page > 1) {
+				$page_num = $page - 1;
+			#####################################################################
+			?>
+										<a href="keep_sample.php?<?=$mode?>&page=<?=$page_num?>" onMouseOver="status='이전페이지';return true;" onMouseOut="status=''"><font color="#666666">◀</font></a>
+			 
+			 <?
+			 }
+			 
+			 for($direct_page = $first_page+1; $direct_page <= $last_page; $direct_page++) {
+				if($page == $direct_page) {
+			?>
+										<font color="#666666">&nbsp;<b>[<?=$direct_page?>]</b></font>
+			<?
+				} else {
+			?>
+										&nbsp;<a href="keep_sample.php?<?=$mode?>&page=<?=$direct_page?>" onMouseOver="status='go to page <?=$direct_page?>';return true;" onMouseOut="status=''"><font color="#666666">[<?=$direct_page?>]</font></a>
+			<?
+				}
+			 }
+			 
+			 if ($IsNext > 0) {
+				$page_num = $page + 1;
+			?>
+										&nbsp;<a href="keep_sample.php?<?=$mode?>&page=<?=$page_num?>" onMouseOver="status='다음페이지';return true;" onMouseOut="status=''"><font color="#666666">▶</font></a>
+			 <?
+			 }
+			 ?>
+			</td>
+		</tr>
+	</table>
+	</div>
+
+		</div>			
+			
+	</div>
+	<!-- 컨텐츠 종료 -->
+
+
+	<!-- 하단(Copy) -->
+
+	 
+	  <? include "../include/bottom.html"; ?>	  
+				
+				
+	<!-- 하단(Copy) -->
+
+	
+
+
+</div>
+</body>
+</html>

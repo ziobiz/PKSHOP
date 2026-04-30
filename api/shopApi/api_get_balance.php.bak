@@ -1,0 +1,191 @@
+<?php
+	include_once( "../lib/basic_class2.php") ;
+	include_once( "../lib/config.php");
+	include_once( "../lib/common.php");
+	include_once( "../lib/php_function.php"); 
+
+	$member_id		= $_POST['user_id'];
+	$deId			= $_POST['deId'];
+	
+
+	if ($deId != $store_key)
+	{
+		$result = array("result"=>"0","msg"=>"deId is wrong");
+		echo json_encode($result);
+	}
+	else
+	{
+
+
+/*
+	$url="https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=Q72WZZ4QK6NBHVR1KRPQCRWG86NUJ9959B";
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_REFERER, $url);
+		curl_setopt($ch, CURLOPT_USERAGENT, $agent);
+		curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0); 
+		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
+		$res = curl_exec($ch);
+		curl_close($ch);
+
+		$gasprice= json_decode($res, true);
+		//var_dump($gasprice);
+
+		$gas_price=$gasprice['result']['FastGasPrice'];
+
+		if($gas_price>0){
+
+			$sql = "c_gas='$gas_price' where idx='1'";
+
+			$DB->update($su_list, $sql);
+
+		}
+*/
+		$DB->get("select * from $su_list", $infos, $infon);
+
+		$gas=$infos[0]['c_gas'];
+
+
+		$url="https://api.binance.com/api/v1/ticker/price?symbol=ETHUSDT";
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_REFERER, $url);
+		curl_setopt($ch, CURLOPT_USERAGENT, $agent);
+		curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0); 
+		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
+		$res = curl_exec($ch);
+		curl_close($ch);
+
+		$price_balance= json_decode($res, true);
+
+	
+		//$price_balance = number_format($price_balance['price'],4);
+		$price_balance = floor($price_balance['price']*10000)/10000;
+
+		if($price_balance>0){
+
+				$sql = "c_price	='$price_balance' where idx='1'";
+		
+				$DB->update($su_list, $sql);
+
+		}
+		$DB->get("select * from $member_table where C_ID='$member_id'", $custs, $custn);
+
+		$member_code	= $custs[0]['C_CODE'];
+		$name			= $custs[0]['C_NAME'];
+		$email			= $custs[0]['C_EMAIL'];
+		$rcount			= $custs[0]['C_C_CNT'];
+		$lowacc			= $custs[0]['C_C_ACC'];
+		$level			= $custs[0]['C_JIK'];
+		$rank			= $custs[0]['C_JIK2'];
+/*		
+	if ($custs[0]['C_ETH'] != "" )
+	{
+
+		$data = "address=".$custs[0]['C_ETH'];
+
+			
+		$ch = curl_init();
+		curl_setopt ($ch, CURLOPT_URL, $eth_balance);
+		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 1);
+		curl_setopt ($ch, CURLOPT_POST, 1);
+		curl_setopt ($ch, CURLOPT_POSTFIELDS, $data);
+		curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
+		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+		$result = curl_exec ($ch);
+		curl_close ($ch);
+
+		$eth_balance = json_decode($result,true);
+
+		$balance_eth = $eth_balance['result'] / 1000000000000000000;
+		
+
+		$DB->get("select * from $charge_list where c_code='$member_code' order by idx desc limit 0,1", $charsgs, $chargn);
+
+
+		if ($chargn == 0) $gday1 = strtotime(date("Y-m-d H:i:s"));
+		else $gday1 = strtotime($charsgs[0]['c_date']);
+
+		$gday2 = strtotime(date("Y-m-d H:i:s"));
+
+
+		$interval = ($gday2 - $gday1) / 60;
+		
+		if ($balance_eth > 0.02 && $interval >= 25)
+		{
+			$real_amount = $balance_eth - 0.02;
+
+			//echo $real_amount;
+
+			include "charge_eth.php";
+		}
+		else if ($chargn == 0)
+		{
+			$real_amount = $balance_eth - 0.02;
+
+			//echo $real_amount;
+
+			include "charge_eth.php";
+		
+		}
+
+	
+
+
+	}
+	else if ($custs[0]['C_ETH'] == "")
+	{
+
+
+					$data = "passwd=".$member_code.$eth_key;
+				
+					
+
+					$ch = curl_init();
+					curl_setopt ($ch, CURLOPT_URL, $eth_creat_Wallet);
+					curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 1);
+					curl_setopt ($ch, CURLOPT_POST, 1);
+					curl_setopt ($ch, CURLOPT_POSTFIELDS, $data);
+					curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
+					curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+					$result = curl_exec ($ch);
+					curl_close ($ch);
+
+				$json_eth = json_decode($result, true);				
+				
+				$code =$custs[0]['C_CODE'];
+				$sql = "C_ETH='".$json_eth['addr']."', C_ETH_PATH='".$json_eth['file']."' where C_CODE='$member_code'";
+				$DB->update($member_table, $sql);
+	}
+*/
+
+		include "total_su.php";
+		
+		$DB->get("select * from $board_type where c_code='$member_code'", $boards, $boardn);
+
+		$low_total = $boards[0]['c_l']."/".$boards[0]['c_r'];
+
+			
+	
+
+		$view_bonus = $total_bonus."/".$total_cb."/".$total_db."/".$total_lol."/".$total_rank."/".$total_msi;
+
+		$DB->get("select * from $su_list", $rs, $rn);
+		$c_price = $rs[0]['c_price'];
+		
+$result =array("rank"=>$rank,"level"=>$level,"total_bonus"=>$view_bonus,"emoney"=>$E_MONEY,"volume"=>$my_volume,"name"=>$name,"price"=>$c_price,"email"=>$email,"rcnt"=>$rcount,"eth"=>$eth_balance,"rates"=>$rate,"ethaddr"=>$custs[0]['C_ETH'],"lowacc"=>$lowacc,"wfee"=>$rs[0]['c_wfee'],"wth"=>$total_with,"hleg"=>$low_total);
+		
+		
+		echo json_encode($result);
+		
+	}
+	
+?>

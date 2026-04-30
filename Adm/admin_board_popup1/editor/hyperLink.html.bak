@@ -1,0 +1,87 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=euc-kr">
+<META HTTP-EQUIV="Pragma" CONTENT="No-Cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<title>하이퍼링크 삽입</title>
+<STYLE>
+td {font-size :9pt;color :#666666;}
+a {text-decoration: none;color:#333333}
+.input {font-family: "dotum";font-size: 12px;color: #333333;border: 1px solid #CCCCCC;}
+</STYLE>
+
+<script language="javascript">
+<!--
+function createLink(){
+	if(window.open){
+		var val,os,ostmp;
+		var u = document.add_form;
+		var mlink = u.type.value + u.link.value;
+
+		ostmp = navigator.appName.charAt(0);
+		
+		if(ostmp=='M') os = '';
+		else if(ostmp=='N') os = 1;
+		else os = 2;
+
+		if(!os) window.returnValue =  mlink;
+		else window.opener.htmltrue('CreateLink',mlink,false);
+		self.close();
+	}
+}
+
+//-->
+</script>
+
+</head>
+
+<BODY scroll=no leftmargin="1" marginwidth="1" topmargin="1" marginheight="1">
+
+<table border="0" cellpadding="8" cellspacing="5" width="100%" height="100%" bgcolor="#E6E8EB">
+	<form name="add_form">
+	<tr><td>
+	<table border="0" cellpadding="5" cellspacing="0" width="100%">
+		<tr>
+		<td bgcolor="white">
+		하이퍼링크 작성
+		</td>
+		</tr>
+		<tr>
+		<td bgcolor="white">
+		<table border="1" cellpadding="6" cellspacing="0" width="99%" bordercolor="#CCCCCC" bordercolordark="white" bordercolorlight="black">
+			<tr>
+			<td>
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr><td colspan="4" height="7" width="100%"></td></tr>
+				<tr>
+					<td width="60"><p>&nbsp;&nbsp;URL: </p></td>
+					<td width="60">
+						<select name="type">
+						<option value="http://" checked>http://</option>
+						<option value="mailto:">mailto:</option>
+						<option value="ftp://">ftp://</option>
+						</select>
+					</td>
+					<td width="70%" colspan="2">
+						<input type="text" name="link" style="width:90%">
+					</td>
+				</tr>
+				<tr><td colspan="4" height="7" width="100%"></td></tr>
+			</table>
+			</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+		<td align="center">
+		<input type="button" value="전송"  onclick="createLink()" class="input"> &nbsp;&nbsp;<input type="button" onClick="window.close();" value="취소" class="input">
+		</td>
+	</tr>
+	</table>
+	</td>
+	</tr>
+	</form>
+</table>
+</BODY>
+</HTML>

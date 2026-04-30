@@ -1,0 +1,127 @@
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" Content="Microsoft Visual Studio 6.0">
+<TITLE>색상 선택</TITLE>
+<STYLE>
+div {position:absolute}
+td {border:1 solid #808080; font-size:10px; cursor:default;}
+</STYLE>
+<script language="javascript">
+<!--
+function Right(e) {                     //마우스 우클릭 제어
+
+    if (navigator.appName == 'Netscape' && (e.which == 3 || e.which == 2)){
+        alert("색상을 선택하세요.");
+        return false;
+    }
+    else if (navigator.appName == 'Microsoft Internet Explorer' && (event.button == 2 || event.button == 3)) {
+        alert("색상을 선택하세요.");
+        return false;
+    }
+
+    return true;
+
+} 
+
+document.onmousedown=Right;
+
+ if (document.layers) {
+    window.captureEvents(Event.MOUSEDOWN);
+    window.onmousedown=Right;
+}
+//-->
+</script>
+<script language="javascript">
+<!--
+window.onresize = new Function ("window.resizeTo(332,300);window.moveTo(200,200);");
+window.onblur = new Function ("setTimeout(\"window.focus()\",300)");
+
+var coltab = new Array(9)
+coltab[0] = new Array("000000","FFFFFF","808080","c0c0c0","ff0000","008000","008000","ffff00","800080","808000","000080","00ffff","00ff00","800000","008080","ff00ff")
+coltab[1] = new Array("006400","191970","696969","708090","778899","00008b","0000cd","008b8b","00bfff","00ced1","00fa9a","00ff7f","00ffff","1e90ff","20b2aa","228b22")
+coltab[2] = new Array("2e8b57","2f4f4f","32cd32","3cb371","40e0d0","4169e1","4682b4","483d8b","48d1cc","4b0082","556b2f","5f9ea0","6495ed","66cdaa","6a5acd","6b8e23")
+coltab[3] = new Array("7b68ee","7cfc00","7fff00","7fffd4","87ceeb","87cefa","8a2be2","8b0000","8b008b","8b4513","8fbc8b","90ee90","9370db","9400d3","98fb98","9932cc")
+coltab[4] = new Array("9acd32","a0522d","a52a2a","a9a9a9","add8e6","adff2f","afeeee","b0c4de","b0e0e6","b22222","b8860b","ba55d3","bc8f8f","bdb76b","c71585","cd5c5c")
+coltab[5] = new Array("cd5c5c","d2691e","d2b48c","d3d3d3","d8bfd8","da70d6","daa520","db7093","dc143c","dcdcdc","dda0dd","deb887","e0ffff","e6e6fa","e9967a","ee82ee")
+coltab[6] = new Array("eee8aa","f08080","f0e68c","f0f8ff","f0fff0","f0ffff","f4a460","f5deb3","f5f5dc","f5f5f5","f5fffa","f8f8ff","fa8072","faebd7","faf0e6","fafad2")
+coltab[7] = new Array("fdf5e6","ff00ff","ff1493","ff4500","ff6347","ff69b4","ff7f50","ff8c00","ffa07a","ffa500","ffb6c1","ffc0cb","ffd700","ffdab9","ffdead","ffe4b5")
+coltab[8] = new Array("ffe4c0","ffe4c4","ffe4e1","ffebcd","ffefd5","fff0f5","fff5ee","fff8dc","fffacd","fffaf0","fffafa","fffcfa","fffdd0","ffffe0","fffff0","fffff6")
+
+function sel(i,j) {
+	document.forms[0].val.value = coltab[i][j]
+	pal.style.backgroundColor = "#"+coltab[i][j]
+}
+function setCol(str) {
+	document.forms[0].val.value = str
+	pal.style.backgroundColor = "#"+str
+}
+function setColor() {
+	var color;
+	
+	if (document.forms[0].trans.checked) {
+		color = "transparent";
+	}
+	else {
+		color = "#" + document.forms[0].val.value;
+	}
+		
+	if (window.opener.document.all.editBox == null) {
+		window.opener.setColor(color);
+	}
+	else {
+		window.opener.document.all.editBox.setColor(color);
+	}
+	
+	window.close();
+}
+function wincancel() {
+	if (window.opener.document.all.editBox == null) {
+		window.opener.focus();
+	}
+	else {
+		window.opener.document.all.editBox.focus();
+	}
+	
+	window.close();
+}
+//-->
+</script>
+</HEAD>
+<BODY onload="document.forms[0].btn.onclick=setColor;" topmargin="10" leftmargin="10" marginwidth="10" marginheight="10" bgcolor="#d0d0d0">
+<FONT SIZE=2>기본 색상</FONT>
+<CENTER>
+<TABLE border=0 width=100%>
+<script language="javascript">
+<!--
+for (var j=0; j<16; j++) {
+	document.write ("<TD bgcolor=\"#"+coltab[0][j]+"\" onClick=\"sel(0,"+j+")\">&nbsp;")
+}
+//-->
+</script>
+</TABLE>
+</CENTER>
+<FONT SIZE=2>추가 색상</FONT>
+<CENTER>
+<TABLE border=0 width=100%>
+<script language="javascript">
+<!--
+for (var i=1; i<9; i++) {
+	document.write("<TR>")
+	for (var j=0; j<16; j++) {
+		document.write ("<TD bgcolor=\"#"+coltab[i][j]+"\" onClick=\"sel("+i+","+j+")\">&nbsp;")
+	}
+}
+//-->
+</script>
+</TABLE>
+</CENTER>
+<FORM>
+<DIV ID=pal STYLE="top:232px; left:10px; width:24px; height:25px; border:1 solid #808080"></DIV>
+<DIV STYLE="top:232px; left:40px; width:160px; height:25px; padding:2px; border:1 ridge silver">
+<FONT SIZE=2> &nbsp;&nbsp;&nbsp;&nbsp;색상 값 : #<INPUT TYPE=TEXT NAME=val SIZE=6 VALUE="c0c0c0" STYLE="border:0 none silver; background-color:#d0d0d0" onChange="setCol(this.value)" onfocus="this.blur();"></DIV>
+<DIV STYLE="top:232px; left:223px"><INPUT TYPE=CHECKBOX NAME=trans>투명</DIV>
+<DIV STYLE="top:262px; left:140px"><INPUT TYPE=BUTTON NAME=btn VALUE="   확 인   "></DIV>
+<DIV STYLE="top:262px; left:226px"><INPUT TYPE=BUTTON VALUE="   취 소   " onClick="wincancel()"></DIV>
+</FORM>
+</BODY>
+</HTML>

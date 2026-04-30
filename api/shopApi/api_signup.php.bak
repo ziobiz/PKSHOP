@@ -1,0 +1,84 @@
+<?
+	include_once( "../lib/basic_class2.php");
+	include_once( "../lib/config.php");
+	include_once( "../lib/common.php");
+	include_once( "../lib/php_function.php");
+
+
+	$n_name			= $_POST['n_name'];
+	$passwd			= hash('sha256',$_POST['passwd']);
+	$f_pass			= hash('sha256',$_POST['fin_passwd']);
+	$phone			= $_POST['phone'];
+	$country_num		= $_POST['m_contury'];
+	$deId			= $_POST['deId'];
+	$c_id			= $_POST['c_id'];
+	$email			= $_POST['email'];	
+	$c_c_id			= $_POST['c_c_id'];
+	$hid			= $_POST['hid'];
+
+	//추천코드확인
+	$DB->get("select * from $member_table where C_ID='$c_c_id'", $codes, $coden);
+	$c_c_code = $codes[0]['C_CODE'];
+
+	
+
+	$DB->get("select * from $member_table where C_ID='$c_id'", $custs, $custn);
+
+	
+
+	if ($deId != $store_key)
+	{
+		$result = array("result"=>"0","msg"=>"deId is wrong");
+		echo json_encode($result);
+	}
+	else if ($certify1 != $certify2)
+	{
+		$result = array("result"=>"0","msg"=>"certification number is wrong");
+		echo json_encode($result);
+	}
+	else if ($coden == 0)
+	{
+		$result = array("result"=>"0","msg"=>"Please check your referral");
+		echo json_encode($result);
+	}
+	else
+	{
+		
+		if ($custn == 0)
+		{
+
+			$DB->get("select * from $member_table order by C_CODE desc limit 0,1", $cnts, $cntn);
+
+			$code 			= $cnts[0]['C_CODE'] +1;
+			$sql = "C_CODE			='$code',
+					C_DATE			='".date("Y-m-d")."',
+					C_NAME			='$n_name',
+					C_HAND			='$phone',
+					C_ID			='$c_id',
+					C_EMAIL			='$email',
+					C_PASS			='$passwd',
+					C_FIN_PASS		='$f_pass',
+					c_country_num	='$country_num',
+					C_C_CODE	='$c_c_code'";
+			
+			$DB->insert($member_table, $sql);
+
+
+			$DB->get("select * from $board_type where c_id='$hid'", $hs, $hn);
+			$board_up_idx  =$hs[0]['idx'];
+			$userid = $c_id;
+			$date = date("Y-m-d H:i:s");
+			include "board_add.php";
+
+
+			$result = array("result"=>"1","msg"=>"Complete");
+			echo json_encode($result);
+		}
+		else
+		{
+			$result = array("result"=>"0","msg"=>"User id is exist");
+			echo json_encode($result);
+		}
+
+	}
+?>

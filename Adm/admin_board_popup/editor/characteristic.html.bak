@@ -1,0 +1,188 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=euc-kr">
+<META HTTP-EQUIV="Pragma" CONTENT="No-Cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<title>특수문자 삽입</title>
+<STYLE>
+td {font-size :9pt;color :#666666;}
+a {text-decoration: none;color:#333333}
+.input {font-family: "dotum";font-size: 12px;color: #333333;border: 1px solid #CCCCCC;}
+</STYLE>
+
+<script language="javascript">
+<!--
+function createChara(val){
+	if(window.open){
+		var os;
+		var ostmp = navigator.appName.charAt(0);
+		// 브라우저 확인
+		if(ostmp=='M') os = '';
+		else if(ostmp=='N') os = 1;
+		else os = 2;
+
+		if(!os) window.returnValue = val;
+		else window.opener.HTMLPaste(val);
+		self.close();
+	}
+}
+//-->
+</script>
+
+</head>
+
+<BODY scroll=no leftmargin="1" marginwidth="1" topmargin="1" marginheight="1">
+
+<table border="0" cellpadding="8" cellspacing="5" width="100%" height="100%" bgcolor="#E6E8EB">
+	<form name="add_form">
+	<tr><td>
+	<table border="0" cellpadding="5" cellspacing="0" width="100%">
+		<tr>
+		<td bgcolor="white">
+		특수문자 작성
+		</td>
+		</tr>
+		<tr>
+		<td bgcolor="white">
+		<table border="1" cellpadding="6" cellspacing="0" width="99%" bordercolor="#CCCCCC" bordercolordark="white" bordercolorlight="black">
+			<tr>
+				<td>
+				<table border="0" cellspacing="0" width="100%" cellpadding="4" bgcolor="white">
+					<tr>
+						<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('§');">&sect;</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('※');">※</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('☆');">☆</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('★');">★</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('○');">○</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('●');">●</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('◎');">◎</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('◇');">◇</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('◆');">◆</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('□');">□</a></td>
+						</tr>
+
+						<tr>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('■');">■</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('△');">△</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▲');">▲</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▽');">▽</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▼');">▼</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('→');">→</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('←');">←</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('↑');">↑</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('↓');">↓</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('↔');">↔</a></td>
+						</tr>
+						<tr>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('〓');">〓</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('◁');">◁</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('◀');">◀</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▷');">▷</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('＃');">＃</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▷');">▷</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▶');">▶</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('♤');">♤</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('♠');">♠</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('♡');">♡</a></td>
+						</tr>
+						<tr>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('♥');">♥</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('♧');">♧</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('♣');">♣</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('⊙');">⊙</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('◈');">◈</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▣');">▣</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('◐');">◐</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('◑');">◑</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▒');">▒</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▤');">▤</a></td>
+						</tr>
+						<tr>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▥');">▥</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▨');">▨</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▧');">▧</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▦');">▦</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▩');">▩</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('♨');">♨</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('☏');">☏</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('☎');">☎</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('☜');">☜</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('☞');">☞</a></td>
+						</tr>
+						<tr>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('¶');">&para;</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('†');">†</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('♪');">♪</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('♬');">♬</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㉿');">㉿</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㈜');">㈜</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('№');">№</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㏇');">㏇</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('™');">™</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㏂');">㏂</a></td>
+						</tr>
+						<tr>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㏘');">㏘</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('℡');">℡</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㈜');">㈜</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('～');">～</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('＠');">＠</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('【');">【</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('】');">】</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('※');">※</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('◎');">◎</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('⊙');">⊙</a></td>
+						</tr>
+						<tr>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('★');">★</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('□');">□</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('→');">→</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('◇');">◇</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('▲');">▲</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('△');">△</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('☎');">☎</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('☞');">☞</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('①');">①</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('②');">②</a></td>
+						</tr>
+						<tr>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('③');">③</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('④');">④</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('⑤');">⑤</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('⑥');">⑥</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('⑦');">⑦</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('⑧');">⑧</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('⑨');">⑨</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('⑩');">⑩</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('⑪');">⑪</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('⑫');">⑫</a></td>
+						</tr>
+						<tr>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('ℓ');">ℓ</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㎘');">㎘</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㎝');">㎝</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㎞');">㎞</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㎡');">㎡</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㎢');">㎢</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㏊');">㏊</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㎎');">㎎</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㎏');">㎏</a></td>
+							<td><a style="cursor:hand;cursor:pointer;" onclick="createChara('㏈');">㏈</a></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+	<td align="center">
+		<input type="button" onClick="window.close();" value="닫기" class="input">
+	</td></tr>
+	</table>
+	</td></tr>
+	</form>
+</table>
+
+</BODY>
+</HTML>
