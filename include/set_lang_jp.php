@@ -219,7 +219,12 @@
 	$packagebuy_12 ="ETH数量";
 	$packagebuy_13 ="リーダーパッケージ";
 
-
-
+$icopay_modal_title = "カード決済 (Icopay / ChillPay)";
+$icopay_modal_desc_inline = "下の ICOPAY 決済画面でカード決済を完了してください。完了後、注文確認ページへ自動的に移動します。";
+$icopay_modal_desc_ccd = "カード情報と同意にチェックを入れた後、「決済を進める」を押してください。";
+$icopay_modal_loading = "決済画面を読み込んでいます…";
+$icopay_modal_cancel = "キャンセル";
+$icopay_modal_pay_btn = "決済を進める";
+$icopay_modal_hint = "決済画面が表示されない場合は、ページを更新するか、ポップアップ/広告ブロックを無効にしてください。";
 
 ?>

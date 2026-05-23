@@ -45,7 +45,8 @@ $pv_array = array("0","50","150","300","600","1200","2400","3600","5000","10000"
 
 /*
  * Icopay ChillPay — $GLOBALS['ICOPAY_COMP_ID'], ICOPAY_BROKER_SECRET 등 채우기.
- * 카드용 KSNET(KSPay) 스크립트는 기본 OFF. 구 KSPay 쓰려면 아래를 true 로.
+ * 인라인 결제(공식 샘플): ICOPAY_INLINE_CHECKOUT=true(기본), 브로커 시크릿만 있으면 동작.
+ * 카드용 KSNET(KSPay) 스크립트는 기본 OFF. 구 KSPay 쓰려면 ICOPAY_USE_KSPAY_CARD=true.
  */
 if (!isset($GLOBALS['ICOPAY_USE_KSPAY_CARD'])) {
 	$GLOBALS['ICOPAY_USE_KSPAY_CARD'] = false;
@@ -55,6 +56,9 @@ if (!isset($GLOBALS['ICOPAY_COMP_ID'])) {
 }
 if (!isset($GLOBALS['ICOPAY_BROKER_SECRET'])) {
 	$GLOBALS['ICOPAY_BROKER_SECRET'] = '';
+}
+if (!isset($GLOBALS['ICOPAY_INLINE_CHECKOUT'])) {
+	$GLOBALS['ICOPAY_INLINE_CHECKOUT'] = true;
 }
 if (!isset($GLOBALS['ICOPAY_CCD_MERCHANT_CODE'])) {
 	$GLOBALS['ICOPAY_CCD_MERCHANT_CODE'] = '';

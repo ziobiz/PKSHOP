@@ -11,6 +11,7 @@ include "../include/get_balance.php";
 include "../include/login_check.php";
 include "../cart/cartfunc.php";
 include_once dirname(__FILE__) . '/../lib/icopay_pg_config.php';
+include_once dirname(__FILE__) . '/../lib/icopay_merchant.php';
 
 $session_cart = $_SESSION['session_cart'];
 
@@ -314,6 +315,7 @@ for($i=0;$i<$tot;$i++) {
                     }else{
                         $state="주문접수";
                     }
+                    $GLOBALS['icopay_order_state'] = $state;
                     // $state="결제완료";
                     // echo $buyername;
     
@@ -628,31 +630,14 @@ for($i=0;$i<$tot;$i++) {
                     $connect_check="ok";
                     //session_register("connect_check");
                     $_SESSION['connect_check'] = $connect_check;
-                    if (defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED
-                        && isset($_POST['paymentkind']) && (string)$_POST['paymentkind'] === '1'
-                        && isset($state) && $state !== "결제완료") {
-                        $_SESSION['icopay_pending_checkout'] = array(
-                            'ediDate' => $ediDate,
-                            'amount' => (string)$total_settle_num,
-                            'ordNo' => $ordNo,
-                            'new_num' => $new_num,
-                            'description' => isset($title_11111) ? $title_11111 : '',
-                            'ts' => time(),
+                    if (icopay_should_return_card_json()) {
+                        icopay_order_save_json_exit(
+                            $ediDate,
+                            $ordNo,
+                            $new_num,
+                            $total_settle_num,
+                            isset($title_11111) ? (string)$title_11111 : ''
                         );
-                        while (ob_get_level() > 0) {
-                            ob_end_clean();
-                        }
-                        header('Content-Type: application/json; charset=utf-8');
-                        echo json_encode(array(
-                            'result' => '1',
-                            'icopayChillpay' => true,
-                            'ediDate' => $ediDate,
-                            'ordNo' => $ordNo,
-                            'new_num' => $new_num,
-                            'amount' => $total_settle_num,
-                            'description' => isset($title_11111) ? $title_11111 : '',
-                        ));
-                        exit;
                     }
 
                     // 체크
@@ -668,6 +653,17 @@ for($i=0;$i<$tot;$i++) {
 
 // echo "!";
 //         exit;
+
+if (icopay_should_return_card_json()) {
+	icopay_order_save_json_exit(
+		isset($ediDate) ? $ediDate : (isset($_POST['ediDate']) ? (string)$_POST['ediDate'] : ''),
+		isset($ordNo) ? $ordNo : (isset($_POST['ordNo']) ? (string)$_POST['ordNo'] : ''),
+		isset($new_num) ? $new_num : '',
+		isset($total_settle_num) ? $total_settle_num : 0,
+		isset($title_11111) ? (string)$title_11111 : ''
+	);
+}
+
 if($state != "결제완료"){
     
 $md5 = md5("5933757143C1DA395C1AECD1accId=2021121005433420956302&amount=$total_settle_num&currency=USD&merchantTransactionId=$new_num&notificationUrl=https://pentakleva.shop/cart/card_finish.php&shopperResultUrl=https://pentakleva.shop/cart/finish.php&signType=MD5");

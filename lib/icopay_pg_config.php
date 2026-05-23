@@ -63,3 +63,46 @@ if (!defined('ICOPAY_CCD_API_KEY')) {
 	}
 	define('ICOPAY_CCD_API_KEY', $__ccd_k);
 }
+
+if (!defined('ICOPAY_USE_LEGACY_CCD')) {
+	$__legacy = false;
+	if (!empty($GLOBALS['ICOPAY_USE_LEGACY_CCD'])) {
+		$__legacy = (bool)$GLOBALS['ICOPAY_USE_LEGACY_CCD'];
+	} elseif (getenv('ICOPAY_USE_LEGACY_CCD') === '1' || getenv('ICOPAY_USE_LEGACY_CCD') === 'true') {
+		$__legacy = true;
+	}
+	define('ICOPAY_USE_LEGACY_CCD', $__legacy);
+}
+
+if (!defined('ICOPAY_INLINE_CHECKOUT')) {
+	$__inline = true;
+	if (isset($GLOBALS['ICOPAY_INLINE_CHECKOUT'])) {
+		$__inline = (bool)$GLOBALS['ICOPAY_INLINE_CHECKOUT'];
+	} elseif (getenv('ICOPAY_INLINE_CHECKOUT') === '0' || getenv('ICOPAY_INLINE_CHECKOUT') === 'false') {
+		$__inline = false;
+	}
+	if (ICOPAY_USE_LEGACY_CCD) {
+		$__inline = false;
+	}
+	define('ICOPAY_INLINE_CHECKOUT', $__inline);
+}
+
+if (!defined('ICOPAY_CHECKOUT_LANG')) {
+	$__clang = '';
+	if (!empty($GLOBALS['ICOPAY_CHECKOUT_LANG'])) {
+		$__clang = trim((string)$GLOBALS['ICOPAY_CHECKOUT_LANG']);
+	} elseif (getenv('ICOPAY_CHECKOUT_LANG')) {
+		$__clang = trim((string)getenv('ICOPAY_CHECKOUT_LANG'));
+	}
+	define('ICOPAY_CHECKOUT_LANG', $__clang);
+}
+
+if (!defined('ICOPAY_DEFAULT_VENDOR')) {
+	$__vendor = 'chillpay';
+	if (!empty($GLOBALS['ICOPAY_DEFAULT_VENDOR'])) {
+		$__vendor = trim((string)$GLOBALS['ICOPAY_DEFAULT_VENDOR']);
+	} elseif (getenv('ICOPAY_DEFAULT_VENDOR')) {
+		$__vendor = trim((string)getenv('ICOPAY_DEFAULT_VENDOR'));
+	}
+	define('ICOPAY_DEFAULT_VENDOR', $__vendor);
+}
