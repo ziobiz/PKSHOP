@@ -48,6 +48,9 @@ if ($icopay_legacy_ccd_ui) {
 $icopay_chillpay_ui = $icopay_inline_ui || ($icopay_legacy_ccd_ui && $icopay_merchant_code !== '' && $icopay_api_key !== '');
 $icopay_api_origin = defined('ICOPAY_PUBLIC_BASE') ? ICOPAY_PUBLIC_BASE : 'https://api.icopay.co.kr';
 $icopay_checkout_lang = function_exists('icopay_resolve_checkout_lang') ? icopay_resolve_checkout_lang() : 'en';
+$icopay_checkout_lang_api = function_exists('icopay_resolve_checkout_lang_api') ? icopay_resolve_checkout_lang_api() : 'ENG';
+$icopay_integration_mode = function_exists('icopay_integration_mode') ? icopay_integration_mode() : 'unified';
+$icopay_buyer_country = defined('ICOPAY_BUYER_COUNTRY_ISO2') ? ICOPAY_BUYER_COUNTRY_ISO2 : 'JP';
 $icopay_allow_legacy_kspay = !empty($GLOBALS['ICOPAY_USE_KSPAY_CARD']);
 $icopay_load_kspay = false;
 if ($icopay_chillpay_ui || (defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED)) {
@@ -199,6 +202,9 @@ if ($buyselected == 'Y') {
             var ICOPAY_INLINE_MODE = <?php echo !empty($icopay_inline_ui) ? 'true' : 'false'; ?>;
             var ICOPAY_API_ORIGIN = <?php echo json_encode($icopay_api_origin, JSON_UNESCAPED_SLASHES); ?>;
             var ICOPAY_CHECKOUT_LANG = <?php echo json_encode($icopay_checkout_lang, JSON_UNESCAPED_UNICODE); ?>;
+            var ICOPAY_CHECKOUT_LANG_API = <?php echo json_encode($icopay_checkout_lang_api, JSON_UNESCAPED_UNICODE); ?>;
+            var ICOPAY_INTEGRATION_MODE = <?php echo json_encode($icopay_integration_mode, JSON_UNESCAPED_UNICODE); ?>;
+            var ICOPAY_BUYER_COUNTRY = <?php echo json_encode($icopay_buyer_country, JSON_UNESCAPED_UNICODE); ?>;
             <?php if (!empty($icopay_legacy_ccd_ui) && $icopay_merchant_code !== '' && $icopay_api_key !== '') { ?>
             var ICOPAY_CCD_CONFIG = {
                 scriptUrl: <?php echo json_encode($icopay_ccd_script, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>,
@@ -214,7 +220,7 @@ if ($buyselected == 'Y') {
                 <?php } elseif (defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED) { ?>
                 alert("Icopay는 설정됐지만 결제 UI를 켤 수 없습니다.\\nlib/icopay_pg_secrets.local.php 에 ICOPAY_COMP_ID, ICOPAY_BROKER_SECRET 을 넣으세요.\\n(구 CCD 방식은 ICOPAY_USE_LEGACY_CCD 와 CCD 키가 필요합니다.)");
                 <?php } else { ?>
-                alert("카드 결제는 Icopay(ChillPay)로만 연동합니다.\\nlib/config.php 에 ICOPAY_COMP_ID, ICOPAY_BROKER_SECRET, ICOPAY_CCD_MERCHANT_CODE, ICOPAY_CCD_API_KEY 를 설정하세요.\\n구 KSNET(KSPay)이 필요하면 lib/config.php 에 ICOPAY_USE_KSPAY_CARD 를 true 로 설정하세요.");
+                alert("카드 결제는 ICOPAY(JPAY)로 연동합니다.\\nlib/icopay_pg_secrets.local.php 에 ICOPAY_COMP_ID, ICOPAY_BROKER_SECRET, ICOPAY_INTEGRATION_MODE=unified 를 설정하세요.\\n구 KSNET(KSPay)이 필요하면 lib/config.php 에 ICOPAY_USE_KSPAY_CARD 를 true 로 설정하세요.");
                 <?php } ?>
             }
             if (typeof window.payResultSubmit !== "function") {
@@ -606,8 +612,8 @@ if ($buyselected == 'Y') {
                     alert('결제 영역을 찾을 수 없습니다.');
                     return;
                 }
-                var targetId = res.targetId || 'icopay-pay-checkout';
-                var checkoutLang = res.checkoutLang || ICOPAY_CHECKOUT_LANG || 'en';
+                var targetId = res.targetId || (ICOPAY_INTEGRATION_MODE === 'unified' ? 'icopay-checkout' : 'icopay-pay-checkout');
+                var checkoutLang = res.checkoutLang || (ICOPAY_INTEGRATION_MODE === 'unified' ? ICOPAY_CHECKOUT_LANG_API : ICOPAY_CHECKOUT_LANG) || 'en';
                 host.innerHTML = '';
                 var mount = document.createElement('div');
                 mount.id = targetId;
@@ -654,17 +660,58 @@ if ($buyselected == 'Y') {
                 document.head.appendChild(s);
             }
 
+            function icopayInlineCollectBuyer() {
+                var email = '';
+                var phone = '';
+                try {
+                    if (document.join && document.join.email) {
+                        email = String(document.join.email.value || '').trim();
+                    }
+                    if (document.join && document.join.htel) {
+                        phone = String(document.join.htel.value || '').replace(/\D/g, '');
+                    }
+                } catch (eBuyer) {}
+                return {
+                    email: email,
+                    phone: phone,
+                    countryIso2: ICOPAY_BUYER_COUNTRY || 'JP'
+                };
+            }
+
             function icopayInlineStartEmbed(orderJson) {
                 $("#icopayChillpayCcdStatus").text('결제 화면을 불러오는 중입니다…').css("display", "block");
                 $("#icopayInlineEmbedHost").empty();
+                var preparePayload = {
+                    merchantOrderId: orderJson.ediDate,
+                    lang: ICOPAY_INTEGRATION_MODE === 'unified' ? ICOPAY_CHECKOUT_LANG_API : ICOPAY_CHECKOUT_LANG
+                };
+                if (ICOPAY_INTEGRATION_MODE === 'unified') {
+                    var buyerCheck = icopayInlineCollectBuyer();
+                    if (!buyerCheck.email) {
+                        $("#icopayChillpayCcdStatus").css("display", "none");
+                        icopayChillpayCloseModal();
+                        alert('Enter the orderer\'s email before card payment.');
+                        if (document.join && document.join.email) {
+                            document.join.email.focus();
+                        }
+                        return;
+                    }
+                    if (!buyerCheck.phone) {
+                        $("#icopayChillpayCcdStatus").css("display", "none");
+                        icopayChillpayCloseModal();
+                        alert('Enter the orderer\'s cell phone before card payment.');
+                        if (document.join && document.join.htel) {
+                            document.join.htel.focus();
+                        }
+                        return;
+                    }
+                    preparePayload.buyer = buyerCheck;
+                }
                 $.ajax({
                     url: './icopay_inline_prepare.php',
                     method: 'POST',
                     contentType: 'application/json; charset=utf-8',
-                    data: JSON.stringify({
-                        merchantOrderId: orderJson.ediDate,
-                        lang: ICOPAY_CHECKOUT_LANG
-                    }),
+                    data: JSON.stringify(preparePayload),
                     dataType: 'json',
                     success: function(res) {
                         if (!res || !res.success || !res.sessionToken) {
@@ -784,7 +831,7 @@ if ($buyselected == 'Y') {
             function _submit(_frm)
             {
                 if (typeof ICOPAY_CHILLPAY_ACTIVE !== 'undefined' && ICOPAY_CHILLPAY_ACTIVE) {
-                    alert('Card payment uses ChillPay (Icopay). Please use the green Order button in the card section.');
+                    alert('Card payment uses ICOPAY (JPAY). Please use the green Order button in the card section.');
                     return;
                 }
                 _frm.sndReply.value = getLocalUrl("wh_rcv.php") ;
@@ -2482,7 +2529,7 @@ function pay_result_close(){
 <?php if (!empty($icopay_chillpay_ui)) { ?>
     <div id="icopayChillpayModal" style="display:none;position:fixed;z-index:10000;left:0;top:0;width:100%;height:100%;overflow:auto;background:rgba(0,0,0,0.55);">
         <div style="background:#fff;max-width:<?php echo !empty($icopay_inline_ui) ? '720' : '540'; ?>px;margin:48px auto;padding:24px;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,0.15);">
-            <p style="margin-top:0;font-weight:bold;"><?php echo htmlspecialchars(isset($icopay_modal_title) ? $icopay_modal_title : 'Card payment (Icopay / ChillPay)', ENT_QUOTES, 'UTF-8'); ?></p>
+            <p style="margin-top:0;font-weight:bold;"><?php echo htmlspecialchars(isset($icopay_modal_title) ? $icopay_modal_title : 'Card payment (ICOPAY / JPAY)', ENT_QUOTES, 'UTF-8'); ?></p>
             <?php if (!empty($icopay_inline_ui)) { ?>
             <p style="font-size:13px;color:#555;"><?php echo htmlspecialchars(isset($icopay_modal_desc_inline) ? $icopay_modal_desc_inline : 'Complete your card payment in the ICOPAY window below.', ENT_QUOTES, 'UTF-8'); ?></p>
             <p id="icopayChillpayCcdStatus" style="display:none;font-size:13px;color:#0a7;margin:10px 0;"><?php echo htmlspecialchars(isset($icopay_modal_loading) ? $icopay_modal_loading : 'Loading payment screen…', ENT_QUOTES, 'UTF-8'); ?></p>

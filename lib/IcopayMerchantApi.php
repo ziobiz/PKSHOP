@@ -7,7 +7,9 @@ final class IcopayMerchantApi
 {
 	public const VENDOR_CHILLPAY = 'chillpay';
 	public const VENDOR_JPAY = 'jpay';
+	public const INTEGRATION_UNIFIED = 'unified';
 	public const HEADER_BROKER_SECRET = 'X-Icopay-Merchant-Broker-Secret';
+	public const EMBED_TARGET_UNIFIED = 'icopay-checkout';
 
 	private string $apiBase;
 	private string $compId;
@@ -27,6 +29,79 @@ final class IcopayMerchantApi
 			(string)($cfg['comp_id'] ?? ''),
 			(string)($cfg['broker_secret'] ?? '')
 		);
+	}
+
+	/**
+	 * 통합 인라인 결제(권장) — 운영 PG(JPAY 등) 자동 분기.
+	 * buyer: email, phone, countryIso2 필수.
+	 *
+	 * @param array{email?:string,phone?:string,countryIso2?:string} $buyer
+	 * @return array{success:bool,data?:array,message?:string,errorCode?:string}
+	 */
+	public function prepareUnifiedCheckout(
+		string $orderNo,
+		$amount,
+		array $buyer,
+		string $currency = '',
+		string $productName = '',
+		string $lang = ''
+	): array {
+		$body = array(
+			'compId' => $this->compId,
+			'orderNo' => $orderNo,
+			'amount' => $amount,
+			'buyer' => array(
+				'email' => trim((string)($buyer['email'] ?? '')),
+				'phone' => trim((string)($buyer['phone'] ?? '')),
+				'countryIso2' => strtoupper(trim((string)($buyer['countryIso2'] ?? ''))),
+			),
+		);
+		if ($currency !== '') {
+			$body['currency'] = strtoupper($currency);
+		}
+		if ($productName !== '') {
+			$body['productName'] = $productName;
+		}
+		if ($lang !== '') {
+			$body['lang'] = strtoupper($lang);
+		}
+		return $this->postJson('/api/middleware/v1/merchant/checkout/prepare', $body);
+	}
+
+	/** @return array{success:bool,data?:array,message?:string,errorCode?:string} */
+	public function getUnifiedPaymentStatus(string $orderNo): array
+	{
+		$qs = http_build_query(array(
+			'compId' => $this->compId,
+			'orderNo' => $orderNo,
+		));
+		return $this->getJson('/api/middleware/v1/merchant/checkout/status?' . $qs);
+	}
+
+	public function getUnifiedEmbedTargetId(): string
+	{
+		return self::EMBED_TARGET_UNIFIED;
+	}
+
+	public function getUnifiedEmbedScriptUrl(): string
+	{
+		return $this->apiBase . '/v1/embed-checkout/' . rawurlencode($this->compId);
+	}
+
+	public function buildUnifiedEmbedHtml(string $sessionToken, string $targetId = '', string $lang = ''): string
+	{
+		$target = $targetId !== '' ? $targetId : $this->getUnifiedEmbedTargetId();
+		$tokEnc = htmlspecialchars($sessionToken, ENT_QUOTES, 'UTF-8');
+		$src = htmlspecialchars($this->getUnifiedEmbedScriptUrl(), ENT_QUOTES, 'UTF-8');
+		$targetEsc = htmlspecialchars($target, ENT_QUOTES, 'UTF-8');
+		$html = '<div id="' . $targetEsc . '"></div>' . "\n"
+			. '<script src="' . $src . '"'
+			. ' data-session-token="' . $tokEnc . '"'
+			. ' data-target="' . $targetEsc . '"';
+		if ($lang !== '') {
+			$html .= ' data-lang="' . htmlspecialchars(strtoupper($lang), ENT_QUOTES, 'UTF-8') . '"';
+		}
+		return $html . ' async defer charset="utf-8"></script>';
 	}
 
 	/** @return array{success:bool,data?:array,message?:string,errorCode?:string} */

@@ -220,7 +220,7 @@
 	$packagebuy_12 ="ETH 수량";
 	$packagebuy_13 ="리더 패키지";
 
-$icopay_modal_title = "카드 결제 (Icopay / ChillPay)";
+$icopay_modal_title = "카드 결제 (ICOPAY / JPAY)";
 $icopay_modal_desc_inline = "아래 ICOPAY 결제 창에서 카드 결제를 완료하세요. 완료 시 자동으로 주문 확인 페이지로 이동합니다.";
 $icopay_modal_desc_ccd = "카드 정보·동의란을 채운 뒤 결제 진행을 누르세요.";
 $icopay_modal_loading = "결제 화면을 불러오는 중입니다…";

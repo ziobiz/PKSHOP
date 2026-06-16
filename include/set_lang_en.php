@@ -413,7 +413,7 @@ $spon3 = "Designate";
 $spon4 = "Find";
 $spon5 = "Add";
 
-$icopay_modal_title = "Card payment (Icopay / ChillPay)";
+$icopay_modal_title = "Card payment (ICOPAY / JPAY)";
 $icopay_modal_desc_inline = "Complete your card payment in the ICOPAY window below. You will be redirected to the order confirmation page when finished.";
 $icopay_modal_desc_ccd = "Enter your card details and accept the consent terms, then click Proceed to payment.";
 $icopay_modal_loading = "Loading payment screen…";

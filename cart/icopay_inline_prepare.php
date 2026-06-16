@@ -50,18 +50,41 @@ if (is_string($amount)) {
 	$amount = str_replace(',', '', $amount);
 }
 $amount = is_numeric($amount) ? (float)$amount : $amount;
-$currency = defined('ICOPAY_CHILL_PAY_CURRENCY') ? ICOPAY_CHILL_PAY_CURRENCY : 'THB';
+$currency = defined('ICOPAY_PAY_CURRENCY') ? ICOPAY_PAY_CURRENCY : 'JPY';
 $productName = isset($pend['description']) ? mb_substr((string)$pend['description'], 0, 200) : 'Order';
 if (!empty($in['productName'])) {
 	$productName = mb_substr((string)$in['productName'], 0, 200);
 }
 
-$checkoutLang = icopay_resolve_checkout_lang();
+$integrationMode = icopay_integration_mode();
+$checkoutLangEmbed = icopay_resolve_checkout_lang();
+$checkoutLangApi = icopay_resolve_checkout_lang_api();
 if (!empty($in['lang'])) {
-	$checkoutLang = strtolower(trim((string)$in['lang']));
+	$rawLang = strtolower(trim((string)$in['lang']));
+	$checkoutLangEmbed = $rawLang;
+	$checkoutLangApi = icopay_map_lang_to_api_code($rawLang);
 }
 
-$prep = $api->prepareInlineCheckout($vendor, $merchantOrderId, $amount, $currency, $productName, $checkoutLang);
+if ($integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED) {
+	$buyer = icopay_resolve_buyer($in);
+	$buyerErr = icopay_validate_buyer($buyer);
+	if ($buyerErr !== null) {
+		icopay_json_response(array('success' => false, 'message' => $buyerErr));
+	}
+	$prep = $api->prepareUnifiedCheckout(
+		$merchantOrderId,
+		$amount,
+		$buyer,
+		$currency,
+		$productName,
+		$checkoutLangApi
+	);
+	$targetId = $api->getUnifiedEmbedTargetId();
+} else {
+	$prep = $api->prepareInlineCheckout($vendor, $merchantOrderId, $amount, $currency, $productName, $checkoutLangEmbed);
+	$targetId = $api->getEmbedTargetId($vendor);
+}
+
 if (empty($prep['success']) || empty($prep['data']['sessionToken'])) {
 	$msg = isset($prep['message']) ? (string)$prep['message'] : 'prepare failed';
 	icopay_json_response(array(
@@ -73,21 +96,28 @@ if (empty($prep['success']) || empty($prep['data']['sessionToken'])) {
 
 $data = $prep['data'];
 $sessionToken = (string)$data['sessionToken'];
-$targetId = $api->getEmbedTargetId($vendor);
-$embedScriptUrl = !empty($data['embedScriptUrl'])
-	? (string)$data['embedScriptUrl']
-	: $api->getEmbedScriptUrl($vendor);
+if ($integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED) {
+	$embedScriptUrl = !empty($data['embedScriptUrl'])
+		? (string)$data['embedScriptUrl']
+		: $api->getUnifiedEmbedScriptUrl();
+} else {
+	$embedScriptUrl = !empty($data['embedScriptUrl'])
+		? (string)$data['embedScriptUrl']
+		: $api->getEmbedScriptUrl($vendor);
+}
 $payUrl = !empty($data['payUrl']) ? (string)$data['payUrl'] : '';
-$payUrl = icopay_append_lang_to_pay_url($payUrl, $checkoutLang);
+$payUrl = icopay_append_lang_to_pay_url($payUrl, $integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED ? $checkoutLangApi : $checkoutLangEmbed);
 
 icopay_json_response(array(
 	'success' => true,
 	'sessionToken' => $sessionToken,
 	'embedScriptUrl' => $embedScriptUrl,
 	'payUrl' => $payUrl,
-	'checkoutLang' => $checkoutLang,
+	'checkoutLang' => $integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED ? $checkoutLangApi : $checkoutLangEmbed,
 	'targetId' => $targetId,
 	'orderNo' => $merchantOrderId,
+	'integrationMode' => $integrationMode,
+	'pgVendor' => isset($data['pgVendor']) ? (string)$data['pgVendor'] : null,
 	'apiOrigin' => defined('ICOPAY_PUBLIC_BASE') ? ICOPAY_PUBLIC_BASE : 'https://api.icopay.co.kr',
 	'checkoutJsUrl' => (defined('ICOPAY_PUBLIC_BASE') ? ICOPAY_PUBLIC_BASE : 'https://api.icopay.co.kr')
 		. '/merchant-api-samples/common/icopay-checkout.js',

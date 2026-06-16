@@ -221,7 +221,7 @@
 	$packagebuy_12 ="ETH数量";
 	$packagebuy_13 ="领导包";
 
-$icopay_modal_title = "银行卡支付 (Icopay / ChillPay)";
+$icopay_modal_title = "银行卡支付 (ICOPAY / JPAY)";
 $icopay_modal_desc_inline = "请在下方 ICOPAY 支付窗口中完成银行卡支付。完成后将自动跳转到订单确认页面。";
 $icopay_modal_desc_ccd = "请填写银行卡信息并勾选同意条款，然后点击继续支付。";
 $icopay_modal_loading = "正在加载支付页面…";

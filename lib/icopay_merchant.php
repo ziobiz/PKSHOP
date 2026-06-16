@@ -11,8 +11,27 @@ function icopay_merchant_config_array(): array
 		'api_base_url' => defined('ICOPAY_PUBLIC_BASE') ? ICOPAY_PUBLIC_BASE : 'https://api.icopay.co.kr',
 		'comp_id' => defined('ICOPAY_COMP_ID') ? ICOPAY_COMP_ID : '',
 		'broker_secret' => defined('ICOPAY_BROKER_SECRET') ? ICOPAY_BROKER_SECRET : '',
-		'default_vendor' => defined('ICOPAY_DEFAULT_VENDOR') ? ICOPAY_DEFAULT_VENDOR : IcopayMerchantApi::VENDOR_CHILLPAY,
+		'default_vendor' => defined('ICOPAY_DEFAULT_VENDOR') ? ICOPAY_DEFAULT_VENDOR : IcopayMerchantApi::VENDOR_JPAY,
+		'integration_mode' => icopay_integration_mode(),
+		'pay_currency' => defined('ICOPAY_PAY_CURRENCY') ? ICOPAY_PAY_CURRENCY : 'JPY',
+		'buyer_country_iso2' => defined('ICOPAY_BUYER_COUNTRY_ISO2') ? ICOPAY_BUYER_COUNTRY_ISO2 : 'JP',
 	);
+}
+
+function icopay_integration_mode(): string
+{
+	if (defined('ICOPAY_INTEGRATION_MODE') && ICOPAY_INTEGRATION_MODE !== '') {
+		$mode = strtolower(trim((string)ICOPAY_INTEGRATION_MODE));
+		if (in_array($mode, array('unified', 'chillpay', 'jpay'), true)) {
+			return $mode;
+		}
+	}
+	return IcopayMerchantApi::INTEGRATION_UNIFIED;
+}
+
+function icopay_unified_checkout_active(): bool
+{
+	return icopay_inline_checkout_active() && icopay_integration_mode() === IcopayMerchantApi::INTEGRATION_UNIFIED;
 }
 
 function icopay_merchant_api(): ?IcopayMerchantApi
@@ -68,6 +87,108 @@ function icopay_resolve_checkout_lang(): string
 		'th' => 'th',
 	);
 	return isset($map[$site]) ? $map[$site] : 'en';
+}
+
+/** 통합 checkout prepare API 용 언어 코드 (ENG, KOR, JPN …). */
+function icopay_resolve_checkout_lang_api(): string
+{
+	if (defined('ICOPAY_CHECKOUT_LANG') && ICOPAY_CHECKOUT_LANG !== '') {
+		return icopay_map_lang_to_api_code((string)ICOPAY_CHECKOUT_LANG);
+	}
+	if (!empty($GLOBALS['ICOPAY_CHECKOUT_LANG'])) {
+		return icopay_map_lang_to_api_code((string)$GLOBALS['ICOPAY_CHECKOUT_LANG']);
+	}
+	$site = 'en';
+	if (!empty($_SESSION['lang'])) {
+		$site = strtolower(trim((string)$_SESSION['lang']));
+	} elseif (!empty($_GET['lang'])) {
+		$site = strtolower(trim((string)$_GET['lang']));
+	}
+	return icopay_map_lang_to_api_code($site);
+}
+
+function icopay_map_lang_to_api_code(string $lang): string
+{
+	$lang = strtolower(trim($lang));
+	$map = array(
+		'en' => 'ENG',
+		'eng' => 'ENG',
+		'kr' => 'KOR',
+		'ko' => 'KOR',
+		'kor' => 'KOR',
+		'jp' => 'JPN',
+		'ja' => 'JPN',
+		'jpn' => 'JPN',
+		'ch' => 'CHN',
+		'zh' => 'CHN',
+		'cn' => 'CHN',
+		'chn' => 'CHN',
+		'th' => 'THA',
+		'tha' => 'THA',
+	);
+	return isset($map[$lang]) ? $map[$lang] : 'ENG';
+}
+
+/**
+ * 통합 prepare buyer(email·phone·countryIso2).
+ *
+ * @param array<string,mixed> $in
+ * @return array{email:string,phone:string,countryIso2:string}
+ */
+function icopay_resolve_buyer(array $in = array()): array
+{
+	$cfg = icopay_merchant_config_array();
+	$country = $cfg['buyer_country_iso2'];
+	$email = '';
+	$phone = '';
+
+	if (isset($in['buyer']) && is_array($in['buyer'])) {
+		$email = trim((string)($in['buyer']['email'] ?? ''));
+		$phone = trim((string)($in['buyer']['phone'] ?? ''));
+		if (!empty($in['buyer']['countryIso2'])) {
+			$country = strtoupper(trim((string)$in['buyer']['countryIso2']));
+		}
+	}
+	if ($email === '' && !empty($in['email'])) {
+		$email = trim((string)$in['email']);
+	}
+	if ($phone === '' && !empty($in['phone'])) {
+		$phone = trim((string)$in['phone']);
+	}
+	if ($email === '' && !empty($_POST['email'])) {
+		$email = trim((string)$_POST['email']);
+	}
+	if ($phone === '' && !empty($_POST['htel'])) {
+		$phone = trim((string)$_POST['htel']);
+	}
+	if ($email === '' && !empty($_POST['sndEmail'])) {
+		$email = trim((string)$_POST['sndEmail']);
+	}
+
+	$phone = preg_replace('/\D+/', '', $phone);
+	if ($phone === null) {
+		$phone = '';
+	}
+
+	return array(
+		'email' => $email,
+		'phone' => $phone,
+		'countryIso2' => $country !== '' ? $country : 'JP',
+	);
+}
+
+function icopay_validate_buyer(array $buyer): ?string
+{
+	if (trim((string)($buyer['email'] ?? '')) === '') {
+		return 'Buyer email is required for ICOPAY checkout.';
+	}
+	if (trim((string)($buyer['phone'] ?? '')) === '') {
+		return 'Buyer phone is required for ICOPAY checkout.';
+	}
+	if (trim((string)($buyer['countryIso2'] ?? '')) === '') {
+		return 'Buyer country (countryIso2) is required for ICOPAY checkout.';
+	}
+	return null;
 }
 
 function icopay_append_lang_to_pay_url(string $payUrl, string $lang): string

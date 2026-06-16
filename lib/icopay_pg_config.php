@@ -1,6 +1,6 @@
 <?php
 /**
- * Icopay broker (ChillPay CCD).
+ * Icopay broker (통합 인라인 / JPAY / ChillPay).
  * 우선순위: icopay_pg_secrets.local.php 의 define > lib/config.php 의 $GLOBALS > 환경변수
  */
 $__icopay_comp = '';
@@ -35,13 +35,21 @@ if (!defined('ICOPAY_BROKER_SECRET')) {
 }
 
 if (!defined('ICOPAY_CHILL_PAY_CURRENCY')) {
-	$__cur = 'THB';
-	if (!empty($GLOBALS['ICOPAY_CHILL_PAY_CURRENCY'])) {
+	$__cur = 'JPY';
+	if (!empty($GLOBALS['ICOPAY_PAY_CURRENCY'])) {
+		$__cur = trim((string)$GLOBALS['ICOPAY_PAY_CURRENCY']);
+	} elseif (!empty($GLOBALS['ICOPAY_CHILL_PAY_CURRENCY'])) {
 		$__cur = trim((string)$GLOBALS['ICOPAY_CHILL_PAY_CURRENCY']);
+	} elseif (getenv('ICOPAY_PAY_CURRENCY')) {
+		$__cur = trim((string)getenv('ICOPAY_PAY_CURRENCY'));
 	} elseif (getenv('ICOPAY_CHILL_PAY_CURRENCY')) {
 		$__cur = trim((string)getenv('ICOPAY_CHILL_PAY_CURRENCY'));
 	}
 	define('ICOPAY_CHILL_PAY_CURRENCY', $__cur);
+}
+
+if (!defined('ICOPAY_PAY_CURRENCY')) {
+	define('ICOPAY_PAY_CURRENCY', ICOPAY_CHILL_PAY_CURRENCY);
 }
 
 if (!defined('ICOPAY_CHILLPAY_ENABLED')) {
@@ -98,11 +106,34 @@ if (!defined('ICOPAY_CHECKOUT_LANG')) {
 }
 
 if (!defined('ICOPAY_DEFAULT_VENDOR')) {
-	$__vendor = 'chillpay';
+	$__vendor = 'jpay';
 	if (!empty($GLOBALS['ICOPAY_DEFAULT_VENDOR'])) {
 		$__vendor = trim((string)$GLOBALS['ICOPAY_DEFAULT_VENDOR']);
 	} elseif (getenv('ICOPAY_DEFAULT_VENDOR')) {
 		$__vendor = trim((string)getenv('ICOPAY_DEFAULT_VENDOR'));
 	}
 	define('ICOPAY_DEFAULT_VENDOR', $__vendor);
+}
+
+if (!defined('ICOPAY_INTEGRATION_MODE')) {
+	$__mode = 'unified';
+	if (!empty($GLOBALS['ICOPAY_INTEGRATION_MODE'])) {
+		$__mode = strtolower(trim((string)$GLOBALS['ICOPAY_INTEGRATION_MODE']));
+	} elseif (getenv('ICOPAY_INTEGRATION_MODE')) {
+		$__mode = strtolower(trim((string)getenv('ICOPAY_INTEGRATION_MODE')));
+	}
+	if (!in_array($__mode, array('unified', 'chillpay', 'jpay'), true)) {
+		$__mode = 'unified';
+	}
+	define('ICOPAY_INTEGRATION_MODE', $__mode);
+}
+
+if (!defined('ICOPAY_BUYER_COUNTRY_ISO2')) {
+	$__country = 'JP';
+	if (!empty($GLOBALS['ICOPAY_BUYER_COUNTRY_ISO2'])) {
+		$__country = strtoupper(trim((string)$GLOBALS['ICOPAY_BUYER_COUNTRY_ISO2']));
+	} elseif (getenv('ICOPAY_BUYER_COUNTRY_ISO2')) {
+		$__country = strtoupper(trim((string)getenv('ICOPAY_BUYER_COUNTRY_ISO2')));
+	}
+	define('ICOPAY_BUYER_COUNTRY_ISO2', $__country);
 }
