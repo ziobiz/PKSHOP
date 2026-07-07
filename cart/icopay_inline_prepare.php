@@ -11,8 +11,8 @@ include dirname(__FILE__) . '/../include/get_balance.php';
 include dirname(__FILE__) . '/../include/login_check.php';
 include dirname(__FILE__) . '/../lib/icopay_merchant.php';
 
-if (!icopay_inline_checkout_active()) {
-	icopay_json_response(array('success' => false, 'message' => 'Inline checkout is not enabled.'));
+if (!icopay_api_checkout_active()) {
+	icopay_json_response(array('success' => false, 'message' => 'ICOPAY API checkout is not enabled.'));
 }
 
 $api = icopay_merchant_api();
@@ -85,8 +85,8 @@ if ($integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED) {
 	$targetId = $api->getEmbedTargetId($vendor);
 }
 
-if (empty($prep['success']) || empty($prep['data']['sessionToken'])) {
-	$msg = isset($prep['message']) ? (string)$prep['message'] : 'prepare failed';
+if (empty($prep['success'])) {
+	$msg = icopay_format_prepare_error($prep);
 	icopay_json_response(array(
 		'success' => false,
 		'message' => $msg,
@@ -95,7 +95,7 @@ if (empty($prep['success']) || empty($prep['data']['sessionToken'])) {
 }
 
 $data = $prep['data'];
-$sessionToken = (string)$data['sessionToken'];
+$sessionToken = !empty($data['sessionToken']) ? (string)$data['sessionToken'] : '';
 if ($integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED) {
 	$embedScriptUrl = !empty($data['embedScriptUrl'])
 		? (string)$data['embedScriptUrl']
@@ -107,6 +107,15 @@ if ($integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED) {
 }
 $payUrl = !empty($data['payUrl']) ? (string)$data['payUrl'] : '';
 $payUrl = icopay_append_lang_to_pay_url($payUrl, $integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED ? $checkoutLangApi : $checkoutLangEmbed);
+$checkoutUi = icopay_checkout_ui_mode();
+if ($checkoutUi === 'url') {
+	$payUrl = icopay_pay_url_for_redirect($payUrl);
+	if ($payUrl === '') {
+		icopay_json_response(array('success' => false, 'message' => 'payUrl missing from prepare response.'));
+	}
+} elseif ($sessionToken === '') {
+	icopay_json_response(array('success' => false, 'message' => 'sessionToken missing from prepare response.'));
+}
 
 icopay_json_response(array(
 	'success' => true,
@@ -117,6 +126,8 @@ icopay_json_response(array(
 	'targetId' => $targetId,
 	'orderNo' => $merchantOrderId,
 	'integrationMode' => $integrationMode,
+	'checkoutUiMode' => $checkoutUi,
+	'redirect' => $checkoutUi === 'url',
 	'pgVendor' => isset($data['pgVendor']) ? (string)$data['pgVendor'] : null,
 	'apiOrigin' => defined('ICOPAY_PUBLIC_BASE') ? ICOPAY_PUBLIC_BASE : 'https://api.icopay.co.kr',
 	'checkoutJsUrl' => (defined('ICOPAY_PUBLIC_BASE') ? ICOPAY_PUBLIC_BASE : 'https://api.icopay.co.kr')

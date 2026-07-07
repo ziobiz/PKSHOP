@@ -29,9 +29,36 @@ function icopay_integration_mode(): string
 	return IcopayMerchantApi::INTEGRATION_UNIFIED;
 }
 
-function icopay_unified_checkout_active(): bool
+function icopay_checkout_ui_mode(): string
 {
-	return icopay_inline_checkout_active() && icopay_integration_mode() === IcopayMerchantApi::INTEGRATION_UNIFIED;
+	if (defined('ICOPAY_CHECKOUT_UI_MODE') && ICOPAY_CHECKOUT_UI_MODE !== '') {
+		$mode = strtolower(trim((string)ICOPAY_CHECKOUT_UI_MODE));
+		if (in_array($mode, array('url', 'inline'), true)) {
+			return $mode;
+		}
+	}
+	return 'url';
+}
+
+function icopay_api_checkout_active(): bool
+{
+	if (!defined('ICOPAY_CHILLPAY_ENABLED') || !ICOPAY_CHILLPAY_ENABLED) {
+		return false;
+	}
+	if (defined('ICOPAY_USE_LEGACY_CCD') && ICOPAY_USE_LEGACY_CCD) {
+		return false;
+	}
+	$cfg = icopay_merchant_config_array();
+	if ($cfg['comp_id'] === '' || $cfg['broker_secret'] === '') {
+		return false;
+	}
+	$ui = icopay_checkout_ui_mode();
+	return $ui === 'url' || $ui === 'inline';
+}
+
+function icopay_url_checkout_active(): bool
+{
+	return icopay_api_checkout_active() && icopay_checkout_ui_mode() === 'url';
 }
 
 function icopay_merchant_api(): ?IcopayMerchantApi
@@ -48,13 +75,39 @@ function icopay_merchant_api(): ?IcopayMerchantApi
 
 function icopay_inline_checkout_active(): bool
 {
-	if (!defined('ICOPAY_CHILLPAY_ENABLED') || !ICOPAY_CHILLPAY_ENABLED) {
-		return false;
+	return icopay_api_checkout_active() && icopay_checkout_ui_mode() === 'inline';
+}
+
+function icopay_unified_checkout_active(): bool
+{
+	return icopay_api_checkout_active() && icopay_integration_mode() === IcopayMerchantApi::INTEGRATION_UNIFIED;
+}
+
+/** URL 결제(전체 페이지 이동)용 payUrl — embed=1 은 제거/0 으로 변경 */
+function icopay_pay_url_for_redirect(string $payUrl): string
+{
+	if ($payUrl === '') {
+		return '';
 	}
-	if (defined('ICOPAY_USE_LEGACY_CCD') && ICOPAY_USE_LEGACY_CCD) {
-		return false;
+	$payUrl = preg_replace('/([?&])embed=1(&|$)/i', '$1embed=0$2', $payUrl);
+	if (preg_match('/[?&]embed=/i', $payUrl)) {
+		return $payUrl;
 	}
-	return !defined('ICOPAY_INLINE_CHECKOUT') || ICOPAY_INLINE_CHECKOUT;
+	return $payUrl . (strpos($payUrl, '?') !== false ? '&' : '?') . 'embed=0';
+}
+
+/** prepare API 오류 메시지 — SPLIT_PAY_MODE 등 가맹 설정 안내 */
+function icopay_format_prepare_error(array $prep): string
+{
+	$msg = isset($prep['message']) ? trim((string)$prep['message']) : 'prepare failed';
+	$code = isset($prep['errorCode']) ? strtoupper(trim((string)$prep['errorCode'])) : '';
+	if ($code === 'SPLIT_PAY_MODE') {
+		return $msg . "\n\n"
+			. '현재 ICOPAY 가맹(compId) URL결제설정이 「분할결제」로 되어 있어 일반 URL 결제(prepare)가 거부됩니다.'
+			. "\nICOPAY 본사에 「URL결제설정 → 일반 URL(단건) 결제」로 변경을 요청하세요."
+			. "\n(분할결제 API를 쓰려면 POST /api/pay/split/contracts 연동이 별도로 필요합니다.)";
+	}
+	return $msg;
 }
 
 /**

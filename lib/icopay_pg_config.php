@@ -137,3 +137,21 @@ if (!defined('ICOPAY_BUYER_COUNTRY_ISO2')) {
 	}
 	define('ICOPAY_BUYER_COUNTRY_ISO2', $__country);
 }
+
+if (!defined('ICOPAY_CHECKOUT_UI_MODE')) {
+	$__ui = '';
+	if (!empty($GLOBALS['ICOPAY_CHECKOUT_UI_MODE'])) {
+		$__ui = strtolower(trim((string)$GLOBALS['ICOPAY_CHECKOUT_UI_MODE']));
+	} elseif (getenv('ICOPAY_CHECKOUT_UI_MODE')) {
+		$__ui = strtolower(trim((string)getenv('ICOPAY_CHECKOUT_UI_MODE')));
+	}
+	if ($__ui === '' && defined('ICOPAY_INLINE_CHECKOUT') && !ICOPAY_INLINE_CHECKOUT) {
+		$__ui = 'url';
+	} elseif ($__ui === '') {
+		$__ui = 'url';
+	}
+	if (!in_array($__ui, array('url', 'inline'), true)) {
+		$__ui = 'url';
+	}
+	define('ICOPAY_CHECKOUT_UI_MODE', $__ui);
+}

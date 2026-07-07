@@ -24,6 +24,7 @@ include_once dirname(__FILE__) . '/../lib/icopay_merchant.php';
 include_once dirname(__FILE__) . '/lib_icopay_chillpay.php';
 
 $icopay_inline_ui = icopay_inline_checkout_active();
+$icopay_url_ui = icopay_url_checkout_active();
 $icopay_legacy_ccd_ui = icopay_legacy_ccd_active();
 $icopay_chill_cfg = null;
 $icopay_ccd_script = 'https://cdn.chill.credit/js/ccdpayment.js';
@@ -45,7 +46,8 @@ if ($icopay_legacy_ccd_ui) {
 		$icopay_api_key = ICOPAY_CCD_API_KEY;
 	}
 }
-$icopay_chillpay_ui = $icopay_inline_ui || ($icopay_legacy_ccd_ui && $icopay_merchant_code !== '' && $icopay_api_key !== '');
+$icopay_chillpay_ui = $icopay_url_ui || $icopay_inline_ui || ($icopay_legacy_ccd_ui && $icopay_merchant_code !== '' && $icopay_api_key !== '');
+$icopay_checkout_ui_mode = function_exists('icopay_checkout_ui_mode') ? icopay_checkout_ui_mode() : 'url';
 $icopay_api_origin = defined('ICOPAY_PUBLIC_BASE') ? ICOPAY_PUBLIC_BASE : 'https://api.icopay.co.kr';
 $icopay_checkout_lang = function_exists('icopay_resolve_checkout_lang') ? icopay_resolve_checkout_lang() : 'en';
 $icopay_checkout_lang_api = function_exists('icopay_resolve_checkout_lang_api') ? icopay_resolve_checkout_lang_api() : 'ENG';
@@ -200,6 +202,8 @@ if ($buyselected == 'Y') {
 
             var ICOPAY_CHILLPAY_ACTIVE = <?php echo $icopay_chillpay_ui ? 'true' : 'false'; ?>;
             var ICOPAY_INLINE_MODE = <?php echo !empty($icopay_inline_ui) ? 'true' : 'false'; ?>;
+            var ICOPAY_URL_MODE = <?php echo !empty($icopay_url_ui) ? 'true' : 'false'; ?>;
+            var ICOPAY_CHECKOUT_UI_MODE = <?php echo json_encode($icopay_checkout_ui_mode, JSON_UNESCAPED_UNICODE); ?>;
             var ICOPAY_API_ORIGIN = <?php echo json_encode($icopay_api_origin, JSON_UNESCAPED_SLASHES); ?>;
             var ICOPAY_CHECKOUT_LANG = <?php echo json_encode($icopay_checkout_lang, JSON_UNESCAPED_UNICODE); ?>;
             var ICOPAY_CHECKOUT_LANG_API = <?php echo json_encode($icopay_checkout_lang_api, JSON_UNESCAPED_UNICODE); ?>;
@@ -678,9 +682,19 @@ if ($buyselected == 'Y') {
                 };
             }
 
-            function icopayInlineStartEmbed(orderJson) {
-                $("#icopayChillpayCcdStatus").text('결제 화면을 불러오는 중입니다…').css("display", "block");
-                $("#icopayInlineEmbedHost").empty();
+            function icopayUrlShowLoading() {
+                $("#popup_mask").css("display", "block");
+                $("#popupDiv").css("display", "block");
+                $("body").css("overflow", "hidden");
+            }
+
+            function icopayUrlHideLoading() {
+                $("#popup_mask").css("display", "none");
+                $("#popupDiv").css("display", "none");
+                $("body").css("overflow", "auto");
+            }
+
+            function icopayBuildPreparePayload(orderJson) {
                 var preparePayload = {
                     merchantOrderId: orderJson.ediDate,
                     lang: ICOPAY_INTEGRATION_MODE === 'unified' ? ICOPAY_CHECKOUT_LANG_API : ICOPAY_CHECKOUT_LANG
@@ -688,24 +702,79 @@ if ($buyselected == 'Y') {
                 if (ICOPAY_INTEGRATION_MODE === 'unified') {
                     var buyerCheck = icopayInlineCollectBuyer();
                     if (!buyerCheck.email) {
-                        $("#icopayChillpayCcdStatus").css("display", "none");
-                        icopayChillpayCloseModal();
                         alert('Enter the orderer\'s email before card payment.');
                         if (document.join && document.join.email) {
                             document.join.email.focus();
                         }
-                        return;
+                        return null;
                     }
                     if (!buyerCheck.phone) {
-                        $("#icopayChillpayCcdStatus").css("display", "none");
-                        icopayChillpayCloseModal();
                         alert('Enter the orderer\'s cell phone before card payment.');
                         if (document.join && document.join.htel) {
                             document.join.htel.focus();
                         }
-                        return;
+                        return null;
                     }
                     preparePayload.buyer = buyerCheck;
+                }
+                return preparePayload;
+            }
+
+            function icopayUrlStartRedirect(orderJson) {
+                icopayUrlShowLoading();
+                var preparePayload = icopayBuildPreparePayload(orderJson);
+                if (!preparePayload) {
+                    icopayUrlHideLoading();
+                    return;
+                }
+                $.ajax({
+                    url: './icopay_inline_prepare.php',
+                    method: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(preparePayload),
+                    dataType: 'json',
+                    success: function(res) {
+                        if (!res || !res.success || !res.payUrl) {
+                            icopayUrlHideLoading();
+                            var errMsg = (res && res.message) ? res.message : '결제 URL(prepare)을 받지 못했습니다.';
+                            if (res && res.errorCode) {
+                                errMsg += ' [' + res.errorCode + ']';
+                            }
+                            if (res && res.errorCode === 'SPLIT_PAY_MODE') {
+                                errMsg += '\n\nICOPAY 본사에 compId URL결제설정을 「일반 URL(단건)」으로 변경 요청하세요.';
+                            }
+                            alert(errMsg);
+                            return;
+                        }
+                        var dest = icopayInlineAppendLang(res.payUrl, res.checkoutLang || ICOPAY_CHECKOUT_LANG_API);
+                        window.location.href = dest;
+                    },
+                    error: function(xhr) {
+                        icopayUrlHideLoading();
+                        var msg = '결제 서버와 통신 중 오류가 났습니다.';
+                        if (xhr && xhr.responseText) {
+                            try {
+                                var ej = JSON.parse(xhr.responseText);
+                                if (ej.message) {
+                                    msg = ej.message;
+                                }
+                            } catch (eJ) {
+                                msg += '\n' + String(xhr.responseText).slice(0, 200);
+                            }
+                        }
+                        alert(msg);
+                    }
+                });
+            }
+
+            function icopayInlineStartEmbed(orderJson) {
+                $("#icopayChillpayCcdStatus").text('결제 화면을 불러오는 중입니다…').css("display", "block");
+                $("#icopayInlineEmbedHost").empty();
+                var preparePayload = icopayBuildPreparePayload(orderJson);
+                if (!preparePayload) {
+                    $("#icopayChillpayCcdStatus").css("display", "none");
+                    icopayChillpayCloseModal();
+                    return;
                 }
                 $.ajax({
                     url: './icopay_inline_prepare.php',
@@ -750,10 +819,14 @@ if ($buyselected == 'Y') {
                 window.__icopayCcdPayButtonShown = false;
                 icopayChillpayClearCcdFallbackTimer();
                 $("#icopayChillpayPayBtn").css("display", "none").prop("disabled", false);
-                $("#popup_mask").css("display", "block");
-                $("#icopayChillpayModal").css("display", "block");
-                $("#icopayChillpayCcdStatus").css("display", "block");
-                $("body").css("overflow", "hidden");
+                if (typeof ICOPAY_URL_MODE !== 'undefined' && ICOPAY_URL_MODE) {
+                    icopayUrlShowLoading();
+                } else {
+                    $("#popup_mask").css("display", "block");
+                    $("#icopayChillpayModal").css("display", "block");
+                    $("#icopayChillpayCcdStatus").css("display", "block");
+                    $("body").css("overflow", "hidden");
+                }
                 $.ajax({
                     type: 'POST',
                     url: './icopay_order_save.php',
@@ -764,29 +837,45 @@ if ($buyselected == 'Y') {
                         try {
                             j = JSON.parse(txt);
                         } catch (e1) {
-                            $("#icopayChillpayCcdStatus").css("display", "none");
-                            $("#popup_mask").css("display", "none");
-                            $("#icopayChillpayModal").css("display", "none");
-                            $("body").css("overflow", "auto");
+                            if (typeof ICOPAY_URL_MODE !== 'undefined' && ICOPAY_URL_MODE) {
+                                icopayUrlHideLoading();
+                            } else {
+                                $("#icopayChillpayCcdStatus").css("display", "none");
+                                $("#popup_mask").css("display", "none");
+                                $("#icopayChillpayModal").css("display", "none");
+                                $("body").css("overflow", "auto");
+                            }
                             var snip = (typeof txt === 'string') ? txt.replace(/^\s+/, '').slice(0, 280) : '';
                             alert('주문 저장 응답이 올바른 JSON이 아닙니다.\n\n' + snip + '\n\nlib/icopay_pg_secrets.local.php 설정 및 서버에 최신 cart/order_ok2.php 배포를 확인하세요.');
                             return;
                         }
                         if (j && j.message && !j.icopayChillpay && j.result !== '1') {
-                            $("#icopayChillpayCcdStatus").css("display", "none");
-                            icopayChillpayCloseModal();
+                            if (typeof ICOPAY_URL_MODE !== 'undefined' && ICOPAY_URL_MODE) {
+                                icopayUrlHideLoading();
+                            } else {
+                                $("#icopayChillpayCcdStatus").css("display", "none");
+                                icopayChillpayCloseModal();
+                            }
                             alert(j.message);
                             return;
                         }
                         if (!j || !j.icopayChillpay) {
-                            $("#icopayChillpayCcdStatus").css("display", "none");
-                            $("#popup_mask").css("display", "none");
-                            $("#icopayChillpayModal").css("display", "none");
-                            $("body").css("overflow", "auto");
+                            if (typeof ICOPAY_URL_MODE !== 'undefined' && ICOPAY_URL_MODE) {
+                                icopayUrlHideLoading();
+                            } else {
+                                $("#icopayChillpayCcdStatus").css("display", "none");
+                                $("#popup_mask").css("display", "none");
+                                $("#icopayChillpayModal").css("display", "none");
+                                $("body").css("overflow", "auto");
+                            }
                             alert('카드 결제를 시작할 수 없습니다. 결제수단이 카드인지, 포인트 전액 결제가 아닌지 확인하세요.');
                             return;
                         }
                         window.__icopayCartOrder = j;
+                        if (typeof ICOPAY_URL_MODE !== 'undefined' && ICOPAY_URL_MODE) {
+                            icopayUrlStartRedirect(j);
+                            return;
+                        }
                         if (typeof ICOPAY_INLINE_MODE !== 'undefined' && ICOPAY_INLINE_MODE) {
                             icopayInlineStartEmbed(j);
                             return;
@@ -819,10 +908,14 @@ if ($buyselected == 'Y') {
                         });
                     },
                     error: function() {
-                        $("#icopayChillpayCcdStatus").css("display", "none");
-                        $("#popup_mask").css("display", "none");
-                        $("#icopayChillpayModal").css("display", "none");
-                        $("body").css("overflow", "auto");
+                        if (typeof ICOPAY_URL_MODE !== 'undefined' && ICOPAY_URL_MODE) {
+                            icopayUrlHideLoading();
+                        } else {
+                            $("#icopayChillpayCcdStatus").css("display", "none");
+                            $("#popup_mask").css("display", "none");
+                            $("#icopayChillpayModal").css("display", "none");
+                            $("body").css("overflow", "auto");
+                        }
                         alert('Network error while saving order.');
                     }
                 });
