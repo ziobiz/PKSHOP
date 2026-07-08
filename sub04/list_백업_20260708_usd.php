@@ -371,7 +371,7 @@ if ($cook_dis == "1" && $cook_dis1 == "승인") {
 							<div class="sp20"></div>
 							<p class="product_title"><a href="../sub04/view.php?left_code=<?=$code?>&code1=<?=$code1?>&code2=<?=$code2?>&code3=<?=$code3?>&code4=<?=$code4?>&theme=f&type=<?=$type?>"><?=$title?></a></p>
 							<?if($_SESSION["member_id"] != ""){?>
-							<p class="best_price" style="font-weight:bold;font-size:16px;color:#c3070b"><?=shop_format_usd_jpy_dual($price_tmp)?></p>
+							<p class="best_price" style="font-weight:bold;font-size:16px;color:#c3070b">$ <?=$price_tmp?></p>
 							<?}?>
 					</div>
 

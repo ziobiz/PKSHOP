@@ -361,7 +361,6 @@ if($theme_str==""){//정렬순서 관련
 	}
 
 $price_tmp_kk = $price_tmp; //shop_view.htm용
-$price_dual_display = shop_format_usd_jpy_dual($price_tmp_kk);
 #################################################
 
 #################포인트 계산################################
@@ -521,7 +520,7 @@ function price_change(){
 							<tr>
 								<td class="option_td">Price</td>
 								
-								<td class=""><span id="priceText"><?=htmlspecialchars($price_dual_display, ENT_QUOTES, 'UTF-8')?></span></font>&nbsp;&nbsp;&nbsp;</td>
+								<td class=""><span id="priceText">$ <?=($price_tmp)?></span></font>&nbsp;&nbsp;&nbsp;</td>
 							</tr>
 							<?if(floor($price_tmp*($c_pv/100))> 0){?>
 							<tr>
@@ -787,15 +786,6 @@ function price_change(){
 		<!--  footer    -->
 	</div>
 	<script>
-var shopUsdJpyRate = <?= shop_usd_jpy_rate($json_balance) ?>;
-function shopFormatUsdJpyDual(usd) {
-	usd = parseFloat(usd) || 0;
-	if (usd <= 0) {
-		return 'USD 0 / JPY 0';
-	}
-	var jpy = Math.ceil((usd * shopUsdJpyRate) / 10) * 10;
-	return 'USD ' + usd.toLocaleString('en-US', {maximumFractionDigits: 0}) + ' / JPY ' + jpy.toLocaleString('en-US');
-}
 
 function go_price3() {
 	var extractTextPattern = /(<([^>]+)>)/gi;
@@ -953,7 +943,7 @@ function go_price3() {
 	
 frm.cprice.value =(parseFloat(<?=$price_tmp_kk?>)+o1)*qty+'&nbsp;';
 frm.cprice1.value = (parseFloat(<?=$price_tmp_kk?>)+o1)*qty;
-$("#priceText").text(shopFormatUsdJpyDual((parseFloat(<?=$price_tmp_kk?>)+o1)*qty));
+$("#priceText").text("$ " + (parseFloat(<?=$price_tmp_kk?>)+o1)*qty);
 $("#pvText").text("$ " + ((parseFloat(<?=$price_tmp_kk?>)+o1)*qty)*(c_pv/100));
 }
 go_price3();

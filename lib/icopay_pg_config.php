@@ -148,10 +148,10 @@ if (!defined('ICOPAY_CHECKOUT_UI_MODE')) {
 	if ($__ui === '' && defined('ICOPAY_INLINE_CHECKOUT') && !ICOPAY_INLINE_CHECKOUT) {
 		$__ui = 'url';
 	} elseif ($__ui === '') {
-		$__ui = 'url';
+		$__ui = 'inline';
 	}
 	if (!in_array($__ui, array('url', 'inline'), true)) {
-		$__ui = 'url';
+		$__ui = 'inline';
 	}
 	define('ICOPAY_CHECKOUT_UI_MODE', $__ui);
 }

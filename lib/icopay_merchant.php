@@ -37,7 +37,7 @@ function icopay_checkout_ui_mode(): string
 			return $mode;
 		}
 	}
-	return 'url';
+	return 'inline';
 }
 
 function icopay_api_checkout_active(): bool
@@ -103,9 +103,8 @@ function icopay_format_prepare_error(array $prep): string
 	$code = isset($prep['errorCode']) ? strtoupper(trim((string)$prep['errorCode'])) : '';
 	if ($code === 'SPLIT_PAY_MODE') {
 		return $msg . "\n\n"
-			. '현재 ICOPAY 가맹(compId) URL결제설정이 「분할결제」로 되어 있어 일반 URL 결제(prepare)가 거부됩니다.'
-			. "\nICOPAY 본사에 「URL결제설정 → 일반 URL(단건) 결제」로 변경을 요청하세요."
-			. "\n(분할결제 API를 쓰려면 POST /api/pay/split/contracts 연동이 별도로 필요합니다.)";
+			. 'ICOPAY 가맹 URL결제설정이 분할결제입니다. URL(redirect) 모드 대신 ICOPAY_CHECKOUT_UI_MODE=inline(통합 인라인)을 사용하세요.'
+			. "\n또는 ICOPAY 본사에 URL결제설정·가맹 API 연동 채널(REDIRECT) 변경을 요청하세요.";
 	}
 	return $msg;
 }
@@ -346,6 +345,8 @@ function icopay_order_save_json_exit($ediDate, $ordNo, $new_num, $total_settle_n
 	$_SESSION['icopay_pending_checkout'] = array(
 		'ediDate' => $ediDate,
 		'amount' => (string)$total_settle_num,
+		'amountUsd' => isset($extra['amountUsd']) ? (string)$extra['amountUsd'] : '',
+		'currency' => 'JPY',
 		'ordNo' => $ordNo,
 		'new_num' => $new_num,
 		'description' => $title_11111 !== '' ? $title_11111 : '',

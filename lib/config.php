@@ -68,4 +68,20 @@ if (!isset($GLOBALS['ICOPAY_CCD_API_KEY'])) {
 	$GLOBALS['ICOPAY_CCD_API_KEY'] = '';
 }
 
+/** 무통장 입금 안내 — API(c_bank) 대신 프론트 표시용 (Ontheline Japan / SMBC) */
+if (!defined('SHOP_BANK_NAME')) {
+	define('SHOP_BANK_NAME', 'SUMITOMO MITSUI BANKING (SMBC) IN JAPAN');
+}
+if (!defined('SHOP_BANK_ACCOUNT')) {
+	define('SHOP_BANK_ACCOUNT', '7282155 (Branch Number: 888)');
+}
+if (!defined('SHOP_BANK_HOLDER')) {
+	define('SHOP_BANK_HOLDER', 'Ontheline Japan Co., Ltd.');
+}
+
+/** USD→JPY 환율 기본값. 0 이면 API c_usdprice 사용 */
+if (!defined('SHOP_USD_JPY_RATE')) {
+	define('SHOP_USD_JPY_RATE', 0);
+}
+
 ?>

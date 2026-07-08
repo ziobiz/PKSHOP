@@ -40,7 +40,7 @@ if ($buyerErr !== null) {
 	exit($buyerErr);
 }
 
-$prep = $api->prepareUnifiedCheckout(
+$prep = $api->prepareUnifiedRedirectCheckout(
 	$merchantOrderId,
 	$amount,
 	$buyer,

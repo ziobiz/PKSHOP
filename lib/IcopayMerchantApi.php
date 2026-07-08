@@ -46,26 +46,30 @@ final class IcopayMerchantApi
 		string $productName = '',
 		string $lang = ''
 	): array {
-		$body = array(
-			'compId' => $this->compId,
-			'orderNo' => $orderNo,
-			'amount' => $amount,
-			'buyer' => array(
-				'email' => trim((string)($buyer['email'] ?? '')),
-				'phone' => trim((string)($buyer['phone'] ?? '')),
-				'countryIso2' => strtoupper(trim((string)($buyer['countryIso2'] ?? ''))),
-			),
+		return $this->postJson(
+			'/api/middleware/v1/merchant/checkout/prepare',
+			$this->buildUnifiedPrepareBody($orderNo, $amount, $buyer, $currency, $productName, $lang)
 		);
-		if ($currency !== '') {
-			$body['currency'] = strtoupper($currency);
-		}
-		if ($productName !== '') {
-			$body['productName'] = $productName;
-		}
-		if ($lang !== '') {
-			$body['lang'] = strtoupper($lang);
-		}
-		return $this->postJson('/api/middleware/v1/merchant/checkout/prepare', $body);
+	}
+
+	/**
+	 * 통합 리다이렉트 — buyer 필수, returnUrl/cancelUrl body 금지.
+	 *
+	 * @param array{email?:string,phone?:string,countryIso2?:string} $buyer
+	 * @return array{success:bool,data?:array,message?:string,errorCode?:string}
+	 */
+	public function prepareUnifiedRedirectCheckout(
+		string $orderNo,
+		$amount,
+		array $buyer,
+		string $currency = '',
+		string $productName = '',
+		string $lang = ''
+	): array {
+		return $this->postJson(
+			'/api/middleware/v1/merchant/checkout/redirect/prepare',
+			$this->buildUnifiedPrepareBody($orderNo, $amount, $buyer, $currency, $productName, $lang)
+		);
 	}
 
 	/** @return array{success:bool,data?:array,message?:string,errorCode?:string} */
@@ -76,6 +80,16 @@ final class IcopayMerchantApi
 			'orderNo' => $orderNo,
 		));
 		return $this->getJson('/api/middleware/v1/merchant/checkout/status?' . $qs);
+	}
+
+	/** @return array{success:bool,data?:array,message?:string,errorCode?:string} */
+	public function getUnifiedRedirectPaymentStatus(string $orderNo): array
+	{
+		$qs = http_build_query(array(
+			'compId' => $this->compId,
+			'orderNo' => $orderNo,
+		));
+		return $this->getJson('/api/middleware/v1/merchant/checkout/redirect/status?' . $qs);
 	}
 
 	public function getUnifiedEmbedTargetId(): string
@@ -166,6 +180,37 @@ final class IcopayMerchantApi
 			. ' data-session-token="' . $tokEnc . '"'
 			. ' data-target="' . $targetEsc . '"'
 			. ' async defer charset="utf-8"></script>';
+	}
+
+	/** @param array{email?:string,phone?:string,countryIso2?:string} $buyer */
+	private function buildUnifiedPrepareBody(
+		string $orderNo,
+		$amount,
+		array $buyer,
+		string $currency,
+		string $productName,
+		string $lang
+	): array {
+		$body = array(
+			'compId' => $this->compId,
+			'orderNo' => $orderNo,
+			'amount' => $amount,
+			'buyer' => array(
+				'email' => trim((string)($buyer['email'] ?? '')),
+				'phone' => trim((string)($buyer['phone'] ?? '')),
+				'countryIso2' => strtoupper(trim((string)($buyer['countryIso2'] ?? ''))),
+			),
+		);
+		if ($currency !== '') {
+			$body['currency'] = strtoupper($currency);
+		}
+		if ($productName !== '') {
+			$body['productName'] = $productName;
+		}
+		if ($lang !== '') {
+			$body['lang'] = strtoupper($lang);
+		}
+		return $body;
 	}
 
 	private function preparePath(string $vendor): string

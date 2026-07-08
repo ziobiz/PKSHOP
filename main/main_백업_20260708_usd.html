@@ -296,7 +296,7 @@ if($theme_str!=""){
 										</div>
 										<p class="best_text" style="padding-bottom:5px;text-align:center;"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&theme=f&type=<?= $type ?>" class="a_3"><?= $title ?></a></p>
 										<?if($_SESSION["member_id"] != ""){?>
-										<p class="best_price" style="text-align:center; font-weight:bold;font-size:16px;color:#c3070b"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&type=<?= $type ?>" class="c_red"><?= shop_format_usd_jpy_dual($price_tmp, $shop_jpy_rate) ?></a></p>
+										<p class="best_price" style="text-align:center; font-weight:bold;font-size:16px;color:#c3070b"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&type=<?= $type ?>" class="c_red">$ <?= number_format($price_tmp) ?></a></p>
 
 										<?}?>
 									</div>
@@ -563,7 +563,7 @@ if($theme_str!=""){
 									<p class="best_text" style="text-align:center;"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&theme=f&type=<?= $type ?>" class="a_3"><?= $title ?></a></p>
 
 									<?if($_SESSION["member_id"] != ""){?>
-									<p class="best_price" style="text-align:center; font-weight:bold;font-size:16px;color:#c3070b"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&type=<?= $type ?>" class="c_red"><?= shop_format_usd_jpy_dual($price_tmp, $shop_jpy_rate) ?></a></p>
+									<p class="best_price" style="text-align:center; font-weight:bold;font-size:16px;color:#c3070b"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&type=<?= $type ?>" class="c_red">$ <?= number_format($price_tmp) ?></a></p>
 
 									<?}?>
 									<div class="sp25"></div>
@@ -896,7 +896,7 @@ if($theme_str!=""){
 
 									</p>
 									<?if($_SESSION["member_id"] != ""){?>
-										<p class="all_price" ><a href="./view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&type=<?= $type ?>" class="c_red"><?= shop_format_usd_jpy_dual($price_tmp, $shop_jpy_rate) ?></a></p>
+										<p class="all_price" ><a href="./view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&type=<?= $type ?>" class="c_red">$ <?= number_format($price_tmp) ?></a></p>
 
 											<?}?>
 									</div>

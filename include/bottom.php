@@ -17,7 +17,7 @@
 	            <p style="font-size:11px;">SUMITOMO MITSUI BANKING (SMBC) IN JAPAN / 7282155 (Branch Number: 888)</p>
 	            </div><BR>
 				<div class="div01">	                
-					<p style="font-size:11px;">Holder: Onthelin Japan Co., Ltd</p>
+					<p style="font-size:11px;">Holder: Ontheline Japan Co., Ltd.</p>
 	            </div>
 	         
 

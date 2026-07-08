@@ -17,6 +17,19 @@
 	
 	
 	$json_balance = json_decode($result,true);
+	if (!is_array($json_balance)) {
+		$json_balance = array();
+	}
+	if (defined('SHOP_BANK_NAME') && SHOP_BANK_NAME !== '') {
+		$json_balance['su_bank'] = SHOP_BANK_NAME;
+	}
+	if (defined('SHOP_BANK_ACCOUNT') && SHOP_BANK_ACCOUNT !== '') {
+		$json_balance['su_banknum'] = SHOP_BANK_ACCOUNT;
+	}
+	if (defined('SHOP_BANK_HOLDER') && SHOP_BANK_HOLDER !== '') {
+		$json_balance['su_bankname'] = SHOP_BANK_HOLDER;
+	}
+	require_once dirname(__FILE__) . '/../lib/shop_currency.php';
 	$session_cart = $_SESSION["session_cart"];
 	$shop_country = $json_balance["shop_country"];
 	if($shop_country == ""){

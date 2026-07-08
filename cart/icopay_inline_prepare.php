@@ -65,20 +65,33 @@ if (!empty($in['lang'])) {
 	$checkoutLangApi = icopay_map_lang_to_api_code($rawLang);
 }
 
+$checkoutUi = icopay_checkout_ui_mode();
+
 if ($integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED) {
 	$buyer = icopay_resolve_buyer($in);
 	$buyerErr = icopay_validate_buyer($buyer);
 	if ($buyerErr !== null) {
 		icopay_json_response(array('success' => false, 'message' => $buyerErr));
 	}
-	$prep = $api->prepareUnifiedCheckout(
-		$merchantOrderId,
-		$amount,
-		$buyer,
-		$currency,
-		$productName,
-		$checkoutLangApi
-	);
+	if ($checkoutUi === 'url') {
+		$prep = $api->prepareUnifiedRedirectCheckout(
+			$merchantOrderId,
+			$amount,
+			$buyer,
+			$currency,
+			$productName,
+			$checkoutLangApi
+		);
+	} else {
+		$prep = $api->prepareUnifiedCheckout(
+			$merchantOrderId,
+			$amount,
+			$buyer,
+			$currency,
+			$productName,
+			$checkoutLangApi
+		);
+	}
 	$targetId = $api->getUnifiedEmbedTargetId();
 } else {
 	$prep = $api->prepareInlineCheckout($vendor, $merchantOrderId, $amount, $currency, $productName, $checkoutLangEmbed);
@@ -107,21 +120,19 @@ if ($integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED) {
 }
 $payUrl = !empty($data['payUrl']) ? (string)$data['payUrl'] : '';
 $payUrl = icopay_append_lang_to_pay_url($payUrl, $integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED ? $checkoutLangApi : $checkoutLangEmbed);
-$checkoutUi = icopay_checkout_ui_mode();
 if ($checkoutUi === 'url') {
 	$payUrl = icopay_pay_url_for_redirect($payUrl);
 	if ($payUrl === '') {
-		icopay_json_response(array('success' => false, 'message' => 'payUrl missing from prepare response.'));
+		icopay_json_response(array('success' => false, 'message' => 'payUrl missing from redirect prepare response.'));
 	}
 } elseif ($sessionToken === '') {
 	icopay_json_response(array('success' => false, 'message' => 'sessionToken missing from prepare response.'));
 }
 
-icopay_json_response(array(
+$response = array(
 	'success' => true,
 	'sessionToken' => $sessionToken,
 	'embedScriptUrl' => $embedScriptUrl,
-	'payUrl' => $payUrl,
 	'checkoutLang' => $integrationMode === IcopayMerchantApi::INTEGRATION_UNIFIED ? $checkoutLangApi : $checkoutLangEmbed,
 	'targetId' => $targetId,
 	'orderNo' => $merchantOrderId,
@@ -132,4 +143,8 @@ icopay_json_response(array(
 	'apiOrigin' => defined('ICOPAY_PUBLIC_BASE') ? ICOPAY_PUBLIC_BASE : 'https://api.icopay.co.kr',
 	'checkoutJsUrl' => (defined('ICOPAY_PUBLIC_BASE') ? ICOPAY_PUBLIC_BASE : 'https://api.icopay.co.kr')
 		. '/merchant-api-samples/common/icopay-checkout.js',
-));
+);
+if ($checkoutUi === 'url') {
+	$response['payUrl'] = $payUrl;
+}
+icopay_json_response($response);

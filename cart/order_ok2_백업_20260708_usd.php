@@ -279,8 +279,6 @@ for($i=0;$i<$tot;$i++) {
                 else $charge=3;
                 $total_settle = $total_price + $charge-$usepoint;
                 $total_settle_num=$total_settle;
-                $total_settle_num_usd = $total_settle_num;
-                $total_settle_jpy_num = shop_usd_to_jpy_ceiling($total_settle_num);
                 $total_pv = $total_pv +floor($total_price*($c_pv/100));
 				$charge_num = $charge;
                 $chargeT =  number_format($charge)."&nbsp;";
@@ -637,9 +635,8 @@ for($i=0;$i<$tot;$i++) {
                             $ediDate,
                             $ordNo,
                             $new_num,
-                            $total_settle_jpy_num,
-                            isset($title_11111) ? (string)$title_11111 : '',
-                            array('amountUsd' => $total_settle_num_usd)
+                            $total_settle_num,
+                            isset($title_11111) ? (string)$title_11111 : ''
                         );
                     }
 
@@ -662,9 +659,8 @@ if (icopay_should_return_card_json()) {
 		isset($ediDate) ? $ediDate : (isset($_POST['ediDate']) ? (string)$_POST['ediDate'] : ''),
 		isset($ordNo) ? $ordNo : (isset($_POST['ordNo']) ? (string)$_POST['ordNo'] : ''),
 		isset($new_num) ? $new_num : '',
-		isset($total_settle_jpy_num) ? $total_settle_jpy_num : shop_usd_to_jpy_ceiling(isset($total_settle_num) ? $total_settle_num : 0),
-		isset($title_11111) ? (string)$title_11111 : '',
-		array('amountUsd' => isset($total_settle_num_usd) ? $total_settle_num_usd : (isset($total_settle_num) ? $total_settle_num : 0))
+		isset($total_settle_num) ? $total_settle_num : 0,
+		isset($title_11111) ? (string)$title_11111 : ''
 	);
 }
 

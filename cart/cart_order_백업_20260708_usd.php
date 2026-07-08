@@ -1323,7 +1323,6 @@ function pay_result_close(){
                             $onlyP = 0;
                             $notP = 0;
                             $title_array="";
-                            $shop_jpy_rate = shop_usd_jpy_rate($json_balance);
                             for ($i = 0; $i < $tot; $i++) {
 
                                 $ii = $i; //gas_sel
@@ -1588,7 +1587,7 @@ function pay_result_close(){
 
                                 $price = $price;
                                 $c_pv = floor($sum_price * ($c_pv / 100));
-                                $price = shop_format_usd_jpy_dual($price_tmp + $price1 + $price2 + $price3 + $price4 + $price5, $shop_jpy_rate);
+                                $price = "$&nbsp;" . number_format($price_tmp + $price1 + $price2 + $price3 + $price4 + $price5);
 
                                 $sale_price_total = $price_tmp   * $arr[1];
 
@@ -1599,14 +1598,14 @@ function pay_result_close(){
 
 
 
-                                $sale_price_total_stt = shop_format_usd_jpy_dual($sale_price_total, $shop_jpy_rate);
-                                $result_price_total = shop_format_usd_jpy_dual($result_price, $shop_jpy_rate);
+                                $sale_price_total_stt = "$&nbsp;" . number_format($sale_price_total);
+                                $result_price_total = "$&nbsp;" . number_format($result_price);
 
                                 $sum_price = $sum_price;
                                 $total_price = $total_price + $sum_price;
 
                                 //	$sum_price =  number_format($sum_price);
-                                $sum_price = shop_format_usd_jpy_dual(($price_tmp + $price1 + $price2 + $price3 + $price4 + $price5) * $arr[1], $shop_jpy_rate);
+                                $sum_price =  "$&nbsp;" . number_format($sum_price);
 
                                 $total_point = $total_point + $point;
                                 $point_tot = $point;
@@ -1657,12 +1656,10 @@ function pay_result_close(){
                             $total_settle = $total_price + $charge;
                             $total_settle_diot = $total_settle + $charge;
                             $total_settle_num = $total_settle;
-                            $total_settle_num_usd = $total_settle_num;
-                            $total_settle_jpy_num = shop_usd_to_jpy_ceiling($total_settle_num, $shop_jpy_rate);
                             $total_settle_num_diot = $total_settle_diot;    //diot 로 계산 한 값
-                            $chargeT = shop_format_usd_jpy_dual($charge, $shop_jpy_rate);
-                            $total_price = shop_format_usd_jpy_dual($total_price, $shop_jpy_rate);
-                            $total_settle = shop_format_usd_jpy_dual($total_settle_num, $shop_jpy_rate);
+                            $chargeT =  "$&nbsp;" . number_format($charge);
+                            $total_price =  "$&nbsp;" . number_format($total_price);
+                            $total_settle =  "$&nbsp;" . number_format($total_settle);
 
                             if ($_SESSION['connect_check'] != "ok") {
 
@@ -2027,9 +2024,7 @@ function pay_result_close(){
                     </form>
                     <div class="sp20"></div>
                     <form name=join id="join" method=post action="confirm.php">
-                        <input type="hidden" name="total_settle" id="total_settle" value="<?= $total_settle_num_usd ?>">
-                        <input type="hidden" name="total_settle_jpy" id="total_settle_jpy" value="<?= $total_settle_jpy_num ?>">
-                        <input type="hidden" id="shop_usd_jpy_rate" value="<?= htmlspecialchars((string)$shop_jpy_rate, ENT_QUOTES, 'UTF-8') ?>">
+                        <input type="hidden" name="total_settle" id="total_settle" value="<?= $total_settle_num ?>">
                         <input type="hidden" name="onlyP" id="onlyP" value="<?= $onlyP ?>">
                         <input type="hidden" name="notP" id="notP" value="<?= $notP ?>">
                         <script language="javascript">
@@ -2389,8 +2384,7 @@ function pay_result_close(){
                             <tr>
                                 <th>Expected amount of money.</th>
                                 <td>
-                                    <input type="text" id="exMoney" class="input_name" value="<?= $total_settle_jpy_num ?>" readonly id="textfield7" size="15">
-                                    <span style="font-size:12px;color:#666;"> JPY</span>
+                                    <input type="text" id="exMoney" class="input_name" value="<?= $total_settle_num ?>" readonly id="textfield7" size="15">
                                 </td>
                             </tr>
                             <!-- <tr>
@@ -2679,8 +2673,7 @@ function pay_result_close(){
     $(".userpoint").on("keyup", function() {
         var shop_bonus = parseFloat("<?= $json_balance['emoney'] ?>");
         var userpoint = $(this).val();
-        var total_settle_num = parseFloat("<?= $total_settle_num_usd ?>");
-        var shopUsdJpyRate = parseFloat("<?= $shop_jpy_rate ?>");
+        var total_settle_num = parseFloat("<?= $total_settle_num ?>");
 
         if (userpoint > shop_bonus) {
             userpoint = shop_bonus;
@@ -2692,15 +2685,7 @@ function pay_result_close(){
             userpoint = 0;
         }
 
-        var remainUsd = total_settle_num - userpoint;
-        if (remainUsd < 0) {
-            remainUsd = 0;
-        }
-        var remainJpy = 0;
-        if (!isNaN(shopUsdJpyRate) && shopUsdJpyRate > 0) {
-            remainJpy = Math.ceil((remainUsd * shopUsdJpyRate) / 10) * 10;
-        }
-        $("#exMoney").val(remainJpy);
+        $("#exMoney").val(total_settle_num - userpoint);
         $(this).val(userpoint);
     });
     $(document).ready(function() {

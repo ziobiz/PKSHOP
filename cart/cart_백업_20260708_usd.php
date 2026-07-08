@@ -182,7 +182,6 @@ function go_recal1() {
 #####################################################################
 $tot=totCount();
 $total_price=0;
-$shop_jpy_rate = shop_usd_jpy_rate($json_balance);
 
 for($i=0;$i<$tot;$i++) {
 	$ii=$i; //gas_sel
@@ -421,13 +420,13 @@ $ki=0;
 	}
 
 	$sum_price = ($price_tmp+$price1+$price2+$price3+$price4+$price5) * $arr[1];
-	$unit_usd = $price_tmp+$price1+$price2+$price3+$price4+$price5;
-	$price = shop_format_usd_jpy_dual($unit_usd, $shop_jpy_rate);
+	$price =  number_format($price_tmp+$price1+$price2+$price3+$price4+$price5);
+	$price =  number_format($price_tmp+$price1+$price2+$price3+$price4+$price5)."&nbsp;";
 	$price_tmp = $price_tmp;
 	$price = $price;
+	$price =  number_format($price_tmp+$price1+$price2+$price3+$price4+$price5)."&nbsp;";
 	
-	$sum_price_num = $sum_price;
-	$sum_price = shop_format_usd_jpy_dual($sum_price_num, $shop_jpy_rate);
+	$sum_price = $sum_price;
 	
 	
 	$coin_total =  $coin * $arr[1]; 
@@ -439,14 +438,15 @@ $ki=0;
 	$sale_price_total = $sail_price   *$arr[1];
 
 	$result_price = $result_price + $sale_price_total;
-	$sale_price_total_stt = shop_format_usd_jpy_dual($sale_price_total, $shop_jpy_rate);
-	$result_price_total = shop_format_usd_jpy_dual($result_price, $shop_jpy_rate);
+	$sale_price_total_stt = "$&npsp;".number_format($sale_price_total);
+	$result_price_total = "$&npsp;".number_format($result_price);
 	
 	
 	//echo $sum_price;
-	$total_price = $total_price + $sum_price_num;
+	$total_price = $total_price + $sum_price;
 	
 //	$sum_price =  number_format($sum_price);
+	$sum_price =  number_format($sum_price)."&nbsp;";
 	
 	$total_point=$total_point+$point;
 	$point_tot=$point;
@@ -497,11 +497,9 @@ if (50 < $total_price) $charge=0;
 else $charge=3;
 
 $total_settle = $total_price + $charge;
-$total_settle_usd = $total_settle;
-$total_settle_jpy = shop_usd_to_jpy_ceiling($total_settle_usd, $shop_jpy_rate);
-$charge = shop_format_usd_jpy_dual($charge, $shop_jpy_rate);
-$total_price = shop_format_usd_jpy_dual($total_price, $shop_jpy_rate);
-$total_settle = shop_format_usd_jpy_dual($total_settle_usd, $shop_jpy_rate);
+$charge =  number_format($charge)."&nbsp;";
+$total_price =  number_format($total_price)."&nbsp;";
+$total_settle =  number_format($total_settle)."&nbsp;";
 $coin_total_settle = number_format($coin_total)."&nbsp;";
 
 
@@ -512,7 +510,7 @@ $coin_total_settle = number_format($coin_total)."&nbsp;";
 		<div class="cart_price">
 			<div class="sp30"></div>
 			<div class="cart_price_inner">
-				Total [&nbsp;Amount(<?= $result_price_total ?>) + Delivery(<?= $charge ?>)&nbsp;]&nbsp;&nbsp;<span class="c_redb font_24"><?=$total_settle?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				Total [&nbsp;Amount(<?= $sum_price ?>) + Delivery(<?= $charge ?>)&nbsp;]&nbsp;&nbsp;<span class="c_redb font_24"><?=$total_settle?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			</div>
 			<div class="sp15"></div>
 			<div class="price_text">

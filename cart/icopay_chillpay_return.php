@@ -1,11 +1,15 @@
 <?php
 /**
- * ChillPay / 브로커 리턴 URL. 성공 시 기존 orderUpdate(ediDate, tid) 호출.
+ * ICOPAY 브라우저 복귀(NOTI Result). 서버 확정은 webhook/status API 권장.
  */
 include dirname(__FILE__) . '/../include/get_balance.php';
 include dirname(__FILE__) . '/../include/login_check.php';
+include dirname(__FILE__) . '/../lib/icopay_merchant.php';
 
 $ediDate = isset($_REQUEST['ediDate']) ? trim((string)$_REQUEST['ediDate']) : '';
+if ($ediDate === '' && !empty($_REQUEST['orderNo'])) {
+	$ediDate = trim((string)$_REQUEST['orderNo']);
+}
 $cancel = isset($_REQUEST['cancel']) ? (string)$_REQUEST['cancel'] : '';
 
 $tid = '';
@@ -37,8 +41,37 @@ if ($ok) {
 	}
 }
 
-if ($ok && $ediDate !== '' && $tid !== '' && $_SESSION['member_id'] !== '') {
-	curl_d($api_category, '&Type=orderUpdate&ediDate=' . rawurlencode($ediDate) . '&tid=' . rawurlencode($tid));
+$paidConfirmed = false;
+if ($ok && $ediDate !== '' && icopay_integration_mode() === IcopayMerchantApi::INTEGRATION_UNIFIED) {
+	$api = icopay_merchant_api();
+	if ($api !== null) {
+		$st = icopay_checkout_ui_mode() === 'url'
+			? $api->getUnifiedRedirectPaymentStatus($ediDate)
+			: $api->getUnifiedPaymentStatus($ediDate);
+		if (!empty($st['success']) && isset($st['data']) && is_array($st['data'])) {
+			$data = $st['data'];
+			$ps = strtoupper(trim((string)($data['paymentStatus'] ?? $data['status'] ?? '')));
+			if (in_array($ps, array('PAID', 'SUCCESS', 'SUCCEEDED', 'COMPLETED', 'APPROVED', 'CAPTURED'), true)) {
+				$paidConfirmed = true;
+				if (!empty($data['approvalNo'])) {
+					$tid = trim((string)$data['approvalNo']);
+				} elseif (!empty($data['transactionId'])) {
+					$tid = trim((string)$data['transactionId']);
+				}
+			} elseif (in_array($ps, array('FAIL', 'FAILED', 'CANCEL', 'CANCELLED', 'NOT_FOUND'), true)) {
+				$ok = false;
+			}
+		}
+	}
+}
+
+if ($ok && $ediDate !== '' && $_SESSION['member_id'] !== '') {
+	if ($paidConfirmed || $tid !== '') {
+		if ($tid === '') {
+			$tid = $ediDate;
+		}
+		icopay_apply_order_paid($ediDate, $tid);
+	}
 }
 
 $img = $ok

@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="../include/reset.css">
   <link rel="stylesheet" href="../include/style.css">
   <?include "../../Adm/common/dbconn.php";?>
-  <?php require_once dirname(__FILE__) . '/../lib/shop_currency.php'; ?>
 
 
 <SCRIPT LANGUAGE="JavaScript">
@@ -246,9 +245,9 @@ for($i = $first; $i <= $last; $i++) {
 		$priced_code = $priced;
 
 	if($priced=="0"){
-		$price_s = shop_format_usd_jpy_dual($pricec);
+		$price_s = "<font class='sbest_text02'>".number_format($pricec)."원</font> ";	//가격표시변환
 	}else{
-		$price_s = shop_format_usd_jpy_dual($priced) . ' <span style="text-decoration:line-through;font-size:12px;">' . shop_format_usd_jpy_dual($pricec) . '</span>';
+		$price_s = "<font class='sbest_text02'>".number_format($priced)."원</font> "."<font style='text-decoration: line-through;'>(".number_format($pricec).")</font>"."원";	
 	}
 
 	### 이미지 파일 저장 디렉토리 ###
