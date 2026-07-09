@@ -1,13 +1,10 @@
 <?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
+include_once "../inc/admin_shell_lib.php";
 include "../common/user_function.php";
 include "../inc/set_com.php";
 ########## 데이터베이스에 연결한다. #################################
-
-include "../inc/top_menu.php";
-include "../inc/left_menu_product.php";
-
 if ($sel_cate=="") {
 	$sel_code1="";
 	$sel_code2="";
@@ -26,7 +23,7 @@ if ($sel_cate=="") {
 
 #####################################################################
 ?>
-
+<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_del() {
@@ -51,17 +48,9 @@ function all_chk() {
 //-->
 </script>
 
-				<table width="800" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
 					<form name="form" method="post">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>재고관리</b></td>
-								</tr>
-							</table>
-					</td></tr>
 					<tr><td height=3></td></tr>
 						<tr>
 							<td>								
@@ -128,7 +117,6 @@ for($i = $first; $i <= $last; $i++) {
 
 #####################################################################
 ?>
-
 									<tr align="center"> 
 										<td width="47" height="26">&nbsp;<?=$article_num?></td>
 										<td width="75" height="26">&nbsp;<?=$code?></td>
@@ -155,12 +143,12 @@ for($i = $first; $i <= $last; $i++) {
 $chk_num = $last-$first+1;
 
 #####################################################################
-?>              
+?>
 								</table>
 							</td>
 						</tr>
 					</table> 
-					<table width="800" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
+					<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
 						<tr> 
 							<td height="20" align="center">
 								<font color="#666666">
@@ -203,14 +191,12 @@ $chk_num = $last-$first+1;
  if ($IsNext > 0) {
  	$page_num = $page + 1;
 ?>
- 
 								&nbsp;<a href="pro_buy.php?page=<?=$page_num?>" onMouseOver="status='다음페이지';return true;" onMouseOut="status=''">
 								<font color="#666666">▶</font></a>
  
  <?
  }
  ?>
-          
 								</font>
 							</td>
 						</tr>
@@ -219,4 +205,4 @@ $chk_num = $last-$first+1;
 					<input type="hidden" name="buy_chk" value="Y">      
 					<input type="hidden" name="chk_num" value="<?=$chk_num?>">      
 					</form>
-<? include "../inc/down_menu.php"; ?>					
+<?php pkshop_admin_shell_end(); ?>

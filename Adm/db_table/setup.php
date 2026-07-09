@@ -1,11 +1,11 @@
 <? 
 include "../common/dbconn.php";
-include "../inc/top_menu.php";
-include "../inc/left_menu_db_table.php";
+include_once "../inc/admin_shell_lib.php";
+pkshop_admin_auto_shell_begin();
 $setup = $_GET[setup];
 ?>
 
-<table width=700 border=0 cellpadding=0 cellspacing=0>
+<table class="pg-table pg-table-form" width="100%" border=0 cellpadding=0 cellspacing=0>
 	<tr><td height=30 colspan="2"></td></tr>
 	<tr>
 		<td width=60 align=center><img src="../image/icon1.gif" width=45 height=35 border=0></td>

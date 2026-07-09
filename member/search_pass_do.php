@@ -27,13 +27,13 @@ $real_name = $row[2];
 $real_email = $row[3];
 
 if($name!="$real_name") {
-	echo "<script language=javascript>alert('성명이 일치하지 않습니다.');</script>";
+	echo "<script language=javascript>alert('Name does not match.');</script>";
 	echo "<script language=javascript>history.go(-1);</script>";
 	exit;	
 }
 
 if($email!="$real_email") {
-	echo "<script language=javascript>alert('휴대폰이 일치 하지 않습니다.');</script>";
+	echo "<script language=javascript>alert('Phone number does not match.');</script>";
 	echo "<script language=javascript>history.go(-1);</script>";
 	exit;
 }
@@ -75,14 +75,14 @@ if($result) {
 	?>
 	<SCRIPT LANGUAGE="JavaScript">
 	<!--
-	alert("비밀번호가 문자로 전송됩니다. \n\n 즐거운 하루 보내세요.");
+	alert("Your password will be sent by SMS. \n\n Have a great day.");
 	location="login.php";
 	//-->
 	</SCRIPT>
 <?
 }else{
 
-	echo "<script language=javascript>alert('잘못된 접근입니다.');</script>";
+	echo "<script language=javascript>alert('Invalid access.');</script>";
 	echo "<script language=javascript>history.go(-1);</script>";
 	exit;
 

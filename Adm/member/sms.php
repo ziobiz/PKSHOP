@@ -1,10 +1,9 @@
 <? 
-include "../inc/top_menu.php"; 
-include "../inc/left_menu_member.php"; 
 include "../common/user_function.php";
 include "../common/dbconn.php";
+include_once "../inc/admin_shell_lib.php";
 ?>
-
+<?php pkshop_admin_auto_shell_begin(); ?>
  <script language=javascript>
 <!--
 function HLength() {
@@ -34,23 +33,14 @@ function HLength() {
 
 //-->
 </script>
-				<table width="700" border="0" cellspacing="0" cellpadding="0" align="center">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
 					<tr><td height=30></td></tr>
-						<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>문자발송</b></td>
-								</tr>
-							</table>
-						</td></tr>
 						<tr><td height=3></td></tr>
 					<tr>
 						<td> 
 							<?
 							$stran_phone1= str_replace("=", ";", $stran_phone1);
 							?>
-
 							<table width="700" border='0' cellspacing='0' cellpadding='0'>
 						<tr>
 
@@ -121,4 +111,4 @@ function HLength() {
 					</tr>
 				</table> 
 				<br>
-<? include "../inc/down_menu.php"; ?>				
+<?php pkshop_admin_shell_end(); ?>				

@@ -6,12 +6,15 @@
 	include "cartfunc.php"; 
 	include "../include/login_check.php"; 
 
-$session_cart = $_SESSION["session_cart"];
+$session_cart = isset($_SESSION['session_cart']) ? $_SESSION['session_cart'] : '';
+$pkshop_head_style = 'shop';
+$pkshop_page_title = 'Shopping Cart';
 
 ?>
 <!doctype html>
 <html lang="en">
  <head>
+<?php include "../include/pkshop_html_head.php"; ?>
   <meta charset="UTF-8">
   <meta name="Generator" content="EditPlus®">
   <script language="javascript">
@@ -203,6 +206,9 @@ for($i=0;$i<$tot;$i++) {
 // echo curl_d($api_category,"&Type=proView&code=$arr[0]");
 // echo "ASd";
 	$gods = json_decode(curl_d($api_category,"&Type=proView&code=$arr[0]"),true);
+	if (!is_array($gods) || !isset($gods[0]) || !is_array($gods[0])) {
+		continue;
+	}
 	$code		= $gods[0]['code'];
 	$title		= $gods[0]['title'];
 	if($title == "")continue;
@@ -310,7 +316,7 @@ $ki=0;
 
 	if($option_t1!=""){	
 		$ki=0;
-		while(list($key,$value) = each($aoption_n1)) {
+		foreach ($aoption_n1 as $key => $value) {
 			if($value == "") {
 			}else {
 				if($value==$arr[5]){	
@@ -329,7 +335,7 @@ $ki=0;
 
 	if($option_t2!=""){	
 	$ki=0;
-	while(list($key,$value) = each($aoption_n2)) {
+	foreach ($aoption_n2 as $key => $value) {
 		if($value == "") {
 		}else {
 			if($value==$arr[6]){	
@@ -348,7 +354,7 @@ $ki=0;
 
 	if($option_t3!=""){	
 	$ki=0;
-	while(list($key,$value) = each($aoption_n3)) {
+	foreach ($aoption_n3 as $key => $value) {
 		if($value == "") {
 		}else {
 			if($value==$arr[7]){	
@@ -367,7 +373,7 @@ $ki=0;
 	
 	if($option_t4!=""){	
 	$ki=0;
-	while(list($key,$value) = each($aoption_n4)) {
+	foreach ($aoption_n4 as $key => $value) {
 		if($value == "") {
 		}else {
 			if($value==$arr[8]){	
@@ -386,7 +392,7 @@ $ki=0;
 
 	if($option_t5!=""){	
 	$ki=0;
-	while(list($key,$value) = each($aoption_n5)) {
+	foreach ($aoption_n5 as $key => $value) {
 		if($value == "") {
 		}else {
 			if($value==$arr[9]){	
@@ -420,13 +426,10 @@ $ki=0;
 	}
 
 	$sum_price = ($price_tmp+$price1+$price2+$price3+$price4+$price5) * $arr[1];
-	$price =  number_format($price_tmp+$price1+$price2+$price3+$price4+$price5);
-	$price =  number_format($price_tmp+$price1+$price2+$price3+$price4+$price5)."&nbsp;";
-	$price_tmp = $price_tmp;
-	$price = $price;
-	$price =  number_format($price_tmp+$price1+$price2+$price3+$price4+$price5)."&nbsp;";
+	$unit_usd = $price_tmp+$price1+$price2+$price3+$price4+$price5;
+	$price = pkshop_format_checkout_price($unit_usd);
 	
-	$sum_price = $sum_price;
+	$sum_price_num = $sum_price;
 	
 	
 	$coin_total =  $coin * $arr[1]; 
@@ -438,15 +441,14 @@ $ki=0;
 	$sale_price_total = $sail_price   *$arr[1];
 
 	$result_price = $result_price + $sale_price_total;
-	$sale_price_total_stt = "$&npsp;".number_format($sale_price_total);
-	$result_price_total = "$&npsp;".number_format($result_price);
+	$sale_price_total_stt = pkshop_format_checkout_price($sale_price_total);
+	$result_price_total = pkshop_format_checkout_price($result_price);
 	
 	
 	//echo $sum_price;
-	$total_price = $total_price + $sum_price;
+	$total_price = $total_price + $sum_price_num;
 	
-//	$sum_price =  number_format($sum_price);
-	$sum_price =  number_format($sum_price)."&nbsp;";
+	$sum_price = pkshop_format_checkout_price($sum_price_num);
 	
 	$total_point=$total_point+$point;
 	$point_tot=$point;
@@ -497,9 +499,9 @@ if (50 < $total_price) $charge=0;
 else $charge=3;
 
 $total_settle = $total_price + $charge;
-$charge =  number_format($charge)."&nbsp;";
-$total_price =  number_format($total_price)."&nbsp;";
-$total_settle =  number_format($total_settle)."&nbsp;";
+$charge_fmt = pkshop_format_checkout_price($charge);
+$total_price_fmt = pkshop_format_checkout_price($total_price);
+$total_settle_fmt = pkshop_format_checkout_price($total_settle);
 $coin_total_settle = number_format($coin_total)."&nbsp;";
 
 
@@ -510,7 +512,7 @@ $coin_total_settle = number_format($coin_total)."&nbsp;";
 		<div class="cart_price">
 			<div class="sp30"></div>
 			<div class="cart_price_inner">
-				Total [&nbsp;Amount(<?= $sum_price ?>) + Delivery(<?= $charge ?>)&nbsp;]&nbsp;&nbsp;<span class="c_redb font_24"><?=$total_settle?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				Total [&nbsp;Amount(<?= $result_price_total ?>) + Delivery(<?= $charge_fmt ?>)&nbsp;]&nbsp;&nbsp;<span class="c_redb font_24"><?=$total_settle_fmt?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			</div>
 			<div class="sp15"></div>
 			<div class="price_text">

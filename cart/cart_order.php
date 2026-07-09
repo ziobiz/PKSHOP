@@ -20,8 +20,14 @@ $session_cart = $_SESSION['session_cart'];
 
 include "cartfunc.php";
 include_once dirname(__FILE__) . '/../lib/icopay_pg_config.php';
-include_once dirname(__FILE__) . '/lib_icopay_chillpay.php';
-$icopay_chill_cfg = (defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED) ? icopay_chillpay_fetch_pg_config() : null;
+$icopay_unified_ui = (defined('ICOPAY_UNIFIED_ENABLED') && ICOPAY_UNIFIED_ENABLED);
+$icopay_chill_cfg = null;
+if (!$icopay_unified_ui && is_file(dirname(__FILE__) . '/lib_icopay_chillpay.php')) {
+	include_once dirname(__FILE__) . '/lib_icopay_chillpay.php';
+	if (defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED && function_exists('icopay_chillpay_fetch_pg_config')) {
+		$icopay_chill_cfg = icopay_chillpay_fetch_pg_config();
+	}
+}
 $icopay_ccd_script = 'https://cdn.chill.credit/js/ccdpayment.js';
 $icopay_merchant_code = '';
 $icopay_api_key = '';
@@ -38,10 +44,10 @@ if ($icopay_merchant_code === '' && defined('ICOPAY_CCD_MERCHANT_CODE') && ICOPA
 if ($icopay_api_key === '' && defined('ICOPAY_CCD_API_KEY') && ICOPAY_CCD_API_KEY !== '') {
 	$icopay_api_key = ICOPAY_CCD_API_KEY;
 }
-$icopay_chillpay_ui = (defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED && $icopay_merchant_code !== '' && $icopay_api_key !== '');
+$icopay_chillpay_ui = (!$icopay_unified_ui && defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED && $icopay_merchant_code !== '' && $icopay_api_key !== '');
 $icopay_allow_legacy_kspay = !empty($GLOBALS['ICOPAY_USE_KSPAY_CARD']);
 $icopay_load_kspay = false;
-if ($icopay_chillpay_ui || (defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED)) {
+if ($icopay_unified_ui || $icopay_chillpay_ui || (defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED)) {
 	$icopay_load_kspay = false;
 } elseif ($icopay_allow_legacy_kspay) {
 	$icopay_load_kspay = true;
@@ -69,7 +75,7 @@ if ($buyselected == 'Y') {
 
     // echo curl_d($api_category,"&Type=cartCount");
     $crts = json_decode(curl_d($api_category, "&Type=cartCount"), true);
-    $total_su = $crts[0]['soo'];
+    $total_su = (is_array($crts) && isset($crts[0]['soo'])) ? $crts[0]['soo'] : '0';
 
     if ($total_su == '0') {
 
@@ -90,6 +96,11 @@ if ($buyselected == 'Y') {
 <html lang="en">
 
 <head>
+<?php
+$pkshop_head_style = 'shop';
+$pkshop_page_title = 'Order';
+include dirname(__FILE__) . '/../include/pkshop_html_head.php';
+?>
     <meta charset="UTF-8">
     <meta name="Generator" content="EditPlus®">
 
@@ -112,7 +123,7 @@ if ($buyselected == 'Y') {
 
     // $DB->get("SELECT C_NAME,C_EMAIL,C_HAND,C_HAND,c_point from $member_table WHERE c_id='$valid_user'",$mems,$memn);
 
-    $name        = $json_balance['name'];
+    $name        = isset($json_balance['name']) ? $json_balance['name'] : '';
     $name_full   = trim((string)$name);
     $buyername_default = $name_full;
     $buyername_l_default = '';
@@ -121,14 +132,15 @@ if ($buyselected == 'Y') {
         $buyername_default = trim($__nm_split[2]);
     }
 
-    $email        = $json_balance['email'];
-    $zip        = $json_balance['zip'];
-    $address    = $json_balance['address'];
-    $tel        = $json_balance['hand'];
-    $handphone  = $json_balance['hand'];
-    $c_zip  = $json_balance['c_zip'];
-    $c_addr  = $json_balance['c_addr'];
-    $c_addr2  = $json_balance['c_addr2'];
+    $email        = isset($json_balance['email']) ? $json_balance['email'] : '';
+    $zip        = isset($json_balance['zip']) ? $json_balance['zip'] : '';
+    $address    = isset($json_balance['address']) ? $json_balance['address'] : '';
+    $tel        = isset($json_balance['hand']) ? $json_balance['hand'] : '';
+    $handphone  = isset($json_balance['hand']) ? $json_balance['hand'] : '';
+    $c_zip  = isset($json_balance['c_zip']) ? $json_balance['c_zip'] : '';
+    $c_addr  = isset($json_balance['c_addr']) ? $json_balance['c_addr'] : '';
+    $c_addr2  = isset($json_balance['c_addr2']) ? $json_balance['c_addr2'] : '';
+    $point      = isset($json_balance['c_point']) ? $json_balance['c_point'] : 0;
     // $point		= $json_balance['c_point'];
     $kk_point = $point;
 
@@ -186,23 +198,28 @@ if ($buyselected == 'Y') {
     <!-- <script src="https://api.payster.co.kr/js/pgAsistant.js"></script> -->
     <script type="text/javascript">
 
+            var ICOPAY_UNIFIED_ACTIVE = <?php echo $icopay_unified_ui ? 'true' : 'false'; ?>;
             var ICOPAY_CHILLPAY_ACTIVE = <?php echo $icopay_chillpay_ui ? 'true' : 'false'; ?>;
+            var ICOPAY_API_BASE = <?php echo json_encode(defined('ICOPAY_PUBLIC_BASE') ? ICOPAY_PUBLIC_BASE : 'https://api.icopay.co.kr', JSON_UNESCAPED_SLASHES); ?>;
+            var ICOPAY_CHECKOUT_LANG = <?php echo json_encode(defined('ICOPAY_CHECKOUT_LANG') ? ICOPAY_CHECKOUT_LANG : 'JPN', JSON_UNESCAPED_UNICODE); ?>;
             <?php if (!empty($icopay_chillpay_ui)) { ?>
             var ICOPAY_CCD_CONFIG = {
                 scriptUrl: <?php echo json_encode($icopay_ccd_script, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>,
                 merchantCode: <?php echo json_encode($icopay_merchant_code, JSON_UNESCAPED_UNICODE); ?>,
                 apiKey: <?php echo json_encode($icopay_api_key, JSON_UNESCAPED_UNICODE); ?>,
-                lang: <?php echo json_encode(defined('ICOPAY_CCD_LANG') ? (string)ICOPAY_CCD_LANG : 'th', JSON_UNESCAPED_UNICODE); ?>
+                lang: <?php echo json_encode(defined('ICOPAY_CCD_LANG') ? (string)ICOPAY_CCD_LANG : 'en', JSON_UNESCAPED_UNICODE); ?>
             };
             <?php } ?>
             <?php if (empty($icopay_load_kspay)) { ?>
             function _pay(_frm) {
-                <?php if (!empty($icopay_chillpay_ui)) { ?>
+                <?php if (!empty($icopay_unified_ui)) { ?>
+                return;
+                <?php } elseif (!empty($icopay_chillpay_ui)) { ?>
                 return;
                 <?php } elseif (defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED) { ?>
-                alert("Icopay는 설정됐지만 ChillPay CCD 정보를 불러오지 못했습니다.\\n서버에서 https://api.icopay.co.kr 접속을 확인하거나, lib/config.php 에 ICOPAY_CCD_MERCHANT_CODE 와 ICOPAY_CCD_API_KEY 를 추가하세요.");
+                alert("Icopay is configured but ChillPay CCD credentials could not be loaded.\\nCheck server access to https://api.icopay.co.kr or set ICOPAY_CCD_MERCHANT_CODE and ICOPAY_CCD_API_KEY in lib/icopay_pg_secrets.local.php.");
                 <?php } else { ?>
-                alert("카드 결제는 Icopay(ChillPay)로만 연동합니다.\\nlib/config.php 에 ICOPAY_COMP_ID, ICOPAY_BROKER_SECRET, ICOPAY_CCD_MERCHANT_CODE, ICOPAY_CCD_API_KEY 를 설정하세요.\\n구 KSNET(KSPay)이 필요하면 lib/config.php 에 ICOPAY_USE_KSPAY_CARD 를 true 로 설정하세요.");
+                alert("Card payment requires ICOPAY.\\nSet ICOPAY_COMP_ID and ICOPAY_BROKER_SECRET in lib/icopay_pg_secrets.local.php.");
                 <?php } ?>
             }
             if (typeof window.payResultSubmit !== "function") {
@@ -217,6 +234,267 @@ if ($buyselected == 'Y') {
                 };
             }
             <?php } ?>
+
+            function icopayUnifiedEnsureHost() {
+                var host = document.getElementById('icopayUnifiedHost');
+                if (host) {
+                    return host;
+                }
+                var wrap = document.getElementById('icopayUnifiedEmbed');
+                if (!wrap) {
+                    return null;
+                }
+                host = document.createElement('div');
+                host.id = 'icopayUnifiedHost';
+                host.style.minHeight = '400px';
+                host.style.width = '100%';
+                wrap.appendChild(host);
+                return host;
+            }
+
+            function icopayUnifiedResolveEmbedConfig(orderJson) {
+                if (!orderJson) {
+                    return null;
+                }
+                if (orderJson.embed && orderJson.embed.src && orderJson.embed.sessionToken) {
+                    return orderJson.embed;
+                }
+                var src = orderJson.embedSrc || '';
+                var sessionToken = orderJson.embedSessionToken || orderJson.sessionToken || '';
+                var target = orderJson.embedTarget || 'icopayUnifiedHost';
+                var lang = orderJson.embedLang || '';
+                if (src && sessionToken) {
+                    return { src: src, sessionToken: sessionToken, target: target, lang: lang };
+                }
+                if (typeof orderJson.embedHtml === 'string' && orderJson.embedHtml) {
+                    try {
+                        var doc = new DOMParser().parseFromString(orderJson.embedHtml, 'text/html');
+                        var oldScript = doc.querySelector('script');
+                        if (oldScript && oldScript.getAttribute('src')) {
+                            return {
+                                src: oldScript.getAttribute('src'),
+                                sessionToken: oldScript.getAttribute('data-session-token') || sessionToken,
+                                target: oldScript.getAttribute('data-target') || target,
+                                lang: oldScript.getAttribute('data-lang') || lang
+                            };
+                        }
+                    } catch (eParse) {}
+                }
+                return null;
+            }
+
+            function icopayUnifiedResolveIframeUrl(orderJson) {
+                if (!orderJson) {
+                    return '';
+                }
+                var url = orderJson.iframeUrl || orderJson.payUrl || '';
+                if (url && url.indexOf('/checkout/') !== -1) {
+                    url = url.replace(/\/checkout\/[^?]+/, '/jpay-pay.html');
+                }
+                return url;
+            }
+
+            function icopayUnifiedIframeHeightPx() {
+                if (window.innerWidth >= 768) {
+                    return 638;
+                }
+                return Math.max(480, Math.min(620, Math.round(window.innerHeight * 0.68)));
+            }
+
+            function icopayUnifiedApplyIframeLayout(iframe) {
+                if (!iframe) {
+                    return;
+                }
+                var h = icopayUnifiedIframeHeightPx();
+                var isDesktop = window.innerWidth >= 768;
+                iframe.style.display = 'block';
+                iframe.style.width = '100%';
+                iframe.style.height = h + 'px';
+                iframe.style.minHeight = h + 'px';
+                iframe.style.maxHeight = isDesktop ? h + 'px' : '72vh';
+                iframe.style.border = '0';
+                iframe.style.background = '#fff';
+                iframe.style.borderRadius = '12px';
+                iframe.style.overflow = 'hidden';
+                iframe.setAttribute('scrolling', isDesktop ? 'no' : 'auto');
+            }
+
+            function icopayUnifiedMountIframe(host, frameUrl) {
+                host.removeAttribute('data-icopay-checkout-mounted');
+                host.innerHTML = '';
+                var iframe = document.createElement('iframe');
+                iframe.id = 'icopayUnifiedFrame';
+                iframe.title = 'ICOPAY secure checkout';
+                iframe.src = frameUrl;
+                iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+                iframe.setAttribute('allow', 'payment *');
+                icopayUnifiedApplyIframeLayout(iframe);
+                host.appendChild(iframe);
+                if (!window.__icopayUnifiedResizeBound) {
+                    window.__icopayUnifiedResizeBound = true;
+                    window.addEventListener('resize', function() {
+                        var frame = document.getElementById('icopayUnifiedFrame');
+                        if (frame) {
+                            icopayUnifiedApplyIframeLayout(frame);
+                        }
+                    });
+                }
+                return true;
+            }
+
+            function icopayUnifiedInjectEmbed(orderJson) {
+                var host = icopayUnifiedEnsureHost();
+                if (!host) {
+                    return false;
+                }
+                var wrap = host.parentNode || document.getElementById('icopayUnifiedEmbed');
+                if (!wrap) {
+                    return false;
+                }
+                var oldScript = document.getElementById('icopayUnifiedEmbedScript');
+                if (oldScript && oldScript.parentNode) {
+                    oldScript.parentNode.removeChild(oldScript);
+                }
+                var frameUrl = icopayUnifiedResolveIframeUrl(orderJson);
+                if (frameUrl) {
+                    return icopayUnifiedMountIframe(host, frameUrl);
+                }
+                var cfg = icopayUnifiedResolveEmbedConfig(orderJson);
+                if (!cfg || !cfg.src || !cfg.sessionToken) {
+                    return false;
+                }
+                host.innerHTML = '';
+                var s = document.createElement('script');
+                s.id = 'icopayUnifiedEmbedScript';
+                s.src = cfg.src;
+                s.charset = 'utf-8';
+                s.setAttribute('data-session-token', cfg.sessionToken);
+                s.setAttribute('data-target', cfg.target || 'icopayUnifiedHost');
+                var embedLang = cfg.lang || ICOPAY_CHECKOUT_LANG || '';
+                if (embedLang) {
+                    s.setAttribute('data-lang', embedLang);
+                }
+                s.onerror = function() {
+                    alert('Could not load the ICOPAY payment window. Please try again in a moment.');
+                    icopayUnifiedCloseModal();
+                };
+                if (host.nextSibling) {
+                    wrap.insertBefore(s, host.nextSibling);
+                } else {
+                    wrap.appendChild(s);
+                }
+                return true;
+            }
+
+            function icopayUnifiedCloseModal() {
+                $("#icopayUnifiedModal").css("display", "none");
+                $("#popup_mask").css("display", "none");
+                $("body").css("overflow", "auto");
+                $("#icopayUnifiedStatus").css("display", "none");
+                var oldScript = document.getElementById('icopayUnifiedEmbedScript');
+                if (oldScript && oldScript.parentNode) {
+                    oldScript.parentNode.removeChild(oldScript);
+                }
+                var host = document.getElementById('icopayUnifiedHost');
+                if (host) {
+                    host.removeAttribute('data-icopay-checkout-mounted');
+                    host.innerHTML = '';
+                }
+            }
+
+            function icopayUnifiedBindPostMessage(orderInfo) {
+                if (window.__icopayUnifiedListenerBound) {
+                    return;
+                }
+                window.__icopayUnifiedListenerBound = true;
+                var handler = function(detail) {
+                    if (!detail) {
+                        return;
+                    }
+                    if (detail.phase === 'finished' && detail.success) {
+                        $.ajax({
+                            type: 'POST',
+                            url: './icopay_unified_confirm.php',
+                            contentType: 'application/json; charset=utf-8',
+                            data: JSON.stringify({
+                                orderNo: orderInfo.orderNo,
+                                ediDate: orderInfo.ediDate
+                            }),
+                            dataType: 'json',
+                            success: function(res) {
+                                if (res && res.success) {
+                                    icopayUnifiedCloseModal();
+                                    window.location.href = './icopay_unified_return.php?success=1&orderNo=' + encodeURIComponent(orderInfo.orderNo) + '&tid=' + encodeURIComponent(res.tid || orderInfo.orderNo);
+                                } else {
+                                    alert((res && res.message) ? res.message : 'Payment confirmation failed.');
+                                }
+                            },
+                            error: function() {
+                                alert('Network error while confirming payment.');
+                            }
+                        });
+                    } else if (detail.phase === 'finished' && detail.success === false) {
+                        alert('Payment was not completed.');
+                        icopayUnifiedCloseModal();
+                    }
+                };
+                if (typeof IcopayCheckout !== 'undefined' && IcopayCheckout.onMessage) {
+                    IcopayCheckout.onMessage(handler, ICOPAY_API_BASE);
+                } else {
+                    window.addEventListener('message', function(ev) {
+                        if (!ev || !ev.data || ev.data.type !== 'ICOPAY_INLINE_CHECKOUT') {
+                            return;
+                        }
+                        handler(ev.data.detail || {});
+                    }, false);
+                }
+            }
+
+            function icopayUnifiedStartFromCart() {
+                $("#popup_mask").css("display", "block");
+                $("#icopayUnifiedModal").css("display", "flex");
+                $("#icopayUnifiedStatus").css("display", "block").text('Preparing payment…');
+                icopayUnifiedEnsureHost();
+                var host = document.getElementById('icopayUnifiedHost');
+                if (host) {
+                    host.innerHTML = '';
+                }
+                $("body").css("overflow", "hidden");
+                $.ajax({
+                    type: 'POST',
+                    url: './order_ok2.php',
+                    data: $('#join').serialize(),
+                    dataType: 'text',
+                    success: function(txt) {
+                        var j = null;
+                        try {
+                            j = JSON.parse(txt);
+                        } catch (e1) {
+                            icopayUnifiedCloseModal();
+                            var snip = (typeof txt === 'string') ? txt.replace(/^\s+/, '').slice(0, 280) : '';
+                            alert('Order save returned invalid JSON.\\n\\n' + snip);
+                            return;
+                        }
+                        if (!j || !j.icopayUnified || (!j.iframeUrl && !j.payUrl && !j.embed && !j.embedHtml && !j.embedSrc && !j.sessionToken)) {
+                            icopayUnifiedCloseModal();
+                            alert((j && j.msg) ? j.msg : 'Cannot start ICOPAY checkout. Select CARD and ensure the order is not fully paid with points.');
+                            return;
+                        }
+                        window.__icopayCartOrder = j;
+                        $("#icopayUnifiedStatus").css("display", "none");
+                        if (!icopayUnifiedInjectEmbed(j)) {
+                            icopayUnifiedCloseModal();
+                            alert('Could not load the ICOPAY payment script.');
+                            return;
+                        }
+                        icopayUnifiedBindPostMessage(j);
+                    },
+                    error: function() {
+                        icopayUnifiedCloseModal();
+                        alert('Network error while saving order.');
+                    }
+                });
+            }
 
             function icopayChillpayClearCcdFallbackTimer() {
                 try {
@@ -342,7 +620,7 @@ if ($buyselected == 'Y') {
                                 $("#icopayChillpayPayBtn").prop("disabled", false);
                                 $("#popup_mask").css("display", "block");
                                 $("#icopayChillpayModal").css("display", "block");
-                                alert((res && res.message) ? res.message : '결제 요청에 실패했습니다. 잠시 후 다시 시도하세요.');
+                                alert((res && res.message) ? res.message : 'Payment request failed. Please try again.');
                             }
                         },
                         error: function() {
@@ -350,7 +628,7 @@ if ($buyselected == 'Y') {
                             $("#icopayChillpayCcdStatus").css("display", "none");
                             $("#popup_mask").css("display", "block");
                             $("#icopayChillpayModal").css("display", "block");
-                            alert('결제 서버와 통신 중 오류가 났습니다.');
+                            alert('A network error occurred while contacting the payment server.');
                         }
                     });
                 } else if (eventId === 'CreateTokenFailed' || eventId === 'CreateTokenError') {
@@ -366,25 +644,25 @@ if ($buyselected == 'Y') {
                             detail += '\n' + (typeof data === 'string' ? data : JSON.stringify(data)).slice(0, 500);
                         }
                     } catch (eDbg) {}
-                    var hint = '\n\n— 확인 사항 —\n· 카드번호·유효기간(MM/YY)·CVV·카드 소유자명을 ChillPay 입력란에 정확히 입력했는지\n· 하단 동의(Consent)에 체크했는지\n· lib/config.php 의 ICOPAY_CCD_LANG (또는 ChillPay 설정)이 상점 국가와 맞는지 (예: 태국 상점은 th)\n· 반복 시 Icopay/ChillPay 쪽 허용 도메인·API 키·테스트/운영 모드';
+                    var hint = '\n\nPlease verify:\n· Card number, expiry (MM/YY), CVV, and cardholder name\n· Consent checkbox is checked\n· ICOPAY_CCD_LANG matches your merchant region (e.g. en)\n· Allowed domain and API keys at Icopay/ChillPay';
                     if (/invalid\s*input/i.test(detail) || /\[-1\]/.test(detail)) {
-                        hint = '\n\nChillPay가 입력값을 거절했습니다(Invalid Input).\n위 항목을 다시 확인한 뒤 **결제 진행**을 눌러 주세요.' + hint;
+                        hint = '\n\nChillPay rejected the card input (Invalid Input).\nPlease review the fields above and click Proceed Payment again.' + hint;
                     }
-                    alert('카드 토큰을 만들지 못했습니다.' + detail + hint);
+                    alert('Could not create card token.' + detail + hint);
                 }
             }
 
             function icopayChillpaySubmitToken() {
                 var jn = document.join;
                 if (!jn) {
-                    alert('주문 폼을 찾을 수 없습니다.');
+                    alert('Order form not found.');
                     return;
                 }
                 icopayChillpaySyncAllPayerFields(jn);
                 var fn = String(jn.buyername && jn.buyername.value != null ? jn.buyername.value : '').trim();
                 var ln = String(jn.buyername_l && jn.buyername_l.value != null ? jn.buyername_l.value : '').trim();
                 if (!fn || !ln) {
-                    alert('주문서의 주문자 First Name·Last Name을 입력해 주세요.\n한 칸에만 이름이 있다면 성과 이름을 공백으로 구분해 적어 주세요. (예: YI BYOUNGSUN)');
+                    alert('Please enter the payer First Name and Last Name on the order form.\nIf your full name is in one field, separate first and last with a space.');
                     icopayChillpayCloseModal();
                     try {
                         if (!ln && jn.buyername_l) {
@@ -400,7 +678,7 @@ if ($buyselected == 'Y') {
                     return;
                 }
                 if (typeof ccdinline === 'undefined' || !ccdinline.CreatePaymentCreditToken) {
-                    alert('카드 입력란이 아직 준비되지 않았습니다.');
+                    alert('Card form is not ready yet.');
                     return;
                 }
                 $("#icopayChillpayPayBtn").prop("disabled", true);
@@ -412,7 +690,7 @@ if ($buyselected == 'Y') {
                 }
                 if (!ok) {
                     $("#icopayChillpayPayBtn").prop("disabled", false);
-                    alert('입력란이 모두 준비되지 않았습니다. 잠시 후 다시 눌러 주세요.');
+                    alert('Card fields are not ready. Please wait a moment and try again.');
                 }
             }
 
@@ -480,7 +758,7 @@ if ($buyselected == 'Y') {
                 s.setAttribute('data-api-key', ICOPAY_CCD_CONFIG.apiKey);
                 s.setAttribute('data-callback-event-receiver', 'icopayChillpayCcdReceiver');
                 s.setAttribute('data-auto-create-payment-credit-token-on-submit', 'false');
-                s.setAttribute('data-lang', ICOPAY_CCD_CONFIG.lang || 'th');
+                s.setAttribute('data-lang', ICOPAY_CCD_CONFIG.lang || 'en');
                 s.onload = function() {
                     try {
                         if (typeof document.onreadystatechange === 'function') {
@@ -522,7 +800,7 @@ if ($buyselected == 'Y') {
                             $("#icopayChillpayModal").css("display", "none");
                             $("body").css("overflow", "auto");
                             var snip = (typeof txt === 'string') ? txt.replace(/^\s+/, '').slice(0, 280) : '';
-                            alert('주문 저장 응답이 올바른 JSON이 아닙니다. 서버 출력(BOM/경고)을 확인하세요.\n\n' + snip);
+                            alert('Order save returned invalid JSON. Check server output for PHP warnings.\n\n' + snip);
                             return;
                         }
                         if (!j || !j.icopayChillpay) {
@@ -530,7 +808,7 @@ if ($buyselected == 'Y') {
                             $("#popup_mask").css("display", "none");
                             $("#icopayChillpayModal").css("display", "none");
                             $("body").css("overflow", "auto");
-                            alert('카드 결제를 시작할 수 없습니다. 결제수단이 카드인지, 포인트 전액 결제가 아닌지 확인하세요.');
+                            alert('Cannot start card payment. Select CARD as payment method and ensure the order total is not paid entirely with points.');
                             return;
                         }
                         window.__icopayCartOrder = j;
@@ -541,7 +819,7 @@ if ($buyselected == 'Y') {
                         icopayChillpayEnsureCcdScript(function() {
                             window.requestAnimationFrame(function() {
                                 window.requestAnimationFrame(function() {
-                                    $("#icopayChillpayCcdStatus").text('카드 입력란을 불러오는 중입니다…');
+                                    $("#icopayChillpayCcdStatus").text('Loading card fields…');
                                     window.__icopayCcdFallbackTimer = setTimeout(function() {
                                         window.__icopayCcdFallbackTimer = null;
                                         if (window.__icopayCcdPayButtonShown) {
@@ -554,7 +832,7 @@ if ($buyselected == 'Y') {
                                             $("#popup_mask").css("display", "none");
                                             $("#icopayChillpayModal").css("display", "none");
                                             $("body").css("overflow", "auto");
-                                            alert('카드 입력란을 불러오지 못했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.');
+                                            alert('Could not load the card form. Please refresh the page and try again.');
                                         }
                                     }, 2800);
                                 });
@@ -696,6 +974,10 @@ function doPaySubmit(){
             var pk = document.querySelector('input[name=paymentkind]:checked');
             var pkVal = pk ? pk.value : '';
             var cardUi = ($('.card').length && $('.card').is(':visible')) || pkVal === '1';
+            if (typeof ICOPAY_UNIFIED_ACTIVE !== 'undefined' && ICOPAY_UNIFIED_ACTIVE && cardUi) {
+                icopayUnifiedStartFromCart();
+                return;
+            }
             if (typeof ICOPAY_CHILLPAY_ACTIVE !== 'undefined' && ICOPAY_CHILLPAY_ACTIVE && cardUi) {
                 icopayChillpayStartFromCart();
                 return;
@@ -759,7 +1041,7 @@ function pay_result_submit(){
 }
 // 결제창 종료 함수(pay_result_close 이름 변경 불가능)
 function pay_result_close(){
-	alert('결제를 취소하였습니다.');
+	alert('Payment was cancelled.');
 }
 </script>
     <script language="JavaScript">
@@ -989,6 +1271,9 @@ function pay_result_close(){
                                 }
 
                                 $goods = json_decode(curl_d($api_category, "&Type=proView&code=$arr[0]"), true);
+                                if (!is_array($goods) || !isset($goods[0]) || !is_array($goods[0])) {
+                                    continue;
+                                }
 
 
                                 $code        = $goods[0]['code'];
@@ -1120,7 +1405,7 @@ function pay_result_close(){
                                 // print_r($aoption_n1);
                                 if ($option_t1 != "") {
                                     $ki = 0;
-                                    while (list($key, $value) = each($aoption_n1)) {
+                                    foreach ($aoption_n1 as $key => $value) {
                                         if ($value == "") {
                                         } else {
                                             if ($value == $arr[5]) {
@@ -1140,7 +1425,7 @@ function pay_result_close(){
 
                                 if ($option_t2 != "") {
                                     $ki = 0;
-                                    while (list($key, $value) = each($aoption_n2)) {
+                                    foreach ($aoption_n2 as $key => $value) {
                                         if ($value == "") {
                                         } else {
                                             if ($value == $arr[6]) {
@@ -1159,7 +1444,7 @@ function pay_result_close(){
 
                                 if ($option_t3 != "") {
                                     $ki = 0;
-                                    while (list($key, $value) = each($aoption_n3)) {
+                                    foreach ($aoption_n3 as $key => $value) {
                                         if ($value == "") {
                                         } else {
                                             if ($value == $arr[7]) {
@@ -1178,7 +1463,7 @@ function pay_result_close(){
 
                                 if ($option_t4 != "") {
                                     $ki = 0;
-                                    while (list($key, $value) = each($aoption_n4)) {
+                                    foreach ($aoption_n4 as $key => $value) {
                                         if ($value == "") {
                                         } else {
                                             if ($value == $arr[8]) {
@@ -1197,7 +1482,7 @@ function pay_result_close(){
 
                                 if ($option_t5 != "") {
                                     $ki = 0;
-                                    while (list($key, $value) = each($aoption_n5)) {
+                                    foreach ($aoption_n5 as $key => $value) {
                                         if ($value == "") {
                                         } else {
                                             if ($value == $arr[9]) {
@@ -1231,13 +1516,9 @@ function pay_result_close(){
 
                                 $sum_price = ($price_tmp + $price1 + $price2 + $price3 + $price4 + $price5) * $arr[1];
 
-                                $price_tmp = $price_tmp;
-
-
-
-                                $price = $price;
+                                $unit_usd = $price_tmp + $price1 + $price2 + $price3 + $price4 + $price5;
                                 $c_pv = floor($sum_price * ($c_pv / 100));
-                                $price = "$&nbsp;" . number_format($price_tmp + $price1 + $price2 + $price3 + $price4 + $price5);
+                                $price = pkshop_format_checkout_price($unit_usd);
 
                                 $sale_price_total = $price_tmp   * $arr[1];
 
@@ -1248,14 +1529,13 @@ function pay_result_close(){
 
 
 
-                                $sale_price_total_stt = "$&nbsp;" . number_format($sale_price_total);
-                                $result_price_total = "$&nbsp;" . number_format($result_price);
+                                $sale_price_total_stt = pkshop_format_checkout_price($sale_price_total);
+                                $result_price_total = pkshop_format_checkout_price($result_price);
 
                                 $sum_price = $sum_price;
                                 $total_price = $total_price + $sum_price;
 
-                                //	$sum_price =  number_format($sum_price);
-                                $sum_price =  "$&nbsp;" . number_format($sum_price);
+                                $sum_price = pkshop_format_checkout_price($sum_price);
 
                                 $total_point = $total_point + $point;
                                 $point_tot = $point;
@@ -1307,9 +1587,12 @@ function pay_result_close(){
                             $total_settle_diot = $total_settle + $charge;
                             $total_settle_num = $total_settle;
                             $total_settle_num_diot = $total_settle_diot;    //diot 로 계산 한 값
-                            $chargeT =  "$&nbsp;" . number_format($charge);
-                            $total_price =  "$&nbsp;" . number_format($total_price);
-                            $total_settle =  "$&nbsp;" . number_format($total_settle);
+                            $chargeT = pkshop_format_checkout_price($charge);
+                            $total_price_fmt = pkshop_format_checkout_price($total_price);
+                            $total_settle_fmt = pkshop_format_checkout_price($total_settle);
+                            $payment_currency = pkshop_get_payment_currency();
+                            $total_settle_payment_amt = pkshop_payment_amount_from_usd($total_settle_num);
+                            $ex_money_display = pkshop_format_currency_amount($total_settle_payment_amt, $payment_currency);
 
                             if ($_SESSION['connect_check'] != "ok") {
 
@@ -1393,6 +1676,9 @@ function pay_result_close(){
 
 
                                     $goods = json_decode(curl_d($api_category, "&Type=proView&code=$arr[0]"), true);
+                                    if (!is_array($goods) || !isset($goods[0]) || !is_array($goods[0])) {
+                                        continue;
+                                    }
                                     $code        = $goods[0]['code'];
 
                                     if ($code == "") {
@@ -1520,7 +1806,7 @@ function pay_result_close(){
 
                                     if ($option_t1 != "") {
                                         $ki = 0;
-                                        while (list($key, $value) = each($aoption_n1)) {
+                                        foreach ($aoption_n1 as $key => $value) {
                                             if ($value == "") {
                                             } else {
                                                 if ($value == $arr[5]) {
@@ -1539,7 +1825,7 @@ function pay_result_close(){
 
                                     if ($option_t2 != "") {
                                         $ki = 0;
-                                        while (list($key, $value) = each($aoption_n2)) {
+                                        foreach ($aoption_n2 as $key => $value) {
                                             if ($value == "") {
                                             } else {
                                                 if ($value == $arr[6]) {
@@ -1558,7 +1844,7 @@ function pay_result_close(){
 
                                     if ($option_t3 != "") {
                                         $ki = 0;
-                                        while (list($key, $value) = each($aoption_n3)) {
+                                        foreach ($aoption_n3 as $key => $value) {
                                             if ($value == "") {
                                             } else {
                                                 if ($value == $arr[7]) {
@@ -1577,7 +1863,7 @@ function pay_result_close(){
 
                                     if ($option_t4 != "") {
                                         $ki = 0;
-                                        while (list($key, $value) = each($aoption_n4)) {
+                                        foreach ($aoption_n4 as $key => $value) {
                                             if ($value == "") {
                                             } else {
                                                 if ($value == $arr[8]) {
@@ -1596,7 +1882,7 @@ function pay_result_close(){
 
                                     if ($option_t5 != "") {
                                         $ki = 0;
-                                        while (list($key, $value) = each($aoption_n5)) {
+                                        foreach ($aoption_n5 as $key => $value) {
                                             if ($value == "") {
                                             } else {
                                                 if ($value == $arr[9]) {
@@ -1662,7 +1948,7 @@ function pay_result_close(){
                     <div class="cart_price">
                         <div class="sp30"></div>
                         <div class="cart_price_inner">
-                            Total payment amount.[Amount(<?= $result_price_total ?>) + The delivery charge(<?= $chargeT ?>)]&nbsp;&nbsp;<span class="c_redb font_24"><?= $total_settle ?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            Total payment amount.[Amount(<?= $result_price_total ?>) + The delivery charge(<?= $chargeT ?>)]&nbsp;&nbsp;<span class="c_redb font_24"><?= $total_settle_fmt ?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         </div>
                         <div class="sp15"></div>
                         <div class="price_text">
@@ -2032,9 +2318,9 @@ function pay_result_close(){
 				</td>
 			</tr> -->
                             <tr>
-                                <th>Expected amount of money.</th>
+                                <th>Expected amount of money (<?=htmlspecialchars($payment_currency, ENT_QUOTES, 'UTF-8')?>)</th>
                                 <td>
-                                    <input type="text" id="exMoney" class="input_name" value="<?= $total_settle_num ?>" readonly id="textfield7" size="15">
+                                    <input type="text" id="exMoney" class="input_name" value="<?=htmlspecialchars($ex_money_display, ENT_QUOTES, 'UTF-8')?>" readonly size="15">
                                 </td>
                             </tr>
                             <!-- <tr>
@@ -2052,7 +2338,9 @@ function pay_result_close(){
                             <tr class="bank" <? if ($onlyP == 0) { ?>style="" <? } else { ?>style="display: none;" <? } ?>>
                                 <th>Deposit information</th>
                                 <td>
-                                    <?= $json_balance["su_bank"] ?> <?= $json_balance["su_banknum"] ?> <?= $json_balance["su_bankname"] ?>
+                                    <?=htmlspecialchars(pkshop_site_setting('payment_bank_line1'), ENT_QUOTES, 'UTF-8')?><br>
+                                    <?=htmlspecialchars(pkshop_site_setting('payment_bank_line2'), ENT_QUOTES, 'UTF-8')?><br>
+                                    <?=htmlspecialchars(pkshop_site_setting('payment_bank_line3'), ENT_QUOTES, 'UTF-8')?>
                                 </td>
                             </tr>
                             <tr class="point" <? if ($onlyP > 0) { ?>style="" <? } else { ?>style="display: none;" <? } ?>>
@@ -2269,20 +2557,90 @@ function pay_result_close(){
     border-radius: 10px;">Please wait</div>
     </div>
     <!-- </div> -->
-<?php if (!empty($icopay_chillpay_ui)) { ?>
+<?php if (!empty($icopay_unified_ui)) { ?>
+    <script src="./icopay-checkout.js"></script>
+    <style>
+        #icopayUnifiedModal {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px 16px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .icopay-unified-modal-card {
+            background: #fff;
+            max-width: 560px;
+            width: 100%;
+            margin: 0;
+            padding: 18px 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+        }
+        .icopay-unified-embed-wrap {
+            width: 100%;
+            overflow: hidden;
+            border-radius: 12px;
+            line-height: 0;
+        }
+        #icopayUnifiedHost {
+            width: 100%;
+            min-height: 0;
+            overflow: hidden;
+            line-height: 0;
+        }
+        #icopayUnifiedHost iframe {
+            display: block;
+            overflow: hidden;
+            vertical-align: top;
+        }
+        .icopay-unified-cancel-wrap {
+            margin-top: 8px;
+            padding-bottom: 18px;
+            text-align: center;
+        }
+        .icopay-unified-cancel-wrap .cart_btn01 {
+            width: 150px;
+            height: 45px;
+            margin: 0 auto;
+            font-weight: 700;
+        }
+        @media (min-width: 768px) {
+            #icopayUnifiedModal {
+                overflow: hidden;
+                padding-top: 28px;
+            }
+            .icopay-unified-embed-wrap,
+            #icopayUnifiedHost,
+            #icopayUnifiedHost iframe {
+                overflow: hidden !important;
+            }
+        }
+    </style>
+    <div id="icopayUnifiedModal" style="display:none;position:fixed;z-index:10000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.55);">
+        <div class="icopay-unified-modal-card">
+            <p id="icopayUnifiedStatus" style="display:none;font-size:13px;color:#0a7;margin:10px 0;">Preparing payment…</p>
+            <div id="icopayUnifiedEmbed" class="icopay-unified-embed-wrap">
+                <div id="icopayUnifiedHost"></div>
+            </div>
+            <div class="icopay-unified-cancel-wrap">
+                <button type="button" id="icopayUnifiedCancelBtn" class="cart_btn01" onclick="icopayUnifiedCloseModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+<?php } elseif (!empty($icopay_chillpay_ui)) { ?>
     <div id="icopayChillpayModal" style="display:none;position:fixed;z-index:10000;left:0;top:0;width:100%;height:100%;overflow:auto;background:rgba(0,0,0,0.55);">
         <div style="background:#fff;max-width:540px;margin:48px auto;padding:24px;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,0.15);">
-            <p style="margin-top:0;font-weight:bold;">카드 결제 (Icopay / ChillPay)</p>
-            <p style="font-size:13px;color:#555;">카드 정보·동의란을 채운 뒤 <strong>결제 진행</strong>을 누르세요. <strong>주문서</strong>의 firstName·Last Name은 ChillPay 카드명과 별개입니다. 비어 있으면 수령인 이름으로 자동 보완되며, 회원명이 두 단어이면 페이지 로드 시 나뉩니다. 취소 후 주문서에서 직접 고칠 수 있습니다.</p>
-            <p id="icopayChillpayCcdStatus" style="display:none;font-size:13px;color:#0a7;margin:10px 0;">카드 입력 화면을 불러오는 중입니다…</p>
+            <p style="margin-top:0;font-weight:bold;font-size:18px;letter-spacing:0.05em;">ICOPAY</p>
+            <p id="icopayChillpayCcdStatus" style="display:none;font-size:13px;color:#0a7;margin:10px 0;">Loading card form…</p>
             <form id="icopayCcdForm" action="#" method="post" onsubmit="return false;">
                 <div id="ccdinline-card-name" class="ccdinline-card-name" style="margin-bottom:8px;"></div>
                 <div id="ccdinline-card-number" class="ccdinline-card-number" style="margin-bottom:8px;"></div>
                 <div id="ccdinline-card-expiry" class="ccdinline-card-expiry" style="margin-bottom:8px;"></div>
                 <div id="ccdinline-card-cvv" class="ccdinline-card-cvv" style="margin-bottom:8px;"></div>
                 <div id="ccdinline-card-remember" class="ccdinline-card-remember" style="margin-bottom:16px;"></div>
-                <button type="button" id="icopayChillpayPayBtn" class="cart_btn01" style="display:none;width:100%;margin-bottom:10px;background:#1a7f37;color:#fff;font-weight:bold;" onclick="icopayChillpaySubmitToken()">결제 진행</button>
-                <button type="button" class="cart_btn01" onclick="icopayChillpayCloseModal()">취소</button>
+                <button type="button" id="icopayChillpayPayBtn" class="cart_btn01" style="display:none;width:100%;margin-bottom:10px;background:#1a7f37;color:#fff;font-weight:bold;" onclick="icopayChillpaySubmitToken()">Proceed Payment</button>
+                <button type="button" class="cart_btn01" onclick="icopayChillpayCloseModal()">Cancel</button>
             </form>
         </div>
     </div>
@@ -2309,19 +2667,26 @@ function pay_result_close(){
     $(".userpoint").on("keyup", function() {
         var shop_bonus = parseFloat("<?= $json_balance['emoney'] ?>");
         var userpoint = $(this).val();
-        var total_settle_num = parseFloat("<?= $total_settle_num ?>");
+        var total_settle_usd = parseFloat("<?= $total_settle_num ?>");
+        var total_settle_payment = parseFloat("<?= (int)$total_settle_payment_amt ?>");
+        var paymentSymbol = "<?=htmlspecialchars(pkshop_currency_options()[$payment_currency]['symbol'], ENT_QUOTES, 'UTF-8')?>";
 
         if (userpoint > shop_bonus) {
             userpoint = shop_bonus;
         }
-        if (userpoint > total_settle_num) {
-            userpoint = total_settle_num;
+        if (userpoint > total_settle_usd) {
+            userpoint = total_settle_usd;
         }
         if (userpoint == "" || userpoint == undefined || isNaN(userpoint)) {
             userpoint = 0;
         }
 
-        $("#exMoney").val(total_settle_num - userpoint);
+        var remain_usd = total_settle_usd - userpoint;
+        var remain_payment = total_settle_payment;
+        if (total_settle_usd > 0) {
+            remain_payment = Math.round(remain_usd * (total_settle_payment / total_settle_usd));
+        }
+        $("#exMoney").val(paymentSymbol + ' ' + remain_payment.toLocaleString());
         $(this).val(userpoint);
     });
     $(document).ready(function() {

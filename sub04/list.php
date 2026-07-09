@@ -9,8 +9,8 @@ $type = $_REQUEST["type"];
 ?>
 <!doctype html>
 <html lang="en">
- <head>
- <?
+<head>
+<?
 	include "../include/get_balance.php";
 /*
 $query = "SELECT coin_price FROM $coin_goods order by no desc";
@@ -45,18 +45,16 @@ if($theme_str==""){//정렬순서 관련
 
 	if($code1!=""){
 		$curl_d = json_decode(curl_d($api_category,"&Type=cate1&code1=$code1"),true);
-		
-		
-	
-		$tmp_cate1		= $curl_d[0]['cate'];
-		$title_cate_1	= $tmp_cate1;	//대분류 이름기억
-		$title_code_1	= $code1;
-		
+		if (is_array($curl_d) && isset($curl_d[0]['cate'])) {
+			$tmp_cate1		= $curl_d[0]['cate'];
+			$title_cate_1	= $tmp_cate1;	//대분류 이름기억
+			$title_code_1	= $code1;
+		}
 	}
 	if($code2!=""){
 		$curl_d = json_decode(curl_d($api_category,"&Type=cate2&code1=$code1&code2=$code2"),true);
 		
-		if(count($curl_d)>0){
+		if(is_array($curl_d) && count($curl_d)>0){
 			$tmp_cate2 = $curl_d[0]['cate'] ;
 			$title_cate_2 = $tmp_cate2;	//중분류 이름기억
 			$title_code_2 = $code2;
@@ -66,7 +64,7 @@ if($theme_str==""){//정렬순서 관련
 	
 		if($code3!=""){
 			$curl_d = json_decode(curl_d($api_category,"&Type=cate3&code1=$code1&code2=$code2&code3=$code3"),true);
-			if(count($curl_d)>0){
+			if(is_array($curl_d) && count($curl_d)>0){
 				$tmp_cate3 = $curl_d[0]['cate'] ;
 				$title_cate_3 = $tmp_cate3;	//중분류 이름기억
 				$title_code_3 = $code3;
@@ -75,7 +73,7 @@ if($theme_str==""){//정렬순서 관련
 	
 		if($code4!=""){
 			$curl_d = json_decode(curl_d($api_category,"&Type=cate4&code1=$code1&code2=$code2&code3=$code3&code4=$code4"),true);
-			if(count($curl_d)>0){
+			if(is_array($curl_d) && count($curl_d)>0){
 				$tmp_cate4 = $curl_d[0]['cate'];
 				$title_cate_4 = $tmp_cate4;	//중분류 이름기억
 				$title_code_4 = $code4;
@@ -93,6 +91,11 @@ if($theme_str == "r"){
 	$Title="PRODUCTS";
 }
 #####################################################################
+$pkshop_head_style = 'shop';
+if ($Title !== '' && $Title !== 'PRODUCTS') {
+	$pkshop_page_title = $Title;
+}
+include "../include/pkshop_html_head.php";
 ?>
  </head>
  <body>
@@ -288,9 +291,6 @@ for($i = $first; $i <= $last; $i++) {
 		$onlyP = $onlyP + 1;
 		$title=$title."<span style='color:#ff0000;'> [InT Only]</span>";
 	}
-	if($shop_country != $country){
-		continue;
-	}
 	$asize = explode(",",$size);				/*사이즈 분리*/	
 	$acolor = explode(",",$color);					/*색상 분리*/
 
@@ -318,18 +318,6 @@ $price_s = "<font class='sbest_text02'>".number_format($pricec)."</font> ";	//�
 	$img_name = $savedir.$imgl;
 	
 	if (!pkshop_can_show_price() && $_SESSION['valid_user'] == "") $price_s = "";
-
-	$img_info = getImageSize($savedir.'/'.$imgl);//본이미지의 정보를 얻어옵니다
-	$img_width = $img_info[0];
-	$img_height = $img_info[1];
-
-	if($img_width > $img_height){
-		$img_size = "width='242'";
-	}else{
-		$img_size = "height='200'";
-	}
-
-
 
 $price_code = $prices;
 	$prices_code = $prices1;
@@ -371,7 +359,7 @@ if ($cook_dis == "1" && $cook_dis1 == "승인") {
 							<div class="sp20"></div>
 							<p class="product_title"><a href="../sub04/view.php?left_code=<?=$code?>&code1=<?=$code1?>&code2=<?=$code2?>&code3=<?=$code3?>&code4=<?=$code4?>&theme=f&type=<?=$type?>"><?=$title?></a></p>
 							<?if(pkshop_can_show_price()){?>
-							<p class="best_price" style="font-weight:bold;font-size:16px;color:#c3070b">$ <?=$price_tmp?></p>
+							<p class="best_price" style="font-weight:bold;font-size:16px;color:#c3070b"><?=pkshop_format_usd_jpy_price($price_tmp)?></p>
 							<?}?>
 					</div>
 

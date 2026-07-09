@@ -26,13 +26,13 @@ $real_name = $row[2];
 $real_email = $row[3];
 
 if($name!="$real_name") {
-	echo "<script language=javascript>alert('성명이 일치하지 않습니다.');</script>";
+	echo "<script language=javascript>alert('Name does not match.');</script>";
 	echo "<script language=javascript>history.go(-1);</script>";
 	exit;	
 }
 
 if($email!="$real_email") {
-	echo "<script language=javascript>alert('휴대폰이 일치 하지 않습니다.');</script>";
+	echo "<script language=javascript>alert('Phone number does not match.');</script>";
 	echo "<script language=javascript>history.go(-1);</script>";
 	exit;
 } 
@@ -40,7 +40,7 @@ if($email!="$real_email") {
 ?>
 <SCRIPT LANGUAGE="JavaScript">
 <!--
-alert("아이디는 '<?=$real_id?>' 입니다. \n\n 즐거운 하루 보내세요.");
+alert("Your ID is '<?=$real_id?>'. \n\n Have a great day.");
 location="find.php";
 //-->
 </SCRIPT>

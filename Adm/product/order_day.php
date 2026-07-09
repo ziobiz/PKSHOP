@@ -1,12 +1,10 @@
 <?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
+include_once "../inc/admin_shell_lib.php";
 include "../common/user_function.php";
 
 ########## 데이터베이스에 연결한다. #################################
-
-include "../inc/top_menu.php";
-include "../inc/left_menu_sell.php";
 $tmonth = $_REQUEST["tmonth"];
 $tday = $_REQUEST["tday"];
 $tyear = $_REQUEST["tyear"];
@@ -49,7 +47,7 @@ $total_record = $rn;
 
 #####################################################################
 ?>
-
+<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go() {
@@ -64,14 +62,13 @@ function move() {
 //-->
 </script>
 
-				<table width="800" border="0" cellspacing="0" cellpadding="0">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr><td height=30></td></tr>
 					<tr><td>
 							<table border=0 cellpadding=0 cellspacing=0>
 
 								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-<? 
+									<? 
 	$file_name=date("Y-m-d");
 ?>
 									<td class='td14'><b>일별 매출 조회&nbsp;&nbsp;<a href="order_day_excel.php?kkid=<?=$kkid?>&tmonth=<?=$tmonth?>&tday=<?=$tday?>&tyear=<?=$tyear?>&emonth=<?=$emonth?>&eday=<?=$eday?>&eyear=<?=$eyear?>&file_name=<?=$file_name?>">[엑셀파일다운로드]</a></b></td>
@@ -273,4 +270,4 @@ for($i = 0; $i < $total_record; $i++) {
 					</tr>
 
 				</table>
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

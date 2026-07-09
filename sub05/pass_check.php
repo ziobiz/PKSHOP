@@ -17,7 +17,7 @@ if($Memo=="Y"){
 	if ($PassWord==$Pwd)  { 	
 		echo "<meta http-equiv='refresh' content='0;url=erase.php?Memo=Y&Comm_No=$Comm_No&No=$No&page=$page&Cm_del=$Cm_del'>"; 	
 	} else { 
-		echo "<script>alert('비밀번호가 일치하지 않습니다.');"; 
+		echo "<script>alert('Password does not match.');"; 
 		echo "window.close();"; 
 		echo "</script>"; 
 	} 
@@ -38,7 +38,7 @@ if($Memo=="Y"){
 			echo "<meta http-equiv='refresh' content='0;url=erase.php?No=$No'>"; 	
 		}
 	}else{ 
-		 echo "<script>alert('비밀번호가 일치하지 않습니다.');"; 
+		 echo "<script>alert('Password does not match.');"; 
 		 echo "history.back();"; 
 		 echo "</script>"; 
 	} 

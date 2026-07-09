@@ -2,13 +2,10 @@
 
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
+include_once "../inc/admin_shell_lib.php";
 include "../common/user_function.php";
 
 ########## 데이터베이스에 연결한다. #################################
-
-include "../inc/top_menu.php";
-include "../inc/left_menu_product.php";
-
 if($first_chk!="Y") {
 	
 	$query = "SELECT title,theme,pricec,prices,priced,point,currnum,warnnum FROM $shop_goods WHERE code='$code'";
@@ -39,7 +36,7 @@ $postnum2 = $postnum1 - $currnum;
 
 #####################################################################
 ?>
-
+<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_plus() {
@@ -63,20 +60,12 @@ function go_list() {
 //-->
 </script>
 
-				<table width="700" border="0" cellspacing="0" cellpadding="0">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>재고관리</b></td>
-								</tr>
-							</table>
-					</td></tr>
 					<tr><td height=3></td></tr>
 					<tr>
 						<td>							
-							<table width="600" border='0' cellspacing='0' cellpadding='0'>
+							<table class="pg-table pg-table-form" width="100%" border='0' cellspacing='0' cellpadding='0'>
 								<form name="form" method="post">
 									<tr><td colspan=2 height=2 bgcolor='#88B7DA'></td></tr>
 									<tr><td colspan=2 height=5></td></tr>
@@ -198,4 +187,4 @@ function go_list() {
 							</td>
 						</tr>
 					</table> 
-<? include "../inc/down_menu.php"; ?>					
+<?php pkshop_admin_shell_end(); ?>

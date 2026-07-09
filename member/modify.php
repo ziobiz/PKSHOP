@@ -53,17 +53,17 @@ $adsms		= $custs[0]['adsms'];
 	function go_modify() {      
 		if(document.form.passwd.value != "") {
 			if(document.form.passwd.value.length < 4) {
-				alert('비밀번호는 최소 4자 이상 입력하세요!');
+				alert('Password must be at least 4 characters.');
 				document.form.newpasswd.focus();
 				return;
 			}
 			if(!document.form.passwd2.value) {
-				alert('새 비밀번호 확인를 입력하세요!');
+				alert('Please enter new password confirmation.');
 				document.form.passwd2.focus();
 				return;
 			}
 			if(document.form.passwd.value != document.form.passwd2.value) {
-				alert('새 비밀번호와 새 비밀번호확인이 일치하지 않습니다.');
+				alert('New password and confirmation do not match.');
 				document.form.passwd2.focus();
 				return;
 			}

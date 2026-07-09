@@ -34,8 +34,24 @@ $key = $_GET['key'];
 $page_num =$_GET["page"];
 }
 
+$p_num = 50;
+if (isset($_REQUEST['p_num']) && $_REQUEST['p_num'] !== '') {
+	$p_num = intval($_REQUEST['p_num']);
+} elseif (isset($_REQUEST['num_per_page']) && $_REQUEST['num_per_page'] !== '') {
+	$p_num = intval($_REQUEST['num_per_page']);
+}
+$allowed_per_page = array(50, 100, 200, 500, 1000);
+if (!in_array($p_num, $allowed_per_page, true)) {
+	$p_num = 50;
+}
 
-
+$page = 1;
+if (isset($_REQUEST['page']) && $_REQUEST['page'] !== '') {
+	$page = intval($_REQUEST['page']);
+}
+if ($page < 1) {
+	$page = 1;
+}
 
 	if ($sel_cate==""){
 		$sel_code1="";
@@ -87,12 +103,52 @@ function go_search() {
 	document.form.action="products.php";
 	document.form.submit();
 }
+
+function go_theme_save() {
+	if (!confirm('현재 페이지 상품의 추천/베스트/HOT 테마 설정을 반영하시겠습니까?')) {
+		return;
+	}
+	document.form.action="products_theme_ok.php";
+	document.form.submit();
+}
+
+function productOrderMove(no, dir) {
+	var params = new URLSearchParams();
+	params.append('action', 'move');
+	params.append('No', no);
+	params.append('dir', dir);
+	params.append('soldout', document.form.soldout.value);
+	params.append('sel_code1', document.form.sel_code1.value);
+	params.append('sel_code2', document.form.sel_code2.value);
+	params.append('sel_code3', document.form.sel_code3.value);
+	params.append('sel_code4', document.form.sel_code4.value);
+
+	fetch('products_order_ajax.php', {
+		method: 'POST',
+		body: params
+	})
+	.then(function(res) { return res.json(); })
+	.then(function(data) {
+		if (data.ok) {
+			location.reload();
+		} else {
+			alert(data.message || '순서 변경에 실패했습니다.');
+		}
+	})
+	.catch(function() {
+		alert('순서 변경 요청 중 오류가 발생했습니다.');
+	});
+}
 //-->
 </script>
 				
 				<table width="900" border="0" cellspacing="0" cellpadding="0">
 				<form name="form" method="post">
 				<input type="hidden" name="soldout" value="<?=$soldout?>">
+				<input type="hidden" name="page" value="<?=$page?>">
+				<input type="hidden" name="chk_order" value="<?=$chk_order?>">
+				<input type="hidden" name="keyfield" value="<?=$keyfield?>">
+				<input type="hidden" name="key" value="<?=$key?>">
 					<tr>
 						<td>							
 							<table width="900" border="0" cellspacing="0" cellpadding="4">
@@ -238,7 +294,7 @@ for ($i=0;$i<$total_record=$rn;$i++){
 								</tr>
 							</table>
 							<table width="900" border='0' cellspacing='0' cellpadding='0'>
-								<tr><td colspan=10 height=3 bgcolor='#88B7DA'></td></tr>
+								<tr><td colspan=12 height=3 bgcolor='#88B7DA'></td></tr>
 								<tr align="center" bgcolor='#EBF0F4'> 
 									<td width="45" height="26">번호</td>
 									<td width="150" height="26">상품코드</td>
@@ -248,6 +304,9 @@ for ($i=0;$i<$total_record=$rn;$i++){
 									<td width="85" height="26">판매가격</td>
 									<td width="85" height="26">RV퍼센트</td>
 									<td width="85" height="26">MNSS</td>
+									<td width="95" height="26">테마 지정<br>
+										<input type="button" value="테마 반영" class="adminbttn" onClick="javascript:go_theme_save()" style="width:88px;border:1px #c9c9c9 solid;background-color:#e6e6e6;cursor:hand;margin-top:2px;">
+									</td>
 
 									<td width="71" height="26">상품홍보</td>
 									<td width="88" height="26">
@@ -265,8 +324,8 @@ for ($i=0;$i<$total_record=$rn;$i++){
 										<?}?>
 									</td>
 								</tr>
-								<tr><td colspan=10 height=1 bgcolor='#D2DEE8'></td></tr>
-								<tr><td colspan=10 height=3></td></tr>
+								<tr><td colspan=12 height=1 bgcolor='#D2DEE8'></td></tr>
+								<tr><td colspan=12 height=3></td></tr>
 <?
 #####################################################################
 
@@ -318,9 +377,15 @@ else if($key == "") {
 $DB->get($query,$rs,$rn);
 
 $total_record=$rn;
-if ($page=="") $page=1;
-$num_per_page = 10;
+$num_per_page = $p_num;
 $page_per_block = 10;
+
+$order_index_map = array();
+if ($chk_order == "Y" && $sel_code1 != "") {
+	for ($oi = 0; $oi < $total_record; $oi++) {
+		$order_index_map[$rs[$oi][0]] = $oi;
+	}
+}
 
 if(!$total_record) {
  	$first = 1;
@@ -339,7 +404,7 @@ if(!$total_record) {
  
 $total_page = ceil($total_record/$num_per_page);
 $article_num = $total_record - $num_per_page*($page-1);
-$mode="keyfield=$keyfield&key=$encoded_key&sel_code1=$sel_code1&sel_code2=$sel_code2&sel_code3=$sel_code3&sel_code4=$sel_code4&chk_order=$chk_order&sel_cate=$sel_cate&soldout=$soldout";
+$mode="keyfield=$keyfield&key=$encoded_key&sel_code1=$sel_code1&sel_code2=$sel_code2&sel_code3=$sel_code3&sel_code4=$sel_code4&chk_order=$chk_order&sel_cate=$sel_cate&soldout=$soldout&p_num=$num_per_page";
 $ii=0;
 for($i = $first; $i <= $last; $i++) { 
 	$No =$rs[$i][0];
@@ -355,9 +420,12 @@ for($i = $first; $i <= $last; $i++) {
 	$order2 =$rs[$i][10];
 	$order3 =$rs[$i][11];
 	$theme_g =$rs[$i][12];
-	$theme_n =$rs[$i][13];
-	$theme_r =$rs[$i][14];
-	$theme_f =$rs[$i][15];
+	$theme_n_raw =$rs[$i][13];
+	$theme_r_raw =$rs[$i][14];
+	$theme_f_raw =$rs[$i][15];
+	$theme_n = $theme_n_raw;
+	$theme_r = $theme_r_raw;
+	$theme_f = $theme_f_raw;
 	$theme_x =$rs[$i][16];
 	$theme_y =$rs[$i][17];
 	$theme_z =$rs[$i][18];
@@ -443,6 +511,11 @@ for($i = $first; $i <= $last; $i++) {
 									<td width="65" height="26">&nbsp;<?=$pricec?></td>
 									<td width="65" height="26">&nbsp;<?=$c_pv?>%</td>
 									<td width="71" height="26">&nbsp;<?=$theme_str?></td>
+									<td width="95" height="26" align="left" style="font-size:11px;padding:4px;">
+										<label style="display:block;white-space:nowrap;"><input type="checkbox" name="theme_n[<?=$No?>]" value="n" <?if($theme_n_raw=="n"){?>checked<?}?>> 추천</label>
+										<label style="display:block;white-space:nowrap;"><input type="checkbox" name="theme_r[<?=$No?>]" value="r" <?if($theme_r_raw=="r"){?>checked<?}?>> 베스트</label>
+										<label style="display:block;white-space:nowrap;"><input type="checkbox" name="theme_f[<?=$No?>]" value="f" <?if($theme_f_raw=="f"){?>checked<?}?>> HOT</label>
+									</td>
 									<td width="70" height="26" align="center">&nbsp;
 <?if($sel_code1 ==""){?>
 
@@ -499,7 +572,16 @@ for ($j=0;$j<$total_order;$j++) {
 
 <?}?>
 										</select>
-<?}else{?>---<?}?>
+<?
+}else{
+	$order_idx = isset($order_index_map[$No]) ? $order_index_map[$No] : -1;
+	$can_up = ($order_idx > 0);
+	$can_down = ($order_idx >= 0 && $order_idx < $total_record - 1);
+?>
+										<button type="button" class="adminbttn" title="위로" onclick="productOrderMove(<?=$No?>,'up')" <?=$can_up ? '' : 'disabled'?> style="width:22px;padding:0;">▲</button>
+										<button type="button" class="adminbttn" title="아래로" onclick="productOrderMove(<?=$No?>,'down')" <?=$can_down ? '' : 'disabled'?> style="width:22px;padding:0;">▼</button>
+										<span style="font-size:11px;"><?=$g_order?></span>
+<?}?>
 									</td>
 									<td></td>
 									<input type="hidden" name="no[<?=$No?>]" value="<?=$No?>"> 
@@ -507,7 +589,7 @@ for ($j=0;$j<$total_order;$j++) {
 										<input type="checkbox" name="check<?=$ii?>" value="<?=$No?>">삭제시체크
 									</td>
 								</tr>
-								<tr><td colspan=10 height=1 bgcolor='#D2DEE8'></td></tr>
+								<tr><td colspan=12 height=1 bgcolor='#D2DEE8'></td></tr>
 
 <?           
 #####################################################################
@@ -523,9 +605,27 @@ $chk_num = $last-$first+1;
 						</td>
 					</tr>
 				</table> 
-				<table width="800" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
-					<tr><td height="20" align="right">*카테고리 선택후에는 각 카테고리별 우선순위로 정렬됩니다.<br />*오래전 입력한 자료를 앞부분에 노출시키고자 할때 우선순위를 활용합니다.<br />*우선순위가 같은 경우는 기본인 등록순으로 정렬됩니다.</td></tr>
+				<table width="900" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
+					<tr><td height="20" align="right" colspan="2">*카테고리 선택후에는 각 카테고리별 우선순위로 정렬됩니다.<br />*1차 카테고리 선택 시 ▲▼ 화살표로 우선순위를 조정할 수 있습니다.<br />*우선순위가 같은 경우는 기본인 등록순으로 정렬됩니다.<br />*테마 지정 열에서 추천/베스트/HOT를 선택 후 [테마 반영]을 누르면 현재 페이지 상품에 일괄 적용됩니다. (한 상품에 여러 테마 동시 지정 가능)</td></tr>
 					<tr> 
+						<td height="20" align="left" width="280">
+							<font color="#666666">한페이지 보기
+<?
+$page_size_options = array(50, 100, 200, 500, 1000);
+foreach ($page_size_options as $ps) {
+	if ($num_per_page == $ps) {
+?>
+								&nbsp;<b><?=$ps?></b>
+<?
+	} else {
+?>
+								&nbsp;<a href="products.php?<?=$mode?>&page=1&p_num=<?=$ps?>" onMouseOver="status='한페이지 <?=$ps?>개';return true;" onMouseOut="status=''"><font color="#666666"><?=$ps?></font></a>
+<?
+	}
+}
+?>
+							</font>
+						</td>
 						<td height="20" align="center">
 							<font color="#666666">
  <?
@@ -537,7 +637,6 @@ $chk_num = $last-$first+1;
  if($total_block <= $block) {
  	$last_page = $total_page;
  }
- $mode="keyfield=$keyfield&key=$encoded_key&sel_code1=$sel_code1&sel_code2=$sel_code2&sel_code3=$sel_code3&sel_code4=$sel_code4&chk_order=$chk_order&sel_cate=$sel_cate&soldout=$soldout";
   if ($page > 1) {
  	$page_num = $page - 1;
 #####################################################################
@@ -573,6 +672,7 @@ $chk_num = $last-$first+1;
 					<input type="hidden" name="chk_num" value="<?=$chk_num?>">   
 					<input type="hidden" name="sel_cate" value="<?=$sel_cate?>">
 					<input type="hidden" name="num_per_page" value="<?=$num_per_page?>">
+					<input type="hidden" name="p_num" value="<?=$num_per_page?>">
 					</form>
 				</table>
 				<br><br>

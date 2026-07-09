@@ -79,7 +79,7 @@
 			<!--
 			function sgo2() {
 				if(document.find2.word.value==""){
-					alert("검색단어를 입력하세요.");
+					alert("Please enter a search term.");
 					return;
 				}
 //				document.find2.stype.value = "1";

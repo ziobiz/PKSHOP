@@ -20,6 +20,18 @@
 						<tr><td colspan=2 bgcolor='#ffffff' height=1></td></tr>
 						<tr bgcolor='#F1F1F1'>
 							<td height=35></td>
+							<td><a href='../product/pro_import.php'>상품 일괄등록</a></td>
+						</tr>
+						<tr><td colspan=2 bgcolor='#DCDCDC' height=1></td></tr>
+						<tr><td colspan=2 bgcolor='#ffffff' height=1></td></tr>
+						<tr bgcolor='#F1F1F1'>
+							<td height=35></td>
+							<td><a href='../product/pro_ai_generate.php'>AI 상품 생성</a></td>
+						</tr>
+						<tr><td colspan=2 bgcolor='#DCDCDC' height=1></td></tr>
+						<tr><td colspan=2 bgcolor='#ffffff' height=1></td></tr>
+						<tr bgcolor='#F1F1F1'>
+							<td height=35></td>
 							<td><a href='../product/products.php'>전체상품관리</a></td>
 						</tr>
 						<tr><td colspan=2 bgcolor='#DCDCDC' height=1></td></tr>
@@ -46,6 +58,24 @@
 						<tr bgcolor='#F1F1F1'>
 							<td height=35></td>
 							<td><a href='../product/pro_like.php'>HOT상품</a></td>
+						</tr>
+						<tr><td colspan=2 bgcolor='#DCDCDC' height=1></td></tr>
+						<tr><td colspan=2 bgcolor='#ffffff' height=1></td></tr>
+						<tr bgcolor='#F1F1F1'>
+							<td height=35></td>
+							<td><a href='../product/pro_all.php'>ALL상품</a></td>
+						</tr>
+						<tr><td colspan=2 bgcolor='#DCDCDC' height=1></td></tr>
+						<tr><td colspan=2 bgcolor='#ffffff' height=1></td></tr>
+						<tr bgcolor='#F1F1F1'>
+							<td height=35></td>
+							<td><a href='../product/pro_ai_products.php'>AI 상품관리</a></td>
+						</tr>
+						<tr><td colspan=2 bgcolor='#DCDCDC' height=1></td></tr>
+						<tr><td colspan=2 bgcolor='#ffffff' height=1></td></tr>
+						<tr bgcolor='#F1F1F1'>
+							<td height=35></td>
+							<td><a href='../product/pro_site_settings.php'>환경설정</a></td>
 						</tr>
 						<tr><td colspan=2 bgcolor='#DCDCDC' height=1></td></tr>
 						<tr><td colspan=2 bgcolor='#ffffff' height=1></td></tr>

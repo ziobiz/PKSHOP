@@ -44,7 +44,7 @@ function go_seatch() {
 }
 
 function Check() {
-	alert("죄송합니다 내용을 확인 할수 없습니다.\n\n글이  이미 삭제 되었습니다.. ");
+	alert("Sorry, this content is no longer available.\n\nThe post may have been deleted.");
 }
 
 function go_del() {

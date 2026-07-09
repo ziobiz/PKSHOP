@@ -5,6 +5,10 @@ include "../common/dbconn.php";
 include "../inc/top_menu.php";
 include "../inc/left_menu_product.php";
 
+if (!isset($country) || $country === '') {
+	$country = '1';
+}
+
 $shop_img="../../shop_img";
 $shop_img_lode="../../shop_img";
 
@@ -44,8 +48,7 @@ function regist() {
 		return;
 	}
 	if(document.form.country.value ==""){
-		alert("국가를 선택해주세요");
-		return false;
+		document.form.country.value = "1";
 	}
 	oEditors.getById["detail"].exec("UPDATE_CONTENTS_FIELD", []);
 	document.form.action="pro_up_ok.php";
@@ -268,11 +271,10 @@ $total_order4=$row_num4[0]["total_order4"] + 1;
 										<td height="30" align="left">
 											&nbsp;&nbsp; 
 											<select name="country" id="country">
-												<option <?=$country =="" ? " selected " : ""?> value="">선택</option>
 												<option <?=$country =="82" ? " selected " : ""?> value="82">KOREA</option>
 												<option <?=$country =="66" ? " selected " : ""?> value="66">THAILAND</option>
 												<option <?=$country =="91" ? " selected " : ""?> value="91">INDIA </option>
-												<option <?=$country =="1" ? " selected " : ""?> value="1">USA</option>
+												<option <?=$country =="" || $country =="1" ? " selected " : ""?> value="1">USA</option>
 												<option <?=$country =="81" ? " selected " : ""?> value="81">JAPAN </option>
 												<option <?=$country =="86" ? " selected " : ""?> value="86">CHINA</option>
 												<option <?=$country =="84" ? " selected " : ""?> value="84">VIETNAM </option>

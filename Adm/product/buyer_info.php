@@ -1,19 +1,14 @@
 <?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
+include_once "../inc/admin_shell_lib.php";
 include "../common/user_function.php";
 
 ########## 데이터베이스에 연결한다. #################################
 
 include "../inc/set_com.php";
-include "../inc/top_menu.php";
-include "../inc/left_menu_sell.php";
-
-
-
-
 ?>
-
+<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_modify() {
@@ -70,17 +65,9 @@ $query=$query." $shop_order WHERE ordernum='$ordernum'";
 
 $ostatus_tmp=$ostatus;
 #####################################################################
-?> 
-				<table width="700" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
+?>
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>주문 내역 정보</b></td>
-								</tr>
-							</table>
-					</td></tr>					
 					<form name="form" method="post" action="buyer_info_ok.php">
 					<tr>
 						<td> 									
@@ -192,8 +179,6 @@ $option_t5 = $rs_o[0]["option_t5"];
 $total_point=$total_point+$point2;//포인트 합계 표시용
 #####################################################################
 ?>
-
-
 								<tr align="center"> 
 									<td height="25" width="90"><?=$signdate?></td>
 									<td height="25" width="63"><?=$code?></td>
@@ -284,8 +269,7 @@ if ($usepoint!="") $tmp2.="<br>&nbsp;&nbsp; (총합계 $total_settle - 포인트
 
 
 #####################################################################
-?>       
-
+?>
 							<input type="hidden" name="com_no" value="<?=$total_record?>">
 							</table>
 							<br>
@@ -458,8 +442,8 @@ if ($usepoint!="") $tmp2.="<br>&nbsp;&nbsp; (총합계 $total_settle - 포인트
 								<tr> 
 									<td height="30" align="center" width="120">처리단계</td>
 									<td colspan="3" height="30">
-										&nbsp; <?=$curr_day?> 
-										 <?//if ($ostatus=='주문취소') {?> 
+										&nbsp; <?=$curr_day?>
+										 <?//if ($ostatus=='주문취소') {?>
 										<!--  [<font color=red><b>주문취소</b></font>] &nbsp;*취소된 내용은 변경 불가능
 										 <input type="hidden" name="ostatus" value="주문취소"> -->
 										<?//}else{?>
@@ -577,4 +561,4 @@ if ($usepoint!="") $tmp2.="<br>&nbsp;&nbsp; (총합계 $total_settle - 포인트
 								</form>  
 				</table> 
 				<br><br>
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

@@ -3,9 +3,7 @@
 
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include "../inc/top_menu.php";
-include "../inc/left_menu_attendance.php";
-
+include_once "../inc/admin_shell_lib.php";
 $query = "SELECT id,ip,signdate FROM $attendance WHERE id='$id' and signdate>'$wdate1' and signdate<'$wdate2' order by signdate desc";
 $DB->get($query,$rs,$rn);
 if(!$result) {
@@ -35,26 +33,14 @@ if($wdate2< 1354201200){
 
 #####################################################################
 ?>
-
-				<table width="700" border="0" cellspacing="0" cellpadding="0">
+<?php pkshop_admin_auto_shell_begin(); ?>
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-						
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>접속IP관리</b></td>
-									<td width="430" align="right"> </td>
-								</tr>
-							
-							</table>
-					</td>
-					</tr>
 					<tr><td height=3></td></tr>
 					<tr>
 						<td>
 							
-							<table width="600" border='0' cellspacing='0' cellpadding='0'>
+							<table class="pg-table pg-table-form" width="100%" border='0' cellspacing='0' cellpadding='0'>
 
 								<tr><td colspan=4 height=2 bgcolor='#88B7DA'></td></tr>
 								<tr><td colspan=4 height=5></td></tr>
@@ -69,7 +55,7 @@ if($wdate2< 1354201200){
 									$result_t= mysql_query($query_t,$DBconn);
 									$row_t = mysql_fetch_row($result_t);	
 									$title=$row_t[0];
-									?>		
+									?>
 									<td width=182 height="30">
 										<font face="돋움" size="2">&nbsp; <b>
 										<?=$title?>(<?=$id?>)</b></font>
@@ -115,4 +101,4 @@ if($wdate2< 1354201200){
 					</tr>
 				</table>
 				<br><br>
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

@@ -69,14 +69,6 @@ $mode="keyfield=$keyfield&key=$encoded_key&sex=$sex&job=$job&dis=$dis";
 				<form name="form" method="post">
 				<input type="hidden" name="id" value="<?=$id?>">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>접속 통계</b></td>
-								</tr>
-							</table>
-					</td></tr>
 					<tr><td height=3></td></tr>
 					<tr>
 						<td>							 

@@ -1,5 +1,8 @@
 <?
 	include "../include/com.php";
+	require_once dirname(__FILE__) . '/../include/site_settings_lib.php';
+	$pk = pkshop_site_settings();
+	ob_start();
 ?>
 <!doctype html>
 <html lang="en">
@@ -357,3 +360,6 @@ http://www.pentakleva.shop
 </div>
 </body>
 </html>
+<?
+echo pkshop_brand_replace_text(ob_get_clean());
+?>

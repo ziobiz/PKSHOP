@@ -2,6 +2,8 @@
 #####################################################################
 include "../common/user_function.php";
 include "../common/dbconn.php";
+include_once "../inc/admin_shell_lib.php";
+pkshop_admin_auto_shell_begin();
 #####################################################################
 ?>
 <html>
@@ -25,7 +27,7 @@ include "../common/dbconn.php";
 				</td>
 				<td align=center valign=top><!-- 우측 컨텐츠 부분 -->
 
-				<table width="800" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
 
 					<tr><td height=30 align="center"><iframe src="../nalog507/admin_counter.php?counter=<?=$counter?>" width="800" height="900" frameborder="0"></iframe></td></tr>
 					

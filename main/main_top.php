@@ -1,4 +1,3 @@
-<link rel="shortcut icon" type="image/x-icon" href="images/pentakleva.ico">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
 <script type="text/javascript" src="../include/swiper.min.js"></script>
 <script>
@@ -32,22 +31,6 @@
 	});
 </script>
 
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta property="og:title" content="Pentakleva">
-<meta property="og:type" content="website">
-<meta property="og:image" content="../images/kakao.jpg?=1">
-<meta property="og:image:width" content="800"/>
-<meta property="og:image:height" content="400"/> 
-<meta property="og:description" content="Pentakleva">
-<title>Pentakleva</title>
-<link rel="stylesheet" href="../include/reset.css">
-<link rel="stylesheet" type="text/css" href="../include/style_main.css" media="screen and (min-width:1024px)"/>
-<link rel="stylesheet" type="text/css" href="../include/responsive.css" media="screen and (max-width:1023px)"/>
-<link rel="stylesheet" href="../include/swiper.min.css">
-
- </head>
 	<div id="header">
 
 		<div class="header_top">
@@ -76,7 +59,7 @@
 
 
 		<div class="header_inner pc_hide" style="position:relative;">
-			<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><a href="../main/main.html"><img src="../images/logo2.png" class="m_logo"></a></div>
+			<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><a href="../main/main.html"><img src="<?=htmlspecialchars(pkshop_site_setting('logo_mobile'), ENT_QUOTES, 'UTF-8')?>" class="m_logo" style="width:<?=intval(pkshop_site_setting('logo_mobile_width'))?>px;height:<?=intval(pkshop_site_setting('logo_mobile_height'))?>px;object-fit:contain;"></a></div>
 			<div class="nav_btn"><img src="../images/nav_btn.png"></div>
 		</div>
 
@@ -84,7 +67,7 @@
 		<div class="header_inner">
 			<div class="po-box">
 				<div class="logo">
-					<a href="../main/main.html"><img src="../images/logo2.png" alt="로고"></a>
+					<a href="../main/main.html"><img src="<?=htmlspecialchars(pkshop_site_setting('logo_pc'), ENT_QUOTES, 'UTF-8')?>" alt="로고" style="width:<?=intval(pkshop_site_setting('logo_pc_width'))?>px;height:<?=intval(pkshop_site_setting('logo_pc_height'))?>px;object-fit:contain;"></a>
 				</div>
 			<SCRIPT LANGUAGE="JavaScript">
 			<!--

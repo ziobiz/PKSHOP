@@ -48,12 +48,12 @@ $handphone=$handphone1."-".$handphone2."-".$handphone3;
 /*
 if($passwd!="") {
 	if(!ereg("([a-z0-9]{3,}$)", $passwd)) {
-		echo "<script language=javascript> alert('비밀번호는 4자이상이어야 합니다.'); </script>";
+		echo "<script language=javascript> alert('Password must be at least 4 characters.'); </script>";
 		echo "<script language=javascript> history.go(-1); </script>";
 		exit;
 	}
 	if($passwd!=$passwd2) {
-		echo "<script language=javascript> alert('비밀번호가 동일하지 않습니다.'); </script>";
+		echo "<script language=javascript> alert('Passwords do not match.'); </script>";
 		echo "<script language=javascript> history.go(-1); </script>";
 		exit;
 	}
@@ -102,7 +102,7 @@ if($passwd!="") {
 ?>
 <script type="text/javascript">
 <!--
-	alert("정보변경이 완료되었습니다");
+	alert("Your information has been updated.");
 	location="modify.php";
 //-->
 </script>

@@ -2,12 +2,10 @@
 #####################################################################
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include "../inc/top_menu.php";
-include "../inc/left_menu_member.php";
-
+include_once "../inc/admin_shell_lib.php";
 #####################################################################
 ?>
- 
+<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function idchk(url){
@@ -77,21 +75,13 @@ function open_addr(url){
 //-->
 </script> 
  
-				<table width="700" border="0" cellspacing="0" cellpadding="0">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>회원관리</b></td>
-								</tr>
-							</table>
-					</td></tr>
 					<tr><td height=3></td></tr>
 					<tr>
 						<td>
 							
-							<table width="600" border='0' cellspacing='0' cellpadding='0'>
+							<table class="pg-table pg-table-form" width="100%" border='0' cellspacing='0' cellpadding='0'>
 							<form name="form" method="post">
 								<tr><td colspan=4 height=2 bgcolor='#88B7DA'></td></tr>
 								<tr><td colspan=4 height=5></td></tr>
@@ -449,4 +439,4 @@ function open_addr(url){
 
 
 
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

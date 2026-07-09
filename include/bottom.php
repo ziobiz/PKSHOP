@@ -1,94 +1,91 @@
 
 
+<?php
+if (!function_exists('pkshop_site_setting')) {
+	require_once dirname(__FILE__) . '/site_settings_lib.php';
+}
+$pk = pkshop_site_settings();
+?>
 <div id="footer_2">
 	    <div class="inner">
 	        <div class="item-0 item-1">
-	            <p class="text-tit">顧客センター</p>
-	            <!-- <div class="div01">
-	                <img src="../images/icon05.png">
-	                <p>1577-9761</p>
-	            </div> -->
-	            <p class="p1">OPEN: 09:00 ~ 18:00 / 土日祝休業</p>
-	            <p class="p1">contact@naphiexchange.com</p>
+	            <p class="text-tit"><?=htmlspecialchars($pk['footer_cs_title'], ENT_QUOTES, 'UTF-8')?></p>
+	            <p class="p1"><?=htmlspecialchars($pk['footer_cs_line1'], ENT_QUOTES, 'UTF-8')?></p>
+	            <p class="p1"><?=htmlspecialchars($pk['footer_cs_line2'], ENT_QUOTES, 'UTF-8')?></p>
 	        </div>
 	        <div class="item-0 item-1">
-	            <p class="text-tit">銀行口座情報</p>
-				<div class="div01">	                
-	            <p style="font-size:11px;">KASIKORN BANK IN THAILAND / 105-8-40491-4</p>
+	            <p class="text-tit"><?=htmlspecialchars($pk['footer_bank_title'], ENT_QUOTES, 'UTF-8')?></p>
+				<div class="div01">
+	            <p style="font-size:12px;"><?=htmlspecialchars($pk['footer_bank_line1'], ENT_QUOTES, 'UTF-8')?></p>
 	            </div><BR>
-				<div class="div01">	                
-					<p style="font-size:11px;">Holder: Naphi Exchange Co., Ltd.</p>
+				<div class="div01">
+					<p style="font-size:11px;"><?=htmlspecialchars($pk['footer_bank_line2'], ENT_QUOTES, 'UTF-8')?></p>
 	            </div>
-	         
-
 	        </div>
 	        <div class="item-0 item-3">
-	            <p class="text-tit">購入履歴情報</p>
+	            <p class="text-tit"><?=htmlspecialchars($pk['footer_history_title'], ENT_QUOTES, 'UTF-8')?></p>
 	            <div class="div01">
 	                <ul>
 	                    <li>
 	                        <a href="../cart/overview.php">
-	                            <img src="../images/b-icon01.png">
+	                            <img src="<?=htmlspecialchars($pk['footer_icon_myinfo'], ENT_QUOTES, 'UTF-8')?>">
 	                            <p>MY INFO</p>
 	                        </a>
 	                    </li>
 	                    <li>
 	                        <a href="../cart/cart.php">
-	                            <img src="../images/b-icon02.png">
+	                            <img src="<?=htmlspecialchars($pk['footer_icon_cart'], ENT_QUOTES, 'UTF-8')?>">
 	                            <p>CART</p>
 	                        </a>
 	                    </li>
-	                    <!-- <li>
-	                        <img src="../images/b-icon03.png">
-	                        <p>CS CENTER</p>
-	                    </li>
-	                    <li>
-	                        <img src="../images/b-icon04.png">
-	                        <p>EVENT</p>
-	                    </li> -->
 	                </ul>
 	            </div>
 	        </div>
 	        <div class="item-0 item-4">
-	            <p class="text-tit">配送情報</p>
-	            <p class="p1">会社住所: 52 Adamas, Ramintra Rd (Soi 31), Anusawaree, Bangkhen Bangkok, Thailand 10220 </p>
-	            <!-- <div class="link-btn" onclick="window.open('https://HCBRStown.co.kr/')">
-	                HCBRS Shortcut to Leisure Business Department.
-	            </div> -->
+	            <p class="text-tit"><?=htmlspecialchars($pk['footer_delivery_title'], ENT_QUOTES, 'UTF-8')?></p>
+	            <p class="p1"><?=htmlspecialchars($pk['footer_delivery_line1'], ENT_QUOTES, 'UTF-8')?></p>
 	        </div>
 	    </div>
 	</div>
 
 	<div id="footer">
 	    <div class="footer_top">
-	        <a href="../main/main.html">家</a>
+	        <a href="../main/main.html"><?=htmlspecialchars($pk['footer_link_home'], ENT_QUOTES, 'UTF-8')?></a>
 	        <div class="footer_top_bar"></div>
-	        <a href="../member/agree.php">利利用規約 / 返金ポリシー</a>
+	        <a href="../member/agree.php"><?=htmlspecialchars($pk['footer_link_terms'], ENT_QUOTES, 'UTF-8')?></a>
 	        <div class="footer_top_bar"></div>
-	        <a href="../member/agree.php">ポリシーについて</a>
+	        <a href="../member/agree.php"><?=htmlspecialchars($pk['footer_link_policy'], ENT_QUOTES, 'UTF-8')?></a>
 	        <div class="footer_top_bar"></div>
-	        <!-- <a href="../sub05/list.php?Sub_No=1">고객센터</a> -->
 	    </div>
 
 	    <div class="footer_middle">
 	        <div class="sp30"></div>
 	        <div class="footer_middle_box">
-	            <p class="footer_middle_title"><span>About company</span></p>
+	            <p class="footer_middle_title"><span><?=htmlspecialchars($pk['footer_about_title'], ENT_QUOTES, 'UTF-8')?></span></p>
 	            <div class="footer_middle_titlebar"></div>
-	            <p class="company_text"><span>会社名</span>&nbsp;&nbsp;Naphi Exchange Co., Ltd.
-	                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>代表取締役</span>&nbsp;&nbsp;TATH KOSINTANONT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span></span>
-	                <span>会社住所</span>&nbsp;&nbsp; 52 Adamas, Ramintra Rd(Soi 31), Anusawaree, Bangkhen Bangkok, Thailand&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	               <span>Tel</span>&nbsp;&nbsp;+66(0)92 583 3355
-	                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>Fax</span>&nbsp;&nbsp;+82(0)504-444-7899<br> 
-	        <span>Business registration number.</span>&nbsp;&nbsp;0105564016423
-	                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span>The mail order business.</span>&nbsp;&nbsp;
+	            <p class="company_text"><span><?=htmlspecialchars($pk['footer_company_label'], ENT_QUOTES, 'UTF-8')?></span>&nbsp;&nbsp;<?=htmlspecialchars($pk['footer_company_name'], ENT_QUOTES, 'UTF-8')?>
+	                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span><?=htmlspecialchars($pk['footer_ceo_label'], ENT_QUOTES, 'UTF-8')?></span>&nbsp;&nbsp;<?=htmlspecialchars($pk['footer_ceo'], ENT_QUOTES, 'UTF-8')?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	                <span><?=htmlspecialchars($pk['footer_address_label'], ENT_QUOTES, 'UTF-8')?></span>&nbsp;&nbsp;<?=htmlspecialchars($pk['footer_address'], ENT_QUOTES, 'UTF-8')?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	               <span><?=htmlspecialchars($pk['footer_tel_label'], ENT_QUOTES, 'UTF-8')?></span>&nbsp;&nbsp;<?=htmlspecialchars($pk['footer_tel'], ENT_QUOTES, 'UTF-8')?>
+	                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span><?=htmlspecialchars($pk['footer_fax_label'], ENT_QUOTES, 'UTF-8')?></span>&nbsp;&nbsp;<?=htmlspecialchars($pk['footer_fax'], ENT_QUOTES, 'UTF-8')?><br>
+	        <span><?=htmlspecialchars($pk['footer_biz_label'], ENT_QUOTES, 'UTF-8')?></span>&nbsp;&nbsp;<?=htmlspecialchars($pk['footer_biz_no'], ENT_QUOTES, 'UTF-8')?>
+	                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span><?=htmlspecialchars($pk['footer_mail_order_label'], ENT_QUOTES, 'UTF-8')?></span>&nbsp;&nbsp;<?=htmlspecialchars($pk['footer_mail_order'], ENT_QUOTES, 'UTF-8')?>
 	        </div>
 	        <div class="sp30"></div>
+<?php if (!empty($pk['footer_bottom_image'])) {
+	$fbw = isset($pk['footer_bottom_image_width']) ? $pk['footer_bottom_image_width'] : 1200;
+	$fbh = isset($pk['footer_bottom_image_height']) ? $pk['footer_bottom_image_height'] : 0;
+	$fbstyle = pkshop_site_image_style_attr($fbw, $fbh, 1200, 0);
+?>
+	        <div class="footer-bottom-image-wrap" style="text-align:center;padding-bottom:20px;">
+	            <img src="<?=htmlspecialchars($pk['footer_bottom_image'], ENT_QUOTES, 'UTF-8')?>" alt="" class="footer-bottom-image"<?=$fbstyle?>>
+	        </div>
+<?php } ?>
 	    </div>
 
 	    <div class="footer_bottom">
 	        <div class="footer_bottom_inner">
-	            <p class="copy">Copyright (C) Naphi Exchange Co., Ltd. All Rights Reserved.</p>
+	            <p class="copy"><?=htmlspecialchars($pk['footer_copyright'], ENT_QUOTES, 'UTF-8')?></p>
 	        </div>
 	    </div>
 	</div>

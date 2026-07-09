@@ -1,14 +1,11 @@
-<?
+﻿<?
 #####################################################################
 // error_reporting( E_ALL );
 //   ini_set( "display_errors", 1 );
 
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include "../inc/top_menu.php";
-include "../inc/left_menu_member.php";
-
-
+include_once "../inc/admin_shell_lib.php";
 $encoded_key = urlencode($key);
 $query = "SELECT *from $member_table where 1=1 ";
 
@@ -64,7 +61,7 @@ $mode="keyfield=$keyfield&key=$encoded_key&sex=$sex&job=$job&dis=$dis&member_cou
 
 #####################################################################
 ?>
-
+<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_del() {
@@ -93,30 +90,18 @@ function go_mail(tmp_mail) {
 }
 //-->
 </script>
-				<table width="900" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
 				
 					<tr><td height=30></td></tr>
 					<tr><td>
 							<table width="100%" border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14' align="left"><b><?if($dis=="0"){?>일반<?}else if($dis=="1"){?>정<?}else{?>대기<?}?>회원관리</b></td>
-									<td align="right"><form name=dform action="./member_dis_excel.php" method=post target="_blank">
-										<input type="hidden" name="level_l" value="<?=$level_l?>">
-										<? $file_name=mktime(date("H"),date("i"),date("s"),date("Y"),date("m"),date("d"));?>
-										<input type="hidden" name ="file_name" value="<?=$file_name?>">
-										<input type="hidden" name ="dis" value="<?=$dis?>">
-										<input type="hidden" name ="member_count" value="<?=$member_count?>">
-										<!-- <input type="submit" value="<?=$level_l?> 엑셀다운로드"> -->
-									</form></td>
-								</tr>
-							</table>
+								</table>
 					</td></tr>
 					<form name="form" method="post">
 					<tr><td height=3></td></tr>
 					<tr>
 						<td>							 
-								<table width="900" border="0" cellspacing="0" cellpadding="4">
+								<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="4">
 									<tr> 
 										
 										<td height="20" align="left"> 
@@ -305,7 +290,7 @@ $total_record_P=$rn_p;
 								}							
 
 								#####################################################################
-								?>								
+								?>
 								<?=date("m")-2?>월 : <?=$vtmmoney?> (<?=$mcnt?>건)
 								</td>
 								<td width="160">
@@ -365,7 +350,7 @@ $total_record_P=$rn_p;
 								}							
 
 								#####################################################################
-								?>								
+								?>
 								<?=date("m")-1?>월 : <?=$vtmmoney?> (<?=$mcnt?>건)
 								</td>
 								<td width="160">
@@ -428,7 +413,7 @@ $total_record_P=$rn_p;
 								
 
 								#####################################################################
-								?>								
+								?>
 								<?=date("n")?>월 : <?=$vtmmoney?> (<?=$mcnt?>건)
 								</td>
 								<td width="220">
@@ -499,7 +484,7 @@ $total_record_P=$rn_p;
 								}else{
 									$all_p=0;
 								}
-								?>								
+								?>
 								 전체 : <?=$vtmmoney?> (<?=$mcnt?>건)
 								</td>
 								<td>
@@ -524,7 +509,7 @@ $chk_num = $last-$first+1;
 						</td>
 					</tr>
 				</table> 
-				<table width="800" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
 					<tr> 
 						<td height="20" align="center"><font color="#666666">
 <?
@@ -568,4 +553,4 @@ if($page!=$total_page){
 					</form>  
 				</table>
 				<br><br>
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

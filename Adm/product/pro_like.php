@@ -2,10 +2,9 @@
 
 ########## 입력값에 대한 타당성 검사를 수행한다. ###########
 include "../common/dbconn.php";
+include_once "../inc/admin_shell_lib.php";
 include "../common/user_function.php";
 ########## 데이터베이스에 연결한다. ###########
-include "../inc/top_menu.php";
-include "../inc/left_menu_product.php";
 include "../inc/set_com.php";
 
 if ($sel_cate==""){
@@ -24,7 +23,7 @@ if ($sel_cate==""){
 	$sel_code4="";
 }
 ?>
-
+<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 //ie에서 배열.indexOf를 사용하기 위한
 Array.prototype.indexOf = function(obj) {
@@ -87,21 +86,13 @@ function all_chk() {
 </script>
 
 
-				<table width="800" border="0" cellspacing="0" cellpadding="0">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0">
 					<form name="form" method="post">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>HOT상품</b></td>
-								</tr>
-							</table>
-					</td></tr>
 					<tr><td height=3></td></tr>
 						<tr> 
 							<td> 								
-								<table width="800" border="0" cellspacing="0" cellpadding="4">
+								<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="4">
 									<tr> 
 										<td height="20">
 											<b>HOT상품 추가</b> : 
@@ -123,13 +114,12 @@ for ($i=0;$i<$total_record=$rn;$i++) {
 	else $oselect = "";
 
 #####################################################################
-?>                         
+?>
 											<option value="<?=$g_code?>" <?=$oselect?>><?=$cate?></option>
 
 <?
 }
 ?>
-
 											</select>
 											&nbsp;&nbsp; 
 											<select name="sel_code2" class="adminbttn" OnChange="go_select('2');">
@@ -151,7 +141,7 @@ for ($i=0;$i<$total_record=$rn;$i++) {
 	else $oselect = "";
 
 #####################################################################
-?>	
+?>
 											<option value="<?=$g_code?>" <?=$oselect?>><?=$cate?></option>
 
 <?          
@@ -178,7 +168,7 @@ for ($i=0;$i<$total_record=$rn;$i++) {
 	else $oselect = "";
 
 #####################################################################
-?>	
+?>
 											<option value="<?=$g_code?>" <?=$oselect?>><?=$cate?></option>
                    
 <?
@@ -205,7 +195,7 @@ for ($i=0;$i<$total_record=$rn;$i++) {
 	else $oselect = "";
 
 #####################################################################
-?>	
+?>
 											<option value="<?=$g_code?>" <?=$oselect?>><?=$cate?></option>
                    
 <?
@@ -231,7 +221,6 @@ for ($i=0;$i<$total_record=$rn;$i++) {
 <?           
 }
 ?>
-                    
 										</select>
                   
 										&nbsp;&nbsp;
@@ -289,7 +278,6 @@ for($i = 0; $i < $total_record; $i++) {
 	$ii=$i+1;
 #####################################################################
 ?>
-
 									<tr align="center"> 
 										<td width="51" height="26">&nbsp;<?=$article_num?></td>
 										<td width="97" height="26">&nbsp;<?=$code?></td>
@@ -328,7 +316,7 @@ for($i = 0; $i < $total_record; $i++) {
    $article_num=$article_num+1;      
    $curr_i++;
 }
-?>      
+?>
 								</table>
 							</td>
 						</tr>
@@ -338,7 +326,7 @@ for($i = 0; $i < $total_record; $i++) {
 					<input type="hidden" name="sel_cate" value="<?=$sel_cate?>">
 					</form>  
 					<BR><BR>
-					<table width="800" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
+					<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
 						<tr> 
 							<td height="20" align="center"> <b>선택한 상품을</b> 
 								<input type="button" value="목록에서  제외" class="adminbttn" onClick="javascript:go_del()">
@@ -349,4 +337,4 @@ for($i = 0; $i < $total_record; $i++) {
 						</tr>
 					</table>
 					<br><br>
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

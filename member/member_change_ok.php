@@ -26,7 +26,7 @@ if($result) {
 ?>
 <script type="text/javascript">
 <!--
-	alert("정보변경이 완료되었습니다");
+	alert("Your information has been updated.");
 	location="modify.php";
 //-->
 </script>

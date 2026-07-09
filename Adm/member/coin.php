@@ -3,29 +3,11 @@
 
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include "../inc/top_menu.php";
-include "../inc/left_menu_member.php";
-
+include_once "../inc/admin_shell_lib.php";
 ?>
- 
-				<table width="800" border="0" cellspacing="0" cellpadding="0">
+<?php pkshop_admin_auto_shell_begin(); ?>
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>코인내역</b>&nbsp;&nbsp;&nbsp;</td>
-									<td align="right">
-									
-									<form name=dform action="./coin_excel.php" method=post target="_blank">
-										<input type="hidden" name="key" value="<?=$key?>">
-										<? $file_name=mktime(date("H"),date("i"),date("s"),date("Y"),date("m"),date("d"));?>
-										<input type="hidden" name ="file_name" value="<?=$file_name?>">
-										<input type="submit" value="<?=$key?> 엑셀다운로드">
-									</form></td>
-								</tr>
-							</table>
-					</td></tr>
 					<tr><td height=3></td></tr>
 				</table>	
 
@@ -69,10 +51,7 @@ $mode="keyfield=$keyfield&key=$encoded_key&sex=$sex&job=$job&dis=$dis&member_cou
 
 #####################################################################
 ?>
-
-				
-										 
-								<table width="800" border="0" cellspacing="0" cellpadding="4">
+								<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="4">
 									<tr> 
 										
 										<td height="20" align="left"> 
@@ -130,7 +109,6 @@ for($i = $first; $i <= $last; $i++) {
 }              
 $chk_num = $last-$first+1;
 ?>
-		
 								</table>
 								</td></tr>
 							</table>
@@ -179,4 +157,4 @@ if($page!=$total_page){
 				</table>
 							<BR><BR> 
 
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

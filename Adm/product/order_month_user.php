@@ -48,16 +48,8 @@ function move() {
 //-->
 </script>
 
-				<table width="800" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>월별 매출 조회</b></td>
-								</tr>
-							</table>
-					</td></tr>	
 					<tr> 
 						<td align=left> 						
 							

@@ -180,12 +180,12 @@
 function find_id(){
 	var frm = document.relogin;
 	if(!frm.name.value){
-		alert("이름을 입력해주세요");
+		alert("Please enter your name.");
 		frm.name.focus();
 		return false;
 	}
 	if(!frm.email.value){
-		alert("전화번호 입력해주세요");
+		alert("Please enter your phone number.");
 		frm.email.focus();
 		return false;
 	}
@@ -196,17 +196,17 @@ function find_id(){
 function find_pass(){
 	var frm = document.relogin02;
 	if(!frm.id.value){
-		alert("아이디를 입력해주세요");
+		alert("Please enter your ID.");
 		frm.id.focus();
 		return false;
 	}
 	if(!frm.name.value){
-		alert("이름을 입력해주세요");
+		alert("Please enter your name.");
 		frm.name.focus();
 		return false;
 	}
 	if(!frm.email.value){
-		alert("전화번호를 입력해주세요");
+		alert("Please enter your phone number.");
 		frm.email.focus();
 		return false;
 	}

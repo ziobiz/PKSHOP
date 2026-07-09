@@ -34,7 +34,7 @@ $handphone3=$handphone[2];
 */
 if($name=="") {
 	echo "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
-	echo "<script language='javascript'>alert('없는 아이디입니다.');</script>";
+	echo "<script language='javascript'>alert('This ID does not exist.');</script>";
 	echo "<script language=javascript>history.back();</script>";
 	exit;
 }
@@ -45,7 +45,7 @@ $row = mysql_fetch_row($result);
 $input_pw = $row[0];
 if($input_pw!=$DB_pw) {
 	echo "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
-	echo "<script language=javascript>alert('패스워드가 일치하지 않습니다.');</script>";
+	echo "<script language=javascript>alert('Password does not match.');</script>";
 	echo "<script language=javascript>history.back();</script>";
 	exit;
 }

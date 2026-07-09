@@ -414,7 +414,7 @@ function checkchar	(value)
 
 			if (frm.searDate.value =="" && frm.searDate2.value =="")
 			{
-				alert('날짜를 선택 하세요');
+				alert('Please select a date.');
 			}
 			else
 			{

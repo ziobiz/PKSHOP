@@ -566,7 +566,14 @@ body {
 .product_inner{
 	width:100%;
 	padding:40px 20px;
-	overflow:hidden;
+	clear: both;
+	overflow: hidden;
+}
+
+.product_inner::after {
+	content: "";
+	display: table;
+	clear: both;
 }
 
 .best_box01{
@@ -588,17 +595,25 @@ body {
 .best_img {
     width: 100%;
     height: 350px;
+    min-height: 350px;
+    max-height: 350px;
     border: 1px #e4e4e4 solid;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    background: #fff;
+}
+
+.best_img a {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .best_img img {
-    width: 80%;
-    height: auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
 .best_text {
@@ -689,17 +704,25 @@ body {
 .new_img{
 	width: 100%;
     height: 350px;
+    min-height: 350px;
+    max-height: 350px;
     border: 1px #e4e4e4 solid;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    background: #fff;
+}
+
+.new_img a {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .new_img img{
-	width: 80%;
-    height: auto;
+	display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
 .new_textbar{
@@ -787,18 +810,26 @@ body {
 
 .all_img {
     width: 100%;
-    height: 250px;
+    height: 350px;
+    min-height: 350px;
+    max-height: 350px;
     border: 1px #e4e4e4 solid;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    background: #fff;
+}
+
+.all_img a {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .all_img img{
-    width: 80%;
-    height: auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
 .all_text {

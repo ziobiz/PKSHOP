@@ -1,7 +1,15 @@
 lib/icopay_pg_secrets.local.php
+lib/gemini_secrets.local.php
+Adm/product/ai_gen_cache/
 
 # Nested clone / test project (keep out of main repo)
 paytest/
 
 # Payment gateway logs (optional)
 cart/php/log/*.log
+
+# Local debug / scrape artifacts (do not commit)
+_*.html
+_*.json
+_cookies*.txt
+_server_*.php

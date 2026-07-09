@@ -379,11 +379,10 @@ for ($i=0;$i<$total_record=$rn;$i++) {
 										<td height="30" align="left">
 											&nbsp;&nbsp; 
 											<select name="country" id="country">
-												<option <?=$country =="" ? " selected " : ""?> value="">선택</option>
 												<option <?=$country =="82" ? " selected " : ""?> value="82">KOREA</option>
 												<option <?=$country =="66" ? " selected " : ""?> value="66">THAILAND</option>
 												<option <?=$country =="91" ? " selected " : ""?> value="91">INDIA </option>
-												<option <?=$country =="1" ? " selected " : ""?>  value="1" >USA</option>
+												<option <?=$country =="" || $country =="1" ? " selected " : ""?>  value="1" >USA</option>
 												<option <?=$country =="81" ? " selected " : ""?> value="81">JAPAN </option>
 												<option <?=$country =="86" ? " selected " : ""?> value="86">CHINA</option>
 												<option <?=$country =="84" ? " selected " : ""?> value="84">VIETNAM </option>
@@ -1151,7 +1150,7 @@ for ($i=0;$i<$total_record=$rn;$i++) {
 										</td>
 									</tr>
 									<tr><td colspan=3 height=1 bgcolor='#D2DEE8'></td></tr> -->
-									<input type="hidden" name="p_id" value="admin">
+									<input type="hidden" name="p_id" value="<?=$p_id?>">
 
 									<!-- <tr> 
 										<td width="115" height="30" align="center">이벤트마감일</td>

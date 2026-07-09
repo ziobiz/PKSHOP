@@ -1,12 +1,13 @@
 <?
-	include "../include/get_balance.php"
-
+	include "../include/get_balance.php";
+	$pkshop_head_style = 'shop';
+	$pkshop_page_title = 'Login';
+	$pkshop_login_from_buy = (isset($_GET['from']) && $_GET['from'] === 'buy');
 ?>
 <!doctype html>
 <html lang="en">
  <head>
-  <meta charset="UTF-8">
-  <meta name="Generator" content="EditPlus®">
+<?php include "../include/pkshop_html_head.php"; ?>
 
   				<script language="JavaScript">
 				<!--
@@ -127,7 +128,7 @@
 
 				</script>
  </head>
- <body>
+ <body onload="getLogin();">
 	<div id="wrap">
 
 	<!-- 상단(Top) -->
@@ -162,6 +163,13 @@
 			<hr class="hr_gray"/>
 
 			<div class="sp35"></div>
+
+			<?php if (!empty($pkshop_login_from_buy)) { ?>
+			<div style="max-width:720px;margin:0 auto 20px;padding:14px 18px;border:1px solid #e8b4b4;background:#fff5f5;color:#c3070b;text-align:center;font-size:15px;line-height:1.5;">
+				<strong>Only members can complete a purchase.</strong><br>
+				Please log in to continue.
+			</div>
+			<?php } ?>
 
 			<!-- 로그인시작 -->
 			<div class="login_inner">

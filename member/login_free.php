@@ -50,12 +50,12 @@
 				<!--
 				function login022() { //v3.0
 					if(!document.relogin22.id.value){
-						alert('아이디를 입력하세요!');
+						alert('Please enter your ID.');
 						document.relogin22.id.focus();
 						return;
 					}
 					if(!document.relogin22.passwd.value){
-						alert('비밀번호를 입력하세요!');
+						alert('Please enter your password.');
 						document.relogin22.passwd.focus();
 						return;
 					}
@@ -118,19 +118,19 @@
 				<!--
 				function login03() { //v3.0
 					if(!document.relogin3.k_name.value){
-						alert('성함을 입력하세요!');
+						alert('Please enter your name.');
 						document.relogin3.k_name.focus();
 						return;
 					}
 					
 					if(!document.relogin3.k_ordernum2.value){
-						alert('휴대폰번호를 입력하세요!');
+						alert('Please enter your mobile number.');
 						document.relogin3.k_ordernum2.focus();
 						return;
 					}
 
 					if(!document.relogin3.k_ordernum2.value){
-						alert('휴대폰번호를 입력하세요!');
+						alert('Please enter your mobile number.');
 						document.relogin3.k_ordernum2.focus();
 						return;
 					}

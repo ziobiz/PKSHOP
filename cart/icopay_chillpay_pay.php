@@ -58,7 +58,9 @@ $payload = array(
 	'paymentCreditToken' => $token,
 	'merchantOrderId' => $pend['ediDate'],
 	'amount' => $amountStr,
-	'currency' => ICOPAY_CHILL_PAY_CURRENCY,
+	'currency' => isset($pend['currency']) && $pend['currency'] !== ''
+		? (string)$pend['currency']
+		: ((function_exists('pkshop_get_payment_currency') ? pkshop_get_payment_currency() : ICOPAY_CHILL_PAY_CURRENCY)),
 	'returnUrl' => $returnUrl,
 	'cancelUrl' => $cancelUrl,
 	'description' => $description,
@@ -83,6 +85,12 @@ $r = icopay_chillpay_http_json('POST', icopay_chillpay_request_url(), array(
 $j = $r['json'];
 if (!is_array($j) || empty($j['success'])) {
 	$msg = is_array($j) && isset($j['message']) ? $j['message'] : 'Broker request failed.';
+	if ($r['curlError'] !== '') {
+		$msg .= ' (curl: ' . $r['curlError'] . ')';
+	}
+	if ($r['httpCode'] > 0) {
+		$msg .= ' [HTTP ' . $r['httpCode'] . ']';
+	}
 	echo json_encode(array('success' => false, 'message' => $msg, 'errorCode' => is_array($j) ? (isset($j['errorCode']) ? $j['errorCode'] : null) : null));
 	exit;
 }

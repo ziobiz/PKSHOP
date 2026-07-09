@@ -1,12 +1,37 @@
 <?
 
 include "../include/get_balance.php";
+include "../include/login_check.php";
+
+$session_cart = isset($_SESSION['session_cart']) ? $_SESSION['session_cart'] : '';
+$pkshop_head_style = 'shop';
+$pkshop_page_title = 'My Page';
+
+if (!function_exists('pkshop_order_status_label_en')) {
+	function pkshop_order_status_label_en($status) {
+		$map = array(
+			'주문접수' => 'Order received',
+			'입금완료' => 'Payment completed',
+			'입금확인메일발송' => 'Payment confirmation sent',
+			'배송예정' => 'Shipping scheduled',
+			'배송완료' => 'Delivered',
+			'주문취소' => 'Order cancelled',
+		);
+		$status = trim((string)$status);
+		return isset($map[$status]) ? $map[$status] : $status;
+	}
+}
 
 ?>
 <!doctype html>
 <html lang="en">
  <head>
-  <meta charset="UTF-8">
+<?php include "../include/pkshop_html_head.php"; ?>
+<?php
+if (!function_exists('pkshop_get_payment_currency')) {
+	require_once dirname(__FILE__) . '/../include/site_settings_lib.php';
+}
+?>
 <script type="text/javascript">
 <!--
 	function cancel_go(ordnum) {
@@ -68,9 +93,12 @@ include "../include/get_balance.php";
 					</tr>
 					<?
 	
-	$name = $json_balance["name"];
+	$name = isset($json_balance['name']) ? $json_balance['name'] : '';
+	$payment_currency = function_exists('pkshop_get_payment_currency') ? pkshop_get_payment_currency() : 'USD';
 	
-	$pay_mobile = $_COOKIE["valid_k_ordernum1"]."-".$_COOKIE["valid_k_ordernum2"]."-".$_COOKIE["valid_k_ordernum3"];
+	$pay_mobile = (isset($_COOKIE['valid_k_ordernum1']) ? $_COOKIE['valid_k_ordernum1'] : '') . '-'
+		. (isset($_COOKIE['valid_k_ordernum2']) ? $_COOKIE['valid_k_ordernum2'] : '') . '-'
+		. (isset($_COOKIE['valid_k_ordernum3']) ? $_COOKIE['valid_k_ordernum3'] : '');
 //echo $name;
 
 
@@ -78,21 +106,11 @@ include "../include/get_balance.php";
 
 #####################################################################
 
-include "../include/login_check.php";
-#####################################################################
-
-// $DB->get("select ordernum, kind, charge, status,char_num from $shop_order where id = '$valid_user' and status<>'주문대기' order by ordernum desc",$ords,$ordn);
-
-
- 
- 
-
- ####################################################################
-
-
-$ords = json_decode(curl_d($api_cart,"&Type=orderCount&session_cart=$session_cart"),true);
-
-$total_record = $ords[0]["count"];
+$ords = json_decode(curl_d($api_cart,"&Type=orderCount&session_cart=$session_cart"), true);
+$total_record = 0;
+if (is_array($ords) && isset($ords[0]['count'])) {
+	$total_record = (int)$ords[0]['count'];
+}
 if($total_record == 0) {
 ?>
 
@@ -105,37 +123,49 @@ if($total_record == 0) {
 	
   $flag = 0;
   for($i=0;$i<$total_record;$i++) {
-	// print_r($ords[$i]);
-	// exit;
-	$ordernum	= $ords[$i]['ordernum'];
-	$kind		= $ords[$i]['kind'];
-	$charge		= $ords[$i]['charge'];
-	$status		= $ords[$i]['status'];
-	$char_num	= $ords[$i]['char_num'];
-	$usepoint	= $ords[$i]['usepoint'];
+	if (!is_array($ords) || !isset($ords[$i]) || !is_array($ords[$i])) {
+		continue;
+	}
+	$ordernum	= isset($ords[$i]['ordernum']) ? $ords[$i]['ordernum'] : '';
+	$kind		= isset($ords[$i]['kind']) ? $ords[$i]['kind'] : '';
+	$charge		= isset($ords[$i]['charge']) ? $ords[$i]['charge'] : 0;
+	$status		= isset($ords[$i]['status']) ? $ords[$i]['status'] : '';
+	$char_num	= isset($ords[$i]['char_num']) ? $ords[$i]['char_num'] : '';
+	$usepoint	= isset($ords[$i]['usepoint']) ? $ords[$i]['usepoint'] : 0;
 
-	$ord2s = json_decode(curl_d($api_cart,"&Type=sellList&ordernum=$ordernum"),true);
-	
-    $total_record1 = $ord2s["total"];
+	$ord2s = json_decode(curl_d($api_cart,"&Type=sellList&ordernum=$ordernum"), true);
+
+    $total_record1 = 0;
+	if (is_array($ord2s) && isset($ord2s['total'])) {
+		$total_record1 = (int)$ord2s['total'];
+	}
 
 	if($i==0) $ordernum_last=$ordernum;
 	
 
 	for($j = 0; $j < $total_record1; $j++) {
+		if (!isset($ord2s[$j]) || !is_array($ord2s[$j])) {
+			continue;
+		}
 
-		$o_ordernum		= $ord2s[$j]['ordernum'];
-		$o_signdate		= $ord2s[$j]['signdate'];
-		$o_title		= $ord2s[$j]['title'];
-		$o_money1		= $ord2s[$j]['money'];
-		$count_sm		= $ord2s[$j]['count'];
-		$o_opt1			= $ord2s[$j]['opt1'];
-		$o_code			= $ord2s[$j]['code'];
-		$o_coin			= $ord2s[$j]['coin'];
-		$o_price		= $ord2s[$j]['prices'];
+		$o_ordernum		= isset($ord2s[$j]['ordernum']) ? $ord2s[$j]['ordernum'] : '';
+		$o_signdate		= isset($ord2s[$j]['signdate']) ? $ord2s[$j]['signdate'] : 0;
+		$o_title		= isset($ord2s[$j]['title']) ? $ord2s[$j]['title'] : '';
+		$o_money1		= isset($ord2s[$j]['money']) ? $ord2s[$j]['money'] : 0;
+		$count_sm		= isset($ord2s[$j]['count']) ? $ord2s[$j]['count'] : 0;
+		$o_opt1			= isset($ord2s[$j]['opt1']) ? $ord2s[$j]['opt1'] : '';
+		$o_code			= isset($ord2s[$j]['code']) ? $ord2s[$j]['code'] : '';
+		$o_coin			= isset($ord2s[$j]['coin']) ? $ord2s[$j]['coin'] : 0;
+		$o_price		= isset($ord2s[$j]['prices']) ? $ord2s[$j]['prices'] : 0;
 		
 		$o_signdate = date("Y.m.d",$o_signdate);	
 
-		$o_money = number_format($o_money1);
+		$o_money_display = function_exists('pkshop_format_currency_amount')
+			? pkshop_format_currency_amount(pkshop_payment_amount_from_usd($o_money1), $payment_currency)
+			: ('$ ' . number_format($o_money1));
+		$charge_display = function_exists('pkshop_format_currency_amount')
+			? pkshop_format_currency_amount(pkshop_payment_amount_from_usd($charge), $payment_currency)
+			: ('$ ' . number_format($charge));
 		
 		
 #####################################################################
@@ -144,8 +174,8 @@ if($total_record == 0) {
                       <td height="25"><?=$o_signdate?></td>
                       <td ><?=$ordernum?></td>
                       <td ><?=$o_title?></td>
-                      <td ><?=$count_sm?> - $ <?=$o_money?> <br>Delivery Fee : $ <?=number_format($charge); ?></td>
-                      <td ><?=$status?></td>
+                      <td ><?=$count_sm?> - <?=$o_money_display?> <br>Delivery Fee : <?=$charge_display?></td>
+                      <td ><?=htmlspecialchars(pkshop_order_status_label_en($status), ENT_QUOTES, 'UTF-8')?></td>
                       <td >				<?
 										#####################################################################
 										if($status=="주문접수"  || $status=="입금완료" || $status=="입금확인메일발송" || $status=="배송예정") {
@@ -229,13 +259,15 @@ if($total_record1==$last_j){
 
 $total_money=$total_settle_all_s;
 $total_settle_all = $total_settle_all_s+$charge-$usepoint;
-$total_settle_all = number_format($total_settle_all);
+$total_settle_all_display = function_exists('pkshop_format_currency_amount')
+	? pkshop_format_currency_amount(pkshop_payment_amount_from_usd($total_settle_all), $payment_currency)
+	: ('$ ' . number_format($total_settle_all));
 
 // $coin_total_st = number_format($coin_total_all)." GP";
 // $sall_st = Number_format($total_settle_sales)." POINT";
 ?>
               <tr>
-                <td colspan="6" height="36" bgcolor="#DFE0EE"><span style="text-align:right; color:#c3070b"> - Total Purchase Amount : $ <?=$total_settle_all?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+                <td colspan="6" height="36" bgcolor="#DFE0EE"><span style="text-align:right; color:#c3070b"> - Total Purchase Amount : <?=$total_settle_all_display?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
               </tr>
  <?
 

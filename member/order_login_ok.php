@@ -19,7 +19,7 @@ $total_record = mysql_num_rows($result);
 
 if($total_record=="0") {
 	echo "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
-	echo "<script language='javascript'>alert('주문내역이 없습니다.');</script>";	
+	echo "<script language='javascript'>alert('No order history found.');</script>";	
 	echo "<script language=javascript>history.back();</script>";
 	exit;
 }else{

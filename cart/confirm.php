@@ -125,6 +125,9 @@ if($paymentkind==5){
 					
 					// $DB->get("SELECT code,title,pricec,prices,priced,point,soldout,price_dis,imgl,opt_num,opt_num_str,option_t1,option_n1,option_p1,option_k1,option_t2,option_n2,option_p2,option_k2,option_t3,option_n3,option_p3,option_k3,option_t4,option_n4,option_p4,option_k4,option_t5,option_n5,option_p5,option_k5,point_dis,imgb1,imgb2,coin FROM $shop_goods WHERE code='$arr[0]'", $gods,$godn);
 					$gods = json_decode(curl_d($api_category,"&Type=proView&code=$arr[0]"),true);
+					if (!is_array($gods) || !isset($gods[0]) || !is_array($gods[0])) {
+						continue;
+					}
 
                     $code		= $gods[0]['code'];
                     if($code==""){
@@ -526,10 +529,9 @@ if($paymentkind==5){
 					
 					
 					$goods = json_decode(curl_d($api_category,"&Type=proView&code=$arr[0]"),true);
-
-					
-					
-
+					if (!is_array($goods) || !isset($goods[0]) || !is_array($goods[0])) {
+						continue;
+					}
 
 					$code		= $goods[0]['code'];
 
@@ -855,6 +857,9 @@ if($paymentkind==5){
 					
 					
 					$goods = json_decode(curl_d($api_category,"&Type=proView&code=$arr[0]"),true);
+					if (!is_array($goods) || !isset($goods[0]) || !is_array($goods[0])) {
+						continue;
+					}
 					$code		= $goods[0]['code'];
 
 					if($code==""){

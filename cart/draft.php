@@ -105,7 +105,7 @@ $query = "SELECT ss.No,ss.title,ss.money,ss.point,ss.code1,ss.code2,ss.code3,ss.
 ?>
 <SCRIPT LANGUAGE="JavaScript">
 <!--
-	alert("주문하신 상품이 없습니다.");
+	alert("You have no items in your order.");
 	history.back();
 //-->
 </SCRIPT>

@@ -1,10 +1,14 @@
 <?
 // error_reporting( E_ALL );
 // ini_set( "display_errors", 1 );
+$theme_str = isset($_GET['theme_str']) ? $_GET['theme_str'] : '';
+$type = isset($_GET['type']) ? $_GET['type'] : '';
+$query_dis = isset($_GET['query_dis']) ? $_GET['query_dis'] : '';
 include "../include/get_balance.php";
 if (!PKSHOP_PUBLIC_PRICE) {
 	include "../include/login_check.php";
 }
+include "../include/product_detail_helper.php";
 
 // include "../include/top_session.php";
 
@@ -29,6 +33,7 @@ function no_cart() {
 function go_cart(code,cate,color,size,add_opt1,add_opt2,add_opt3,add_opt4,add_opt5) {
 
 	var amount = document.p_form.qty.value;
+	var opt1 = "", opt2 = "", opt3 = "", opt4 = "", opt5 = "";
 	<?if ($option_n1 != ''){?>
 	var opt1 = document.p_form.opt1.value;
 	<?}?>
@@ -57,14 +62,14 @@ function go_cart(code,cate,color,size,add_opt1,add_opt2,add_opt3,add_opt4,add_op
 }
 
 function buy_go(code,cate,color,size,add_opt1,add_opt2,add_opt3,add_opt4,add_opt5) {
-	var shop_bonus = parseFloat($("#shop_bonus").val());
-	var cprice1 = parseFloat($("#cprice1").val());
-	
-	if(cprice1 > shop_bonus){
-		alert("I don't have enough shopping points.");
+	var valid_user = '<?= isset($valid_user) ? addslashes($valid_user) : "" ?>';
+	if (!valid_user) {
+		alert('Only members can complete a purchase. Please log in to continue.');
+		location.href = '../member/login.php?from=buy';
 		return false;
 	}
 	amount = document.p_form.qty.value;
+	var opt1 = "", opt2 = "", opt3 = "", opt4 = "", opt5 = "";
 	<?if ($option_n1 != ''){?>
 	var opt1 = document.p_form.opt1.value;
 	<?}?>
@@ -90,11 +95,11 @@ function buy_go(code,cate,color,size,add_opt1,add_opt2,add_opt3,add_opt4,add_opt
 	/*
 	if (document.p_form.color.value == '')
 	{
-		alert("색상을 선택해주세요.");
+		alert("Please select a color.");
 	}
 	else if (document.p_form.size.value == '')
 	{
-		alert("사이즈를 선택해주세요.");
+		alert("Please select a size.");
 	}
 	else*/
 	// {
@@ -174,24 +179,26 @@ $code1_cate_tmp = $code1;
 $code2_cate_tmp = $code2;
 $code3_cate_tmp = $code3;
 $code4_cate_tmp = $code4;
+$title_cate_1 = '';
+$title_cate_2 = '';
+$title_cate_3 = '';
+$title_cate_4 = '';
 
 //echo "$code1 $code2 $code3 $code4,$theme_str";
 if($theme_str==""){//정렬순서 관련
 
 	if($code1!=""){
 		$curl_d = json_decode(curl_d($api_category,"&Type=cate1&code1=$code1"),true);
-		
-		
-	
-		$tmp_cate1		= $curl_d[0]['cate'];
-		$title_cate_1	= $tmp_cate1;	//대분류 이름기억
-		$title_code_1	= $code1;
-		
+		if (is_array($curl_d) && isset($curl_d[0]['cate'])) {
+			$tmp_cate1		= $curl_d[0]['cate'];
+			$title_cate_1	= $tmp_cate1;	//대분류 이름기억
+			$title_code_1	= $code1;
+		}
 	}
 	
 	if($code2!=""){
 	$curl_d = json_decode(curl_d($api_category,"&Type=cate2&code1=$code1&code2=$code2"),true);
-	if(count($curl_d)>0){
+	if(is_array($curl_d) && count($curl_d)>0){
 		$tmp_cate2 = $curl_d[0]['cate'] ;
 		$title_cate_2 = $tmp_cate2;	//중분류 이름기억
 		$title_code_2 = $code2;
@@ -199,9 +206,9 @@ if($theme_str==""){//정렬순서 관련
 	
 	}
 
-	if($code3!=""){
+		if($code3!=""){
 		$curl_d = json_decode(curl_d($api_category,"&Type=cate3&code1=$code1&code2=$code2&code3=$code3"),true);
-		if(count($curl_d)>0){
+		if(is_array($curl_d) && count($curl_d)>0){
 			$tmp_cate3 = $curl_d[0]['cate'] ;
 			$title_cate_3 = $tmp_cate3;	//중분류 이름기억
 			$title_code_3 = $code3;
@@ -210,7 +217,7 @@ if($theme_str==""){//정렬순서 관련
 
 	if($code4!=""){
 		$curl_d = json_decode(curl_d($api_category,"&Type=cate4&code1=$code1&code2=$code2&code3=$code3&code4=$code4"),true);
-		if(count($curl_d)>0){
+		if(is_array($curl_d) && count($curl_d)>0){
 			$tmp_cate4 = $curl_d[0]['cate'];
 			$title_cate_4 = $tmp_cate4;	//중분류 이름기억
 			$title_code_4 = $code4;
@@ -220,7 +227,17 @@ if($theme_str==""){//정렬순서 관련
 }
 
 
+$goods = json_decode(curl_d($api_history,"&Type=goodsView&code=".$code),true);
+if (!is_array($goods) || !isset($goods[0]) || !is_array($goods[0])) {
+	$goods = array(array());
+}
+
 #####################################################################
+$pkshop_head_style = 'shop';
+if (!empty($goods[0]['title'])) {
+	$pkshop_page_title = $goods[0]['title'];
+}
+include "../include/pkshop_html_head.php";
 ?>
  </head>
 
@@ -254,12 +271,13 @@ if($theme_str==""){//정렬순서 관련
 
 	$query = "SELECT title,info,pricec,prices,priced,point,size,color,currnum,detail,company,feature,soldout,relation,price_dis,imgm,opt_num,opt_num_str,option_t1,option_n1,option_p1,option_k1,option_t2,option_n2,option_p2,option_k2,option_t3,option_n3,option_p3,option_k3,option_t4,option_n4,option_p4,option_k4,option_t5,option_n5,option_p5,option_k5,point_dis,color_opt,size_opt,add_opt1,add_opt2,add_opt3,add_opt4,add_opt5,home,event_str,imgb1,imgb2,imgb3,imgb4,imgb5,coin,c_pv FROM $shop_goods WHERE code='$code'";
 	
-	$goods = json_decode(curl_d($api_history,"&Type=goodsView&code=".$code),true);
-	// print_r($goods);
-
 	// $DB->get($query, $goods,$goodn);
 	
 	
+
+	if (!is_array($goods) || !isset($goods[0]) || !is_array($goods[0])) {
+		$goods = array(array());
+	}
 
 	$row = $goods;
 	$title		= $row[0]['title'];		/*상품명*/	
@@ -320,14 +338,7 @@ if($theme_str==""){//정렬순서 관련
 
 	$coin		= $row[0]['coin'];
 	$c_pv		= $row[0]['c_pv'];
-	$country = $row[0]['country'];
-	
-	if($shop_country != $country){?>
-		<script>
-			alert("It's a product that can't be purchased in that country.");
-			history.back();
-		</script>
-	<?exit;}
+	$country = isset($row[0]['country']) ? $row[0]['country'] : '';
 
 	if($title == ""){?>
 		<script>
@@ -347,6 +358,15 @@ if($theme_str==""){//정렬순서 관련
 	$priced_code = $priced;  //할인
 
 	$detail = stripslashes($detail);
+	$detail = pkshop_sanitize_product_detail_html($detail, array(
+		'imgl'  => $imgl,
+		'imgm'  => $imgm,
+		'imgb1' => $imgb1,
+		'imgb2' => $imgb2,
+		'imgb3' => $imgb3,
+		'imgb4' => $imgb4,
+		'imgb5' => $imgb5,
+	));
 ##############회&nbsp;원등급에 따른 가격계산###################################3
 	if($cook_dis=="1" && $cook_dis1=="승인"){
 		$price_tmp = $priced;
@@ -362,7 +382,8 @@ if($theme_str==""){//정렬순서 관련
 		}
 	}
 
-$price_tmp_kk = $price_tmp; //shop_view.htm용
+$price_tmp_kk = $price_tmp; //shop_view.htm용 — USD 숫자값 유지
+$price_tmp_display = pkshop_format_display_price($price_tmp_kk);
 #################################################
 
 #################포인트 계산################################
@@ -375,13 +396,9 @@ if($point_dis=='pe'){
 }
 #################################################
 
-$price_tmp = number_format($price_tmp).'&nbsp;'; //표시용 가격
-
 	
 	$asize = explode(",",$size);				/*사이즈 분리*/			 
 	$acolor = explode(",",$color);				/*색상 분리*/
-	$price = number_format($price);				/*가격표시변환*/
-	//$prices = number_format($prices);			/*가격표시변환*/
 	$priced = number_format($priced);		/*가격표시변환*/
 
 	$aopt_num = explode(",",$opt_num);
@@ -424,9 +441,29 @@ $price_tmp = number_format($price_tmp).'&nbsp;'; //표시용 가격
 
 	$img_name = $imgb1;
 
-	$img_info = getImageSize($savedir.'/'.$imgb1);//&nbsp;원본이미지의 정보를 얻어옵니다
-	$img_width = $img_info[0];
-	$img_height = $img_info[1];
+	$view_img = '';
+	if ($imgl != '') {
+		$view_img = $imgl;
+	} elseif ($imgm != '') {
+		$view_img = $imgm;
+	} elseif ($imgb1 != '') {
+		$view_img = $imgb1;
+	} elseif ($imgb2 != '') {
+		$view_img = $imgb2;
+	} elseif ($imgb3 != '') {
+		$view_img = $imgb3;
+	}
+
+	$thumb_images = array();
+	foreach (array($imgl, $imgm, $imgb1, $imgb2, $imgb3) as $timg) {
+		if ($timg != '' && !in_array($timg, $thumb_images)) {
+			$thumb_images[] = $timg;
+		}
+	}
+
+	$img_info = @getImageSize($savedir . (($view_img != '') ? $view_img : $imgb1));
+	$img_width = isset($img_info[0]) ? $img_info[0] : 0;
+	$img_height = isset($img_info[1]) ? $img_info[1] : 0;
 
 	if($img_width > $img_height){
 		$img_size = "width='274'";
@@ -435,16 +472,6 @@ $price_tmp = number_format($price_tmp).'&nbsp;'; //표시용 가격
 	}
 
 	
-	if($imgb3 != "" ){
-	$view_img = $imgb3;
-	// }else{
-	// 	if($imgl != ""){
-	// 		$view_img=$imgl;
-	// 	}
-	// 	if($imgb1 != ""){
-	// 		$view_img=$imgb1;
-	// 	}
-	}
 
 
 ?>
@@ -482,18 +509,11 @@ function price_change(){
 					<div class="view_img">
 						<div class="thumbnail-m"><img src="//pentakleva.shop/upload/<?=$view_img?>" id="pr_img" style="max-height: 275px;"></div>
 						
-						<div class="thumbnail-s swiper mySwiper01">
+						<div class="thumbnail-s swiper viewThumbSwiper">
 								<ul class="swiper-wrapper">
-									<?if($imgm != ""){?>
-									<li class="swiper-slide" style="cursor:pointer;"><img src="//pentakleva.shop/upload/<?=$imgm?>" src="//pentakleva.shop/upload/<?=$imgm?>" alt="items"></li>
+									<?foreach ($thumb_images as $timg) {?>
+									<li class="swiper-slide" style="cursor:pointer;"><img src="//pentakleva.shop/upload/<?=$timg?>" alt="items"></li>
 									<?}?>
-                                     <?if($imgb1 != ""){?>
-									<li class="swiper-slide" style="cursor:pointer;"><img src="//pentakleva.shop/upload/<?=$imgb1?>" alt="items"></li>
-                                    <?}?>
-                                     <?if($imgb3 != ""){?>
-									<li class="swiper-slide" style="cursor:pointer;"><img src="//pentakleva.shop/upload/<?=$imgb3?>" alt="items"></li>
-                                    <?}?>
-                                     
 								</ul>
 							</div>
 
@@ -522,7 +542,7 @@ function price_change(){
 							<tr>
 								<td class="option_td">Price</td>
 								
-								<td class=""><span id="priceText">$ <?=($price_tmp)?></span></font>&nbsp;&nbsp;&nbsp;</td>
+								<td class=""><span id="priceText"><?=htmlspecialchars($price_tmp_display, ENT_QUOTES, 'UTF-8')?></span></font>&nbsp;&nbsp;&nbsp;</td>
 							</tr>
 							<?if(floor($price_tmp*($c_pv/100))> 0){?>
 							<tr>
@@ -571,17 +591,11 @@ function price_change(){
 								<td>
 							<select id="color" name="color">
 							<option value=''>Choice</option>	
-							<?for($i=0; $i<=count($acolor)-1; $i++){
-
-								echo $acolor[$i]."----";
-								if ($acolor[$i] != "")
-								{
+							<?for($i=0; $i<count($acolor); $i++){
+								if ($acolor[$i] == "") continue;
 								?>
-
-							<option value=<?=$acolor[$i]?>><?=$acolor[$i]?></option>									
-							<?}
-							}
-							?>
+							<option value="<?=htmlspecialchars($acolor[$i], ENT_QUOTES, 'UTF-8')?>"><?=htmlspecialchars($acolor[$i], ENT_QUOTES, 'UTF-8')?></option>									
+							<?}?>
 								</select>
 									Color
 								</td>
@@ -602,7 +616,7 @@ function price_change(){
 								if($asize[$i]=="")continue;
 								?>
 							
-							<option value=<?=$asize[$i]?>><?=$asize[$i]?></option>									
+							<option value="<?=htmlspecialchars($asize[$i], ENT_QUOTES, 'UTF-8')?>"><?=htmlspecialchars($asize[$i], ENT_QUOTES, 'UTF-8')?></option>									
 							<?$kkk++;}?>
 								<?if($kkk==0){?>
 									<option value="기본">basics</option>
@@ -626,7 +640,7 @@ function price_change(){
 							<!-- <option value=''>선택</option>	 -->
 							<?for($i=0; $i<=count($aoption_n1)-1; $i++){?>
 							
-							<option value="<?=$aoption_n1[$i]?>"><?=$aoption_n1[$i]?> ($ <?=$aaoption_k1[$i]?>) </option>									
+							<option value="<?=$aoption_n1[$i]?>"><?=$aoption_n1[$i]?> (<?=pkshop_format_display_price($aaoption_k1[$i])?>) </option>									
 							<?}?>
 								</select>
 								</td>
@@ -649,7 +663,7 @@ function price_change(){
 							<!-- <option value=''>선택</option>	 -->
 							<?for($i=0; $i<=count($aoption_n2)-1; $i++){?>
 
-							<option value=<?=$aoption_n2[$i]?>><?=$aoption_n2[$i]?>  ($ <?=$aaoption_k2[$i]?>) </option>									
+							<option value=<?=$aoption_n2[$i]?>><?=$aoption_n2[$i]?>  (<?=pkshop_format_display_price($aaoption_k2[$i])?>) </option>									
 							<?}?>
 							</select>
 							</td>
@@ -672,7 +686,7 @@ function price_change(){
 							<!-- <option value=''>선택</option>	 -->
 							<?for($i=0; $i<=count($aoption_n3)-1; $i++){?>
 
-							<option value=<?=$aoption_n3[$i]?>><?=$aoption_n3[$i]?>  ($ <?=$aaoption_k3[$i]?>) </option>									
+							<option value=<?=$aoption_n3[$i]?>><?=$aoption_n3[$i]?>  (<?=pkshop_format_display_price($aaoption_k3[$i])?>) </option>									
 							<?}?>
 							</select>
 							</td>
@@ -695,7 +709,7 @@ function price_change(){
 							<!-- <option value=''>선택</option>	 -->
 							<?for($i=0; $i<=count($aoption_n4)-1; $i++){?>
 
-							<option value=<?=$aoption_n4[$i]?>><?=$aoption_n4[$i]?>  ($ <?=$aaoption_k4[$i]?>) </option>									
+							<option value=<?=$aoption_n4[$i]?>><?=$aoption_n4[$i]?>  (<?=pkshop_format_display_price($aaoption_k4[$i])?>) </option>									
 							<?}?>
 							</select>
 							</td>
@@ -718,7 +732,7 @@ function price_change(){
 							<!-- <option value=''>선택</option>	 -->
 							<?for($i=0; $i<=count($aoption_n5)-1; $i++){?>
 
-							<option value=<?=$aoption_n5[$i]?>><?=$aoption_n5[$i]?>  ($ <?=$aaoption_k5[$i]?>) </option>									
+							<option value=<?=$aoption_n5[$i]?>><?=$aoption_n5[$i]?>  (<?=pkshop_format_display_price($aaoption_k5[$i])?>) </option>									
 							<?}?>
 							</select>
 							</td>
@@ -741,9 +755,8 @@ function price_change(){
 						</div>
 
 						</form>
-					</div>
 				</div>
-</form>
+			</div>
 
 				<div class="sp30"></div>
 
@@ -758,9 +771,11 @@ function price_change(){
 
 
 					<div class="sp50"></div>
-					<div class="view_pg">
+					<div class="view_pg" style="text-align:center;">
 					<?=$detail?>
+					<?if (trim(strip_tags($detail)) == '') {?>
 						<img src="../sub04/images/content.jpg">
+					<?}?>
 					</div>
 
 
@@ -787,6 +802,7 @@ function price_change(){
 
 		<!--  footer    -->
 	</div>
+	<?php include dirname(__FILE__) . '/../include/pkshop_currency_script.php'; ?>
 	<script>
 
 function go_price3() {
@@ -819,9 +835,7 @@ function go_price3() {
 		<?}?>
 
 	<?if($option_t1!=""){?>
-	<?
-	while(list($key1,$value1) = each($aaoption_n1)) {
-	?>
+	<?php foreach ($aaoption_n1 as $key1 => $value1) { ?>
 	  
 	
 	if (frm.opt1[<?=$key1?>].selected == true) {
@@ -852,13 +866,11 @@ function go_price3() {
 			<?}?>
 		<?}?>
 	}
-	<?}?>
-	<?}?>
+	<?php } ?>
+	<?php } ?>
 
 	<?if($option_t2!=""){?>
-	<?
-	while(list($key1,$value1) = each($aaoption_n2)) {
-	?>
+	<?php foreach ($aaoption_n2 as $key1 => $value1) { ?>
 	if (frm.opt2[<?=$key1?>].selected == true) {
 		
 		<?if($price_tmp!=""){?>
@@ -881,13 +893,11 @@ function go_price3() {
 			<?}?>
 		<?}?>
 	}
-	<?}?>
-	<?}?>
+	<?php } ?>
+	<?php } ?>
 	
 	<?if($option_t3!=""){?>
-	<?
-	while(list($key1,$value1) = each($aaoption_n3)) {
-	?>
+	<?php foreach ($aaoption_n3 as $key1 => $value1) { ?>
 	if (frm.opt3[<?=$key1?>].selected == true) {
 		<?if($price_tmp!=""){?>
 			o1_3 = o1_2+<?=$aoption_p3[$key1]?>;
@@ -910,13 +920,11 @@ function go_price3() {
 
 		<?}?>
 	}
-	<?}?>
-	<?}?>
+	<?php } ?>
+	<?php } ?>
 
 	<?if($option_t4!=""){?>
-	<?
-	while(list($key1,$value1) = each($aaoption_n4)) {
-	?>
+	<?php foreach ($aaoption_n4 as $key1 => $value1) { ?>
 	if (frm.opt4[<?=$key1?>].selected == true) {
 		<?if($price_tmp!=""){?>
 			o1_4 = o1_3+<?=$aoption_p4[$key1]?>;
@@ -939,18 +947,19 @@ function go_price3() {
 
 		<?}?>
 	}
-	<?}?>
-	<?}?>
+	<?php } ?>
+	<?php } ?>
 
 	
 frm.cprice.value =(parseFloat(<?=$price_tmp_kk?>)+o1)*qty+'&nbsp;';
 frm.cprice1.value = (parseFloat(<?=$price_tmp_kk?>)+o1)*qty;
-$("#priceText").text("$ " + (parseFloat(<?=$price_tmp_kk?>)+o1)*qty);
-$("#pvText").text("$ " + ((parseFloat(<?=$price_tmp_kk?>)+o1)*qty)*(c_pv/100));
+var lineUsd = (parseFloat(<?=$price_tmp_kk?>)+o1)*qty;
+$("#priceText").text(typeof pkshopFormatUsdPrice === 'function' ? pkshopFormatUsdPrice(lineUsd) : ('$ ' + lineUsd));
+$("#pvText").text("RV " + Math.floor(lineUsd * (c_pv / 100)));
 }
 go_price3();
 
-var swiper = new Swiper(".mySwiper01", {
+var viewThumbSwiper = new Swiper(".viewThumbSwiper", {
         slidesPerView: 3,
         spaceBetween: 15,
         loop: true,
@@ -964,7 +973,7 @@ var swiper = new Swiper(".mySwiper01", {
         },
       });
 	  $(document).ready(function () {
-	$(".swiper-slide").on("click", function () {
+	$(".viewThumbSwiper .swiper-slide").on("click", function () {
             var src = $(this).children().attr("src");
             
             $("#pr_img").attr("src",src);

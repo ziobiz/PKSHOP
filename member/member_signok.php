@@ -24,7 +24,7 @@ $dis1="0";
 if($passwd!="") {
 	
 	if($passwd!=$passwd2) {
-		echo "<script language=javascript> alert('비밀번호가 동일하지 않습니다.'); </script>";
+		echo "<script language=javascript> alert('Passwords do not match.'); </script>";
 		echo "<script language=javascript> history.back(); </script>";
 		exit;
 	}
@@ -59,7 +59,7 @@ $email		= $_POST['email'];
 /*
 if ($rowc['c_code'] == "")
 {
-		echo "<script language=javascript> alert('추천인 아이디가 틀립니다.'); </script>";
+		echo "<script language=javascript> alert('Referrer ID is invalid.'); </script>";
 		echo "<script language=javascript> history.back(); </script>";
 		exit;
 
@@ -151,7 +151,7 @@ if($result) {
 ?>
 <script type="text/javascript">
 <!--
-	alert("회원가입이 완료되었습니다");
+	alert("Registration completed successfully.");
 	location="../main/main.html";
 //-->
 </script>

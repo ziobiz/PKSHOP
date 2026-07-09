@@ -56,6 +56,9 @@ include "../common/dbconn.php";
 	$fee		=$_POST["fee"];
 	$c_pv		=$_POST["c_pv"];
 	$country		=$_POST["country"];
+	if ($country == "") {
+		$country = "1";
+	}
 	$onlypoint		=$_POST["onlypoint"];
 	$imgm=$_POST["imgm"]; $soldout=$_POST["soldout"]; $rank=$_POST["rank"]; $option_t1=$_POST["option_t1"]; $option_n1=$_POST["option_n1"]; $option_p1=$_POST["option_p1"]; $option_k1=$_POST["option_k1"]; $option_t2=$_POST["option_t2"]; $option_n2=$_POST["option_n2"]; $option_p2=$_POST["option_p2"]; $option_k2=$_POST["option_k2"]; 
 	$option_t3=$_POST["option_t3"]; $option_n3=$_POST["option_n3"]; $option_p3=$_POST["option_p3"]; $option_k3=$_POST["option_k3"]; 

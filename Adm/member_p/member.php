@@ -93,41 +93,18 @@ function go_mail(tmp_mail) {
 }
 //-->
 </script>
-				<table width="800" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
 				
 					<tr><td height=30></td></tr>
 					<tr><td>
 							<table width="100%" border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>이벤트기록</b></td><td align="right">
-									
-									
-									
-									<form name=dform action="./member_dis_excel.php" method=post target="_blank">
-										
-										<? 
-										$file_name=date("Y")."-".date("m")."-".date("d")." ".date("H")."-".date("i");
-										$query_k="select title FROM $shop_goods where code='$id'";  
-										$result_k= mysql_query($query_k,$DBconn);
-										$row_k = mysql_fetch_row($result_k);	
-										$title_k=$row_k[0];										
-										?>
-
-										<input type="hidden" name ="file_name" value="<?=$title_k?>(<?=$file_name?>)">
-										<input type="hidden" name ="id" value="<?=$id?>">
-										<input type="hidden" name ="member_count" value="<?=$member_count?>">
-										<input type="button" value="이벤트등록" class="adminbttn" onClick="location.href='member_write.php?id=<?=$id?>'">&nbsp;&nbsp;
-										<input type="submit" value="엑셀다운로드">
-									</form></td>
-								</tr>
-							</table>
+								</table>
 					</td></tr>
 					<form name="form" method="post">
 					<tr><td height=3></td></tr>
 					<tr>
 						<td>							 
-								<table width="800" border="0" cellspacing="0" cellpadding="4">
+								<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="4">
 									<tr> 
 										
 										<td height="20"> 
@@ -214,7 +191,7 @@ $chk_num = $last-$first+1;
 						</td>
 					</tr>
 				</table> 
-				<table width="800" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
 					<tr> 
 						<td height="20" align="center"><font color="#666666">
 <?

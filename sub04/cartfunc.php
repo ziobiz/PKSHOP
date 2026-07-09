@@ -55,7 +55,7 @@ function addCart($cartval)
 
 		if(!$session_cart) {
 			if(!$session_cart)
-				echo "세션등록에 실패하였습니다.<br>";
+				echo "Failed to update your cart session.<br>";
 		}
 		if($session_cart=="") $session_cart = $tmpStr;
 		else $session_cart .= ";". $tmpStr;

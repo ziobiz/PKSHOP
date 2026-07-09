@@ -3,10 +3,8 @@
 
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include "../inc/top_menu.php";
-include "../inc/left_menu_center.php";
-
-
+include_once "../inc/admin_shell_lib.php";
+pkshop_admin_auto_shell_begin();
 $encoded_key = urlencode($key);
 $query = "SELECT id,name,passwd,email,signdate,dis1,company,member_cnt,etc1,etc2,handphone from $member_table where dis='$dis' ";
 
@@ -88,23 +86,18 @@ function go_mail(tmp_mail) {
 }
 //-->
 </script>
-				<table width="800" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
 				
 					<tr><td height=30></td></tr>
 					<tr><td>
 							<table width="100%" border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14' align="left"><b>센터관리</b></td>
-									
-								</tr>
-							</table>
+								</table>
 					</td></tr>
 					<form name="form" method="post">
 					<tr><td height=3></td></tr>
 					<tr>
 						<td>							 
-								<table width="800" border="0" cellspacing="0" cellpadding="4">
+								<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="4">
 									<tr> 
 										
 										<td height="20" align="left"> 
@@ -489,7 +482,7 @@ $chk_num = $last-$first+1;
 						</td>
 					</tr>
 				</table> 
-				<table width="800" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
 					<tr> 
 						<td height="20" align="center"><font color="#666666">
 <?
@@ -533,4 +526,4 @@ if($page!=$total_page){
 					</form>  
 				</table>
 				<br><br>
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

@@ -83,7 +83,7 @@ $cate2 = stripslashes($cate2);
 $cate3 = stripslashes($cate3);
 $cate4 = stripslashes($cate4);
 
-$tmp="cate1=$cate1&cate2=$cate2&cate3=$cate3&cate4=$cate4";
+$tmp="cateuid1=$cateuid1&cateuid2=$cateuid2&cateuid3=$cateuid3&cateuid4=$cateuid4";
 
 
 echo "<meta http-equiv='Refresh' content='0; URL=category.php?$tmp'>";

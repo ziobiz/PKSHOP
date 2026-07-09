@@ -4,14 +4,10 @@
 
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
+include_once "../inc/admin_shell_lib.php";
 include "../common/user_function.php";
 include "../inc/set_com.php";
 ########## 데이터베이스에 연결한다. #################################
-
-
-include "../inc/top_menu.php";
-include "../inc/left_menu_order.php";
-
 //임시 작업
 //$sql="CREATE table coin_wallet (";
 //$sql=$sql."No int not null primary key auto_increment"; //넘버값
@@ -28,7 +24,7 @@ include "../inc/left_menu_order.php";
 //}
 
 ?>
-
+<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_del() {
@@ -80,17 +76,6 @@ function select_all(){
 					<input type="hidden" name="sel_status" value="<?=$sel_status?>">
 					
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>주문관리</b> (<?=$sel_status?>) 
-<!-- 									<font onclick="go_excel();" style="cursor:pointer;">[엑셀파일다운로드]</font> -->
-									</td>
-								</tr>
-							</table>
-					</td></tr>
 					<tr><td height=3></td></tr>
 					<tr> 
 						<td> 							
@@ -455,7 +440,6 @@ for($i = $first; $i <= $last; $i++) {
 //	echo($addr);
 // 코인 입금확인 end
 ?>
-
 								<tr align="center"> 
 									<td height="26">&nbsp;<?=$ordernum?></a></td>
 									<td height="26"><?=$signdate?></td>
@@ -478,7 +462,6 @@ for($i = $first; $i <= $last; $i++) {
 // 	$etc1=$etc1;
 // }
 ?>
-
 <!-- <?if($etc1!=""){?><font onclick="window.open('../member/member_event.php?id=<?=$id?>','','width=500,height=400')" style="cursor:hand;color:#ff6633" >[<?=$etc1?>]</font><?}?>
 <?if($etc2!=""){?><font onclick="window.open('../member/member_event.php?id=<?=$id?>','','width=500,height=400')" style="cursor:hand;color:#0066ff">[기타1]</font><?}?>
 <?if($etc1=="" && $etc2==""){?><font onclick="window.open('../member/member_event.php?id=<?=$id?>','','width=500,height=400')" style="cursor:hand;">[기타2]</font><?}?> -->
@@ -540,7 +523,6 @@ $option_t5 = $rs_o[0]["option_t5"];
 $total_point=$total_point+$point2;//포인트 합계 표시용
 #####################################################################
 ?>
-
 								<tr><td colspan=9 height=1 bgcolor='#f0f0f0'></td></tr>
 								<tr align="center"> 
 									<td colspan="3" height="26" width="146"><?=$title_cc?></td>
@@ -571,8 +553,7 @@ $total_point=$total_point+$point2;//포인트 합계 표시용
    $ii++;
 }
 $chk_num = $last-$first+1;
-?>   		
-
+?>
 							</table>
 						</td>
 					</tr>
@@ -597,7 +578,6 @@ $chk_num = $last-$first+1;
   if ($page > 1) {
  	$page_num = $page - 1;
 ?>
-
 							<a href="pro_order.php?<?=$mode?>&page=<?=$page_num?>" onMouseOver="status='이전페이지';return true;" onMouseOut="status=''">◀</a>
 
 <?
@@ -609,7 +589,7 @@ $chk_num = $last-$first+1;
  							<font color="#666666">&nbsp;<b><?=$direct_page?></b></font>
 <?	
 	} else {
-?> 	
+?>
 							&nbsp;<a href="pro_order.php?<?=$mode?>&page=<?=$direct_page?>" onMouseOver="status='go to page $direct_page';return true;" onMouseOut="status=''"><font color="#666666"><?=$direct_page?></font></a>
  <?	
 	}
@@ -618,13 +598,11 @@ $chk_num = $last-$first+1;
  if ($IsNext > 0) {
  	$page_num = $page + 1;
 ?>
- 
 							&nbsp;<a href="pro_order.php?<?=$mode?>&page=<?=$page_num?>" onMouseOver="status='다음페이지';return true;" onMouseOut="status=''">▶</a>
  
  <?
  }
- ?>          
-          
+ ?>
 							</font>
 						</td>
 					</tr>
@@ -633,4 +611,4 @@ $chk_num = $last-$first+1;
 					</form>  
 				</table>
 				<br><br>
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

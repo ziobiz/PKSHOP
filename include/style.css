@@ -2216,9 +2216,22 @@ select {
 
 .view_pg img {
 		display: block;
-		margin: auto;
+		width: 100%;
+		max-width: 100%;
+		height: auto;
+		margin: 0 auto;
+		vertical-align: bottom;
 }
 
+.view_pg p {
+	text-align: center;
+}
+
+.view_pg p.view_detail_img {
+	margin: 0;
+	padding: 0;
+	line-height: 0;
+}
 
 .car-span {
 	padding-left: 10px;

@@ -59,7 +59,7 @@ function EnterCheck(i) {
 </head>
 
 <body>
-<table width="800" border="0" align="center" cellpadding="0" cellspacing="0">
+<table class="pg-table pg-table-form" width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
   <tr>
     <td height="151" colspan="3">&nbsp;</td>
   </tr>

@@ -32,15 +32,13 @@ if ($cate=='1'){
 }else if ($cate=='3'){
 	$query = "SELECT uid FROM $shop_cate WHERE code1='$code1' and code2='$code2' and code3!='00' and code4='00' ORDER BY order_rank";
 }else if ($cate=='4'){
-	$query = "SELECT uid FROM $shop_cate WHERE code1='$code1' and code2='$code2' and code3='$code3' and code3!='00' ORDER BY order_rank";
+	$query = "SELECT uid FROM $shop_cate WHERE code1='$code1' and code2='$code2' and code3='$code3' and code4!='00' ORDER BY order_rank";
 }	
 
 
 $DB->get($query,$rs,$rn);
 
-
-$total_record = $rn;
-for ($i=0;$i<$total_record=$rn;$i++){
+for ($i=0; $i<$rn; $i++){
 	$ii=$i+1;
 	$uid =$rs[$i][0];	
 	$tmprank = "rank" . $cate . $ii;

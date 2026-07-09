@@ -1,13 +1,10 @@
-﻿<?
+<?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
+include_once "../inc/admin_shell_lib.php";
 include "../common/user_function.php";
 
 ########## 데이터베이스에 연결한다. #################################
-
-include "../inc/top_menu.php";
-include "../inc/left_menu_sell.php";
-
 include "../../pc/include/core_api.php";
 
 
@@ -65,18 +62,9 @@ include "../../pc/include/core_api.php";
 
 
 ?>
-
-				<table width="800" border="0" cellspacing="0" cellpadding="0">
+<?php pkshop_admin_auto_shell_begin(); ?>
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>Master 계좌 관리&nbsp;&nbsp;</b></td>
-								</tr>
-							</table>
-					</td></tr>		
 					<tr> 
 						<td align=left> 							
 							<b><font size="3">  </font></b></p>
@@ -121,4 +109,4 @@ include "../../pc/include/core_api.php";
 					}
 				</script>
 
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

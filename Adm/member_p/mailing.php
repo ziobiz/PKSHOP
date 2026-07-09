@@ -185,4 +185,4 @@ include "../inc/left_menu_member.php";
 					</tr>
 				</table> 
 				<br>
-<? include "../inc/down_menu.php"; ?>				
+<?php pkshop_admin_shell_end(); ?>				

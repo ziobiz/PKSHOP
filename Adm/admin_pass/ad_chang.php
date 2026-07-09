@@ -1,13 +1,10 @@
+include_once "../inc/admin_shell_lib.php";
 <html>
 <head>
 <title>관리자모드</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" href="../image/style.css" type="text/css">
 <head>
-
-
-
-<? include "../inc/top_menu.php"; ?>
 <tr><td>
 <table width='100%' border=0 cellpadding=0 cellspacing=0>
 <tr>
@@ -16,6 +13,7 @@
 			<tr>
 				<td width=170 bgcolor='#F1F1F1' valign=top rowspan=2><!-- 좌측 메뉴부분 -->
 					<? include "../inc/left_menu.php"; ?>
+<?php pkshop_admin_auto_shell_begin(); ?>
 				</td>
 				<td align=center valign=top><!-- 우측 컨텐츠 부분 -->
 
@@ -108,7 +106,8 @@ function check()
 </table>
 
 </td></tr>
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>
+<?php pkshop_admin_auto_shell_begin(); ?>
 <!-- 전체 테이블 end -->
 </div>
 </body>

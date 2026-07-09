@@ -1,13 +1,10 @@
 <?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
+include_once "../inc/admin_shell_lib.php";
 include "../common/user_function.php";
 
 ########## 데이터베이스에 연결한다. #################################
-
-
-include "../inc/top_menu.php";
-include "../inc/left_menu_sell.php";
 if($tyear == "") {	$year_e = date("Y"); }
 
 function _microtime ( ) {
@@ -17,6 +14,7 @@ $time_start=_microtime();
 #####################################################################
 
 ?>
+<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go() {
@@ -33,16 +31,8 @@ function move() {
 //-->
 </script>
 
-				<table width="800" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
+				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
 					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>월별 매출 조회</b></td>
-								</tr>
-							</table>
-					</td></tr>	
 					<tr> 
 						<td align=left> 						
 							
@@ -319,7 +309,6 @@ for($i=1;$i<2;$i++) {
 
 #####################################################################
 ?>
-								
 									<td height=30>
 										<img src="../image/graph1.gif" width=<?=$graph?> height=10>&nbsp;(<?=$mcnt?>)</td>
 									<td align=center height=30><font color="#3399FF"><b>\<?=$vtmmoney?></font></td>
@@ -342,8 +331,6 @@ for($i=1;$i<2;$i++) {
 
 	}
 ?>
-
-
 <?
 	$vytmoney = number_format($ytmoney);
 	$vytmoney = number_format($ytmoney);
@@ -370,4 +357,4 @@ for($i=1;$i<2;$i++) {
 							<br><br>
 
 							<?//echo (_microtime() - $time_start);?>
-<? include "../inc/down_menu.php"; ?>
+<?php pkshop_admin_shell_end(); ?>

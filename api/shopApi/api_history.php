@@ -54,7 +54,7 @@
 		{
 			$k = 0;
 			$code = $_POST["code"];
-			$sql = "SELECT title,info,pricec,prices,priced,point,size,color,currnum,detail,company,feature,soldout,relation,price_dis,imgm,opt_num,opt_num_str,option_t1,option_n1,option_p1,option_k1,option_t2,option_n2,option_p2,option_k2,option_t3,option_n3,option_p3,option_k3,option_t4,option_n4,option_p4,option_k4,option_t5,option_n5,option_p5,option_k5,point_dis,color_opt,size_opt,add_opt1,add_opt2,add_opt3,add_opt4,add_opt5,home,event_str,imgb1,imgb2,country,imgb3,imgb4,imgb5,coin,c_pv,onlypoint,code1,code2,onlypoint FROM $shop_goods WHERE code=:code";
+			$sql = "SELECT title,info,pricec,prices,priced,point,size,color,currnum,detail,company,feature,soldout,relation,price_dis,imgl,imgm,opt_num,opt_num_str,option_t1,option_n1,option_p1,option_k1,option_t2,option_n2,option_p2,option_k2,option_t3,option_n3,option_p3,option_k3,option_t4,option_n4,option_p4,option_k4,option_t5,option_n5,option_p5,option_k5,point_dis,color_opt,size_opt,add_opt1,add_opt2,add_opt3,add_opt4,add_opt5,home,event_str,imgb1,imgb2,country,imgb3,imgb4,imgb5,coin,c_pv,onlypoint,code1,code2,onlypoint FROM $shop_goods WHERE code=:code";
 			
 			
 			$DB->get($sql, $cartes, $carten,array("code"=>$code));
@@ -85,7 +85,7 @@
 		else if ($Type == "best")
 		{
 			$k = 0;
-			$sql = "SELECT code1,code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4 ,opt_num,imgb1,imgb2,country,c_pv,onlypoint FROM shop_goods where theme_r = 'r' and soldout='N' ORDER BY order1,signdate desc";
+			$sql = "SELECT code1,code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4 ,opt_num,imgb1,imgb2,country,c_pv,onlypoint FROM shop_goods where theme_r = 'r' and soldout='N' ORDER BY rank_r asc, order1 asc, signdate desc";
 			
 			// echo $sql;
 
@@ -104,7 +104,7 @@
 					continue;
 				}
 
-				$data_list[$k]=array("code2"=>$bests[$i]['code2'],"code3"=>$bests[$i]['code3'],"code"=>$bests[$i]['code'],"title"=>$bests[$i]['title'],"pricec"=>$bests[$i]['pricec'],"prices"=>$bests[$i]['prices'],"priced"=>$bests[$i]['priced'],"company"=>$bests[$i]['company'],"new"=>$bests[$i]['new'],"soldout"=>$bests[$i]['soldout'],"best"=>$bests[$i]['best'],"cut"=>$bests[$i]['cut'],"recommend"=>$bests[$i]['recommend'],"price_dis"=>$bests[$i]['price_dis'],"size"=>$bests[$i]['size'],"color"=>$bests[$i]['color'],"imgl"=>$bests[$i]['imgl'],"code4"=>$bests[$i]['code4'],"opt_num"=>$bests[$i]['opt_num'],"imgb1"=>$bests[$i]['imgb1'],"imgb2"=>$bests[$i]['imgb2'],"country"=>$bests[$i]['country'],"c_pv"=>$bests[$i]['c_pv'],"onlypoint"=>$bests[$i]["onlypoint"]);
+				$data_list[$k]=array("code1"=>$bests[$i]['code1'],"code2"=>$bests[$i]['code2'],"code3"=>$bests[$i]['code3'],"code"=>$bests[$i]['code'],"title"=>$bests[$i]['title'],"pricec"=>$bests[$i]['pricec'],"prices"=>$bests[$i]['prices'],"priced"=>$bests[$i]['priced'],"company"=>$bests[$i]['company'],"new"=>$bests[$i]['new'],"soldout"=>$bests[$i]['soldout'],"best"=>$bests[$i]['best'],"cut"=>$bests[$i]['cut'],"recommend"=>$bests[$i]['recommend'],"price_dis"=>$bests[$i]['price_dis'],"size"=>$bests[$i]['size'],"color"=>$bests[$i]['color'],"imgl"=>$bests[$i]['imgl'],"code4"=>$bests[$i]['code4'],"opt_num"=>$bests[$i]['opt_num'],"imgb1"=>$bests[$i]['imgb1'],"imgb2"=>$bests[$i]['imgb2'],"country"=>$bests[$i]['country'],"c_pv"=>$bests[$i]['c_pv'],"onlypoint"=>$bests[$i]["onlypoint"]);
 				$k++;
 			}
 
@@ -115,7 +115,7 @@
 		else if ($Type == "new")
 		{
 			$k = 0;
-			$sql = "SELECT code1,code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4 ,opt_num,imgb1,imgb2,country,c_pv,onlypoint FROM shop_goods where theme_n = 'n' and soldout='N' ORDER BY signdate desc ";
+			$sql = "SELECT code1,code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4 ,opt_num,imgb1,imgb2,country,c_pv,onlypoint FROM shop_goods where theme_n = 'n' and soldout='N' ORDER BY rank_n asc, signdate desc ";
 			
 			//echo $sql;
 
@@ -133,7 +133,7 @@
 				if($cates[0]["show2"] == 1){
 					continue;
 				}
-				$data_list[$k]=array("code2"=>$news[$i]['code2'],"code3"=>$news[$i]['code3'],"code"=>$news[$i]['code'],"title"=>$news[$i]['title'],"pricec"=>$news[$i]['pricec'],"prices"=>$news[$i]['prices'],"priced"=>$news[$i]['priced'],"company"=>$news[$i]['company'],"new"=>$news[$i]['new'],"soldout"=>$news[$i]['soldout'],"best"=>$news[$i]['best'],"cut"=>$news[$i]['cut'],"recommend"=>$news[$i]['recommend'],"price_dis"=>$news[$i]['price_dis'],"size"=>$news[$i]['size'],"color"=>$news[$i]['color'],"imgl"=>$news[$i]['imgl'],"code4"=>$news[$i]['code4'],"opt_num"=>$news[$i]['opt_num'],"imgb1"=>$news[$i]['imgb1'],"imgb2"=>$news[$i]['imgb2'],"country"=>$news[$i]['country'],"c_pv"=>$news[$i]['c_pv'],"onlypoint"=>$news[$i]["onlypoint"]);
+				$data_list[$k]=array("code1"=>$news[$i]['code1'],"code2"=>$news[$i]['code2'],"code3"=>$news[$i]['code3'],"code"=>$news[$i]['code'],"title"=>$news[$i]['title'],"pricec"=>$news[$i]['pricec'],"prices"=>$news[$i]['prices'],"priced"=>$news[$i]['priced'],"company"=>$news[$i]['company'],"new"=>$news[$i]['new'],"soldout"=>$news[$i]['soldout'],"best"=>$news[$i]['best'],"cut"=>$news[$i]['cut'],"recommend"=>$news[$i]['recommend'],"price_dis"=>$news[$i]['price_dis'],"size"=>$news[$i]['size'],"color"=>$news[$i]['color'],"imgl"=>$news[$i]['imgl'],"code4"=>$news[$i]['code4'],"opt_num"=>$news[$i]['opt_num'],"imgb1"=>$news[$i]['imgb1'],"imgb2"=>$news[$i]['imgb2'],"country"=>$news[$i]['country'],"c_pv"=>$news[$i]['c_pv'],"onlypoint"=>$news[$i]["onlypoint"]);
 				$k++;
 			}
 
@@ -162,7 +162,7 @@
 				if($cates[0]["show2"] == 1){
 					continue;
 				}
-				$data_list[$k]=array("code2"=>$news[$i]['code2'],"code3"=>$news[$i]['code3'],"code"=>$news[$i]['code'],"title"=>$news[$i]['title'],"pricec"=>$news[$i]['pricec'],"prices"=>$news[$i]['prices'],"priced"=>$news[$i]['priced'],"company"=>$news[$i]['company'],"new"=>$news[$i]['new'],"soldout"=>$news[$i]['soldout'],"best"=>$news[$i]['best'],"cut"=>$news[$i]['cut'],"recommend"=>$news[$i]['recommend'],"price_dis"=>$news[$i]['price_dis'],"size"=>$news[$i]['size'],"color"=>$news[$i]['color'],"imgl"=>$news[$i]['imgl'],"code4"=>$news[$i]['code4'],"opt_num"=>$news[$i]['opt_num'],"imgb1"=>$news[$i]['imgb1'],"imgb2"=>$news[$i]['imgb2'],"country"=>$news[$i]['country'],"c_pv"=>$news[$i]['c_pv'],"onlypoint"=>$news[$i]["onlypoint"]);
+				$data_list[$k]=array("code1"=>$news[$i]['code1'],"code2"=>$news[$i]['code2'],"code3"=>$news[$i]['code3'],"code"=>$news[$i]['code'],"title"=>$news[$i]['title'],"pricec"=>$news[$i]['pricec'],"prices"=>$news[$i]['prices'],"priced"=>$news[$i]['priced'],"company"=>$news[$i]['company'],"new"=>$news[$i]['new'],"soldout"=>$news[$i]['soldout'],"best"=>$news[$i]['best'],"cut"=>$news[$i]['cut'],"recommend"=>$news[$i]['recommend'],"price_dis"=>$news[$i]['price_dis'],"size"=>$news[$i]['size'],"color"=>$news[$i]['color'],"imgl"=>$news[$i]['imgl'],"code4"=>$news[$i]['code4'],"opt_num"=>$news[$i]['opt_num'],"imgb1"=>$news[$i]['imgb1'],"imgb2"=>$news[$i]['imgb2'],"country"=>$news[$i]['country'],"c_pv"=>$news[$i]['c_pv'],"onlypoint"=>$news[$i]["onlypoint"]);
 				$k++;
 			}
 
@@ -225,7 +225,30 @@
 		else if ($Type == "all3")
 		{
 			$k = 0;
-			$sql = "SELECT code1,code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4 ,opt_num,imgb1,imgb2,country,c_pv,onlypoint FROM $shop_goods where soldout='N' ORDER BY order1,signdate desc";
+			$cate1 = isset($_POST['code1']) ? htmlspecialchars(addslashes($_POST['code1'])) : '';
+			$cate2 = isset($_POST['code2']) ? htmlspecialchars(addslashes($_POST['code2'])) : '';
+			$cate3 = isset($_POST['code3']) ? htmlspecialchars(addslashes($_POST['code3'])) : '';
+			$cate4 = isset($_POST['code4']) ? htmlspecialchars(addslashes($_POST['code4'])) : '';
+
+			$where = "soldout='N'";
+			if ($cate1 != '') {
+				$where .= " AND code1='" . $cate1 . "'";
+			}
+			if ($cate2 != '' && $cate2 != '00') {
+				$where .= " AND code2='" . $cate2 . "'";
+			}
+			if ($cate3 != '' && $cate3 != '00') {
+				$where .= " AND code3='" . $cate3 . "'";
+			}
+			if ($cate4 != '' && $cate4 != '00') {
+				$where .= " AND code4='" . $cate4 . "'";
+			}
+
+			$sql = "SELECT code1,code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4 ,opt_num,imgb1,imgb2,imgb3,imgb4,imgb5,country,c_pv,onlypoint FROM $shop_goods where $where ORDER BY order1,signdate desc";
+			$limit = isset($_POST['limit']) ? intval($_POST['limit']) : 0;
+			if ($limit > 0) {
+				$sql .= " LIMIT " . $limit;
+			}
 
 			//echo $sql;
 		
@@ -242,7 +265,7 @@
 				if($cates[0]["show2"] == 1){
 					continue;
 				}
-				$data_list[$k]=array("code2"=>$all1s[$i]['code2'],"code3"=>$all1s[$i]['code3'],"code"=>$all1s[$i]['code'],"title"=>$all1s[$i]['title'],"pricec"=>$all1s[$i]['pricec'],"prices"=>$all1s[$i]['prices'],"priced"=>$all1s[$i]['priced'],"company"=>$all1s[$i]['company'],"new"=>$all1s[$i]['new'],"soldout"=>$all1s[$i]['soldout'],"best"=>$all1s[$i]['best'],"cut"=>$all1s[$i]['cut'],"recommend"=>$all1s[$i]['recommend'],"price_dis"=>$all1s[$i]['price_dis'],"size"=>$all1s[$i]['size'],"color"=>$all1s[$i]['color'],"imgl"=>$all1s[$i]['imgl'],"code4"=>$all1s[$i]['code4'],"opt_num"=>$all1s[$i]['opt_num'],"imgb1"=>$all1s[$i]['imgb1'],"imgb2"=>$all1s[$i]['imgb2'],"country"=>$all1s[$i]['country'],"c_pv"=>$all1s[$i]['c_pv'],"onlypoint"=>$all1s[$i]["onlypoint"]);
+				$data_list[$k]=array("code1"=>$all1s[$i]['code1'],"code2"=>$all1s[$i]['code2'],"code3"=>$all1s[$i]['code3'],"code"=>$all1s[$i]['code'],"title"=>$all1s[$i]['title'],"pricec"=>$all1s[$i]['pricec'],"prices"=>$all1s[$i]['prices'],"priced"=>$all1s[$i]['priced'],"company"=>$all1s[$i]['company'],"new"=>$all1s[$i]['new'],"soldout"=>$all1s[$i]['soldout'],"best"=>$all1s[$i]['best'],"cut"=>$all1s[$i]['cut'],"recommend"=>$all1s[$i]['recommend'],"price_dis"=>$all1s[$i]['price_dis'],"size"=>$all1s[$i]['size'],"color"=>$all1s[$i]['color'],"imgl"=>$all1s[$i]['imgl'],"code4"=>$all1s[$i]['code4'],"opt_num"=>$all1s[$i]['opt_num'],"imgb1"=>$all1s[$i]['imgb1'],"imgb2"=>$all1s[$i]['imgb2'],"imgb3"=>$all1s[$i]['imgb3'],"imgb4"=>$all1s[$i]['imgb4'],"imgb5"=>$all1s[$i]['imgb5'],"country"=>$all1s[$i]['country'],"c_pv"=>$all1s[$i]['c_pv'],"onlypoint"=>$all1s[$i]["onlypoint"]);
 				$k++;
 			}
 
@@ -358,18 +381,34 @@
 			if($theme_str == "z") $kk_query = "and theme_z='z'";
 			if($theme_str == "s") $kk_query = "and theme_s='s'";
 		
-			if($query_dis=="k_new"){
-				$kk_query.="ORDER BY signdate desc";
+			if($query_dis=="k_new" || $query_dis==""){
+				if($theme_str == "n") {
+					$kk_query .= " ORDER BY rank_n asc, signdate desc";
+				} else if($theme_str == "r") {
+					$kk_query .= " ORDER BY rank_r asc, signdate desc";
+				} else if($theme_str == "f") {
+					$kk_query .= " ORDER BY rank_f asc, signdate desc";
+				} else {
+					$kk_query .= " ORDER BY signdate desc";
+				}
 			}else if($query_dis=="k_price"){
-				$kk_query.="ORDER BY pricec ";
+				$kk_query.=" ORDER BY pricec ";
 			}else if($query_dis=="k_price2"){
-				$kk_query.="ORDER BY pricec desc";
+				$kk_query.=" ORDER BY pricec desc";
 			}else if($query_dis=="k_ga1"){
-				$kk_query.="ORDER BY title";
+				$kk_query.=" ORDER BY title";
 			}else if($query_dis=="k_ga2"){
-				$kk_query.="ORDER BY title desc";
+				$kk_query.=" ORDER BY title desc";
 			}else{
-				$kk_query.="ORDER BY signdate desc";
+				if($theme_str == "n") {
+					$kk_query .= " ORDER BY rank_n asc, signdate desc";
+				} else if($theme_str == "r") {
+					$kk_query .= " ORDER BY rank_r asc, signdate desc";
+				} else if($theme_str == "f") {
+					$kk_query .= " ORDER BY rank_f asc, signdate desc";
+				} else {
+					$kk_query .= " ORDER BY signdate desc";
+				}
 			}
 
 			if($word != ""){
@@ -392,7 +431,7 @@
 			if($theme_str == ""){
 			$sql = "SELECT code1,code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4,opt_num,imgb4,imgb2,country,c_pv,onlypoint FROM $shop_goods where  soldout='N' $where $kk_query" ;
 			}else{
-				$sql = "SELECT code1,code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4,opt_num,imgb1,imgb2,country,c_pv,onlypoint FROM $shop_goods where soldout='N' $where $kk_query" ;
+			$sql = "SELECT code1,code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4,opt_num,imgb1,imgb2,country,c_pv,onlypoint,rank_n,rank_r,rank_f FROM $shop_goods where soldout='N' $where $kk_query" ;
 			}
 			// echo $sql;
 			$DB->get($sql, $all1s, $all1n);

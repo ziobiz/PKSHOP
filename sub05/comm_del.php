@@ -4,7 +4,7 @@
 function Comm_Ok()	{
 	frm   = document.Comm_Delelt
 	if(frm.PassWord.value == ""){
-		alert("해당 커맨드 비밀번호를 입력해 주세요.");
+		alert("Please enter the comment password.");
 		frm.PassWord.focus();
 		return;
 	}   
