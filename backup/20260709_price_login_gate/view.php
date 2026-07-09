@@ -2,9 +2,7 @@
 // error_reporting( E_ALL );
 // ini_set( "display_errors", 1 );
 include "../include/get_balance.php";
-if (!PKSHOP_PUBLIC_PRICE) {
-	include "../include/login_check.php";
-}
+include "../include/login_check.php";
 
 // include "../include/top_session.php";
 

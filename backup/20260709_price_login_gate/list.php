@@ -317,7 +317,7 @@ $price_s = "<font class='sbest_text02'>".number_format($pricec)."</font> ";	//�
 
 	$img_name = $savedir.$imgl;
 	
-	if (!pkshop_can_show_price() && $_SESSION['valid_user'] == "") $price_s = "";
+	if ($_SESSION['valid_user'] == "") $price_s = "";
 
 	$img_info = getImageSize($savedir.'/'.$imgl);//본이미지의 정보를 얻어옵니다
 	$img_width = $img_info[0];
@@ -370,7 +370,7 @@ if ($cook_dis == "1" && $cook_dis1 == "승인") {
 						</div>
 							<div class="sp20"></div>
 							<p class="product_title"><a href="../sub04/view.php?left_code=<?=$code?>&code1=<?=$code1?>&code2=<?=$code2?>&code3=<?=$code3?>&code4=<?=$code4?>&theme=f&type=<?=$type?>"><?=$title?></a></p>
-							<?if(pkshop_can_show_price()){?>
+							<?if($_SESSION["member_id"] != ""){?>
 							<p class="best_price" style="font-weight:bold;font-size:16px;color:#c3070b">$ <?=$price_tmp?></p>
 							<?}?>
 					</div>
