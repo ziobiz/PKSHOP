@@ -30,7 +30,7 @@ $ADM_SHELL_MENU_JSON = adm_shell_json_menu_info();
 <title><?=adm_shell_h($ADM_SHELL_CTX['title'])?> — Pentakleva Admin</title>
 <?=pkshop_admin_favicon_head_html()?>
 <link rel="stylesheet" href="../image/style.css" type="text/css" />
-<link rel="stylesheet" href="../image/pg_admin.css?v=20260710logofix" type="text/css" />
+<link rel="stylesheet" href="../image/pg_admin.css?v=20260710currencyui" type="text/css" />
 <link rel="stylesheet" href="../image/admin-modern.css?v=20260710cards" type="text/css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>

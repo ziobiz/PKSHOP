@@ -3105,6 +3105,59 @@ body.pg-admin > table {
   line-height: 1.5;
 }
 
+.pg-site-settings-screen .pg-settings-footer-grid .pg-settings-field-row {
+  max-width: none;
+}
+
+.pg-site-settings-screen .pg-settings-footer-grid .pg-settings-field-row .pg-form-field {
+  flex: 1 1 0;
+  min-width: 280px;
+}
+
+.pg-site-settings-screen .pg-settings-footer-grid .pg-form-control .pg-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pg-site-settings-screen .pg-settings-about-grid .pg-settings-field-row {
+  max-width: none;
+}
+
+.pg-site-settings-screen .pg-settings-about-grid .pg-settings-field-row .pg-form-field {
+  flex: 1 1 0;
+  min-width: 280px;
+}
+
+.pg-site-settings-screen .pg-settings-about-grid .pg-form-control .pg-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pg-site-settings-screen .pg-currency-field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.pg-site-settings-screen .pg-currency-field-row .pg-input--w-sm {
+  flex: 0 0 auto;
+  min-width: 96px;
+}
+
+.pg-site-settings-screen .pg-currency-field-row .pg-input--w-md {
+  flex: 1 1 auto;
+  min-width: 180px;
+  max-width: 320px;
+}
+
+.pg-site-settings-screen select.pg-input:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
 .pg-ai-progress-label {
   font-weight: 600;
   color: #374151;

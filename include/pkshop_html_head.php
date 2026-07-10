@@ -32,7 +32,7 @@ $og_image = pkshop_site_asset_url(pkshop_site_setting('og_image', '../images/kak
 <?php } ?>
 <link rel="stylesheet" href="../include/reset.css">
 <?php if ($pkshop_head_style === 'main') { ?>
-<link rel="stylesheet" type="text/css" href="../include/style_main.css" media="screen and (min-width:1024px)"/>
+<link rel="stylesheet" type="text/css" href="../include/style_main.css?v=20260710promogrid" media="screen and (min-width:1024px)"/>
 <?php } else { ?>
 <link rel="stylesheet" type="text/css" href="../include/style.css" media="screen and (min-width:1024px)"/>
 <?php } ?>

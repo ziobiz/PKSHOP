@@ -322,7 +322,7 @@ if (!function_exists('pkshop_promo_render_rotating_section')) {
             return;
         }
 
-        echo '<div id="' . htmlspecialchars($container_id, ENT_QUOTES, 'UTF-8') . '" class="pkshop-promo-rotate" data-interval="' . (int)$interval_sec . '">';
+        echo '<div id="' . htmlspecialchars($container_id, ENT_QUOTES, 'UTF-8') . '" class="pkshop-promo-rotate pkshop-promo-rotate--' . htmlspecialchars($layout, ENT_QUOTES, 'UTF-8') . '" data-interval="' . (int)$interval_sec . '">';
         echo $html_frames[0];
         echo '</div>';
 

@@ -1,8 +1,8 @@
 <?php
 /**
- * PKSHOP — CRYPTO/TINPASS 레이아웃 로그인 화면 (UI/브랜딩만)
- * - 관리자: login_do.php / admanager
- * - 회원: logok.php / API 로그인 (기존 PKSHOP 방식 유지)
+ * PKSHOP — CRYPTO/TINPASS 레이아웃 로그인 화면 (관리자 전용 UI/브랜딩)
+ * - 관리자: Adm/login/login.php + login_do.php / admanager
+ * - 회원: member/login.php — 쇼핑몰 기본 레이아웃 (본 라이브러리 미사용)
  * - 이메일·OTP·JWT 인증 없음 (CRYPTO Node/PG 기능 미이식)
  */
 require_once dirname(__FILE__) . '/site_settings_lib.php';

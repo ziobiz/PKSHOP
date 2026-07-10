@@ -2779,6 +2779,23 @@ font-size:0.8em;
 .new_product01:nth-child(2n-1) {
     margin-right: 4%;
 }
+
+.pkshop-promo-rotate--best,
+.pkshop-promo-rotate--recommended,
+.pkshop-promo-rotate--all {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 4%;
+    row-gap: 12px;
+}
+
+.pkshop-promo-rotate--best .best_box01,
+.pkshop-promo-rotate--recommended .new_product01,
+.pkshop-promo-rotate--all .all_box01 {
+    float: none;
+    width: auto;
+    margin-right: 0;
+}
+
 .new_product02{
 	width:260px;
 	background:#ffffff;

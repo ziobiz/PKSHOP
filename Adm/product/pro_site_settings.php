@@ -47,29 +47,56 @@ async function saveApiKey() {
 	alert(res.message || 'API 키가 저장되었습니다.');
 }
 function syncPaymentCurrency() {
+	var primaryOn = document.getElementById('currency_primary_enabled').value === '1';
+	var secondaryOn = document.getElementById('currency_secondary_enabled').value === '1';
+	var primaryCode = document.getElementById('currency_primary_code');
+	var secondaryCode = document.getElementById('currency_secondary_code');
+	var paymentSel = document.getElementById('currency_payment_code');
+	var paymentHidden = document.getElementById('currency_payment_code_hidden');
+	var paymentHint = document.getElementById('currency_payment_hint');
+
+	primaryCode.disabled = !primaryOn;
+	secondaryCode.disabled = !secondaryOn;
+
 	var enabled = [];
-	if (document.getElementById('currency_primary_enabled').checked) {
-		enabled.push(document.getElementById('currency_primary_code').value);
-	}
-	if (document.getElementById('currency_secondary_enabled').checked) {
-		var sec = document.getElementById('currency_secondary_code').value;
+	if (primaryOn) enabled.push(primaryCode.value);
+	if (secondaryOn) {
+		var sec = secondaryCode.value;
 		if (enabled.indexOf(sec) < 0) enabled.push(sec);
 	}
-	var sel = document.getElementById('currency_payment_code');
-	var current = sel.value;
-	sel.innerHTML = '';
+
+	var currentPayment = paymentSel.value;
+	paymentSel.innerHTML = '';
 	for (var i = 0; i < enabled.length; i++) {
 		var opt = document.createElement('option');
 		opt.value = enabled[i];
-		opt.textContent = enabled[i];
-		if (enabled[i] === current) opt.selected = true;
-		sel.appendChild(opt);
+		opt.textContent = enabled[i] + ' (ICOPAY·카드결제)';
+		if (enabled[i] === currentPayment) opt.selected = true;
+		paymentSel.appendChild(opt);
 	}
-	if (sel.options.length === 0) {
-		var opt = document.createElement('option');
-		opt.value = 'USD';
-		opt.textContent = 'USD';
-		sel.appendChild(opt);
+	if (paymentSel.options.length && !paymentSel.value) {
+		paymentSel.value = enabled[0];
+	}
+
+	if (enabled.length === 1) {
+		paymentSel.value = enabled[0];
+		paymentSel.disabled = true;
+		paymentSel.removeAttribute('name');
+		if (paymentHidden) {
+			paymentHidden.value = enabled[0];
+			paymentHidden.setAttribute('name', 'currency_payment_code');
+		}
+		if (paymentHint) paymentHint.textContent = '활성 통화가 1개이므로 결제 기준 통화가 자동 설정됩니다.';
+	} else if (enabled.length >= 2) {
+		paymentSel.disabled = false;
+		paymentSel.setAttribute('name', 'currency_payment_code');
+		if (paymentHidden) paymentHidden.removeAttribute('name');
+		if (paymentHint) paymentHint.textContent = '1차·2차 통화 중 결제에 사용할 통화를 선택하세요.';
+	} else {
+		paymentSel.disabled = true;
+		paymentSel.removeAttribute('name');
+		if (paymentHidden) paymentHidden.removeAttribute('name');
+		if (paymentHint) paymentHint.textContent = '최소 1개 통화를 사용으로 설정하세요.';
 	}
 }
 function pkshopValidateBrandUploads() {
@@ -212,27 +239,39 @@ adm_ui_field_row('버튼 문구', '<input type="text" name="login_admin_btn" val
 <?php adm_ui_notice('상품 DB 가격은 USD 기준입니다. Yahoo Finance 환율로 변환·표시합니다.', 'info'); ?>
 <?php adm_ui_settings_col_open(); ?>
 <?php
-$primary_curr = '<label class="pg-check-item"><input type="checkbox" name="currency_primary_enabled" id="currency_primary_enabled" value="1"' . ($s['currency_primary_enabled'] !== '0' ? ' checked' : '') . ' onchange="syncPaymentCurrency();"></label> ';
-$primary_curr .= '<select name="currency_primary_code" id="currency_primary_code" class="pg-input pg-input--w-md" onchange="syncPaymentCurrency();">';
+$primary_enabled = ($s['currency_primary_enabled'] !== '0');
+$secondary_enabled = ($s['currency_secondary_enabled'] !== '0');
+$primary_curr = '<div class="pg-currency-field-row">';
+$primary_curr .= '<select name="currency_primary_enabled" id="currency_primary_enabled" class="pg-input pg-input--w-sm" onchange="syncPaymentCurrency();">';
+$primary_curr .= '<option value="1"' . ($primary_enabled ? ' selected' : '') . '>사용</option>';
+$primary_curr .= '<option value="0"' . (!$primary_enabled ? ' selected' : '') . '>미사용</option>';
+$primary_curr .= '</select>';
+$primary_curr .= '<select name="currency_primary_code" id="currency_primary_code" class="pg-input pg-input--w-md" onchange="syncPaymentCurrency();"' . (!$primary_enabled ? ' disabled' : '') . '>';
 foreach ($currency_opts as $code => $info) {
     $primary_curr .= '<option value="' . adm_ui_h($code) . '"' . ($s['currency_primary_code'] === $code ? ' selected' : '') . '>' . adm_ui_h($info['label']) . '</option>';
 }
-$primary_curr .= '</select>';
+$primary_curr .= '</select></div>';
 adm_ui_field_row('1차 통화', $primary_curr, false, true);
 
-$secondary_curr = '<label class="pg-check-item"><input type="checkbox" name="currency_secondary_enabled" id="currency_secondary_enabled" value="1"' . ($s['currency_secondary_enabled'] !== '0' ? ' checked' : '') . ' onchange="syncPaymentCurrency();"></label> ';
-$secondary_curr .= '<select name="currency_secondary_code" id="currency_secondary_code" class="pg-input pg-input--w-md" onchange="syncPaymentCurrency();">';
+$secondary_curr = '<div class="pg-currency-field-row">';
+$secondary_curr .= '<select name="currency_secondary_enabled" id="currency_secondary_enabled" class="pg-input pg-input--w-sm" onchange="syncPaymentCurrency();">';
+$secondary_curr .= '<option value="1"' . ($secondary_enabled ? ' selected' : '') . '>사용</option>';
+$secondary_curr .= '<option value="0"' . (!$secondary_enabled ? ' selected' : '') . '>미사용</option>';
+$secondary_curr .= '</select>';
+$secondary_curr .= '<select name="currency_secondary_code" id="currency_secondary_code" class="pg-input pg-input--w-md" onchange="syncPaymentCurrency();"' . (!$secondary_enabled ? ' disabled' : '') . '>';
 foreach ($currency_opts as $code => $info) {
     $secondary_curr .= '<option value="' . adm_ui_h($code) . '"' . ($s['currency_secondary_code'] === $code ? ' selected' : '') . '>' . adm_ui_h($info['label']) . '</option>';
 }
-$secondary_curr .= '</select><p class="pg-field-hint">미사용 시 1개 통화만 노출·결제</p>';
+$secondary_curr .= '</select></div><p class="pg-field-hint">미사용 시 1개 통화만 노출·결제</p>';
 adm_ui_field_row('2차 통화', $secondary_curr, false, true);
 
-$payment_curr = '<select name="currency_payment_code" id="currency_payment_code" class="pg-input pg-input--w-md">';
+$payment_curr = '<input type="hidden" id="currency_payment_code_hidden" value="' . adm_ui_h($s['currency_payment_code']) . '">';
+$payment_curr .= '<select id="currency_payment_code" name="currency_payment_code" class="pg-input pg-input--w-md" onchange="syncPaymentCurrency();">';
 foreach ($enabled_codes as $code) {
     $payment_curr .= '<option value="' . adm_ui_h($code) . '"' . ($s['currency_payment_code'] === $code ? ' selected' : '') . '>' . adm_ui_h($code) . ' (ICOPAY·카드결제)</option>';
 }
-$payment_curr .= '</select><p class="pg-field-hint">노출 통화 중에서만 선택 가능</p>';
+$payment_curr .= '</select>';
+$payment_curr .= '<p class="pg-field-hint" id="currency_payment_hint">노출 통화 중에서만 선택 가능</p>';
 adm_ui_field_row('결제 기준 통화', $payment_curr, false, true);
 
 $example_html = '<div class="pg-field-stack"><div>예시 (USD 430 기준): <strong>' . adm_ui_h(pkshop_format_display_price(430)) . '</strong></div>';

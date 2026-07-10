@@ -111,25 +111,33 @@ foreach ($delete_image_fields as $field) {
 
 if ($section === 'currency') {
 	$opts = pkshop_currency_options();
-	$primary = strtoupper($data['currency_primary_code']);
-	$secondary = strtoupper($data['currency_secondary_code']);
-	$payment = strtoupper($data['currency_payment_code']);
-	if (!isset($opts[$primary]) || !isset($opts[$secondary]) || !isset($opts[$payment])) {
+	$existing = pkshop_site_settings(true);
+	$data['currency_primary_enabled'] = (isset($_POST['currency_primary_enabled']) && $_POST['currency_primary_enabled'] === '1') ? '1' : '0';
+	$data['currency_secondary_enabled'] = (isset($_POST['currency_secondary_enabled']) && $_POST['currency_secondary_enabled'] === '1') ? '1' : '0';
+	$primary = strtoupper(isset($_POST['currency_primary_code']) ? trim((string)$_POST['currency_primary_code']) : $existing['currency_primary_code']);
+	$secondary = strtoupper(isset($_POST['currency_secondary_code']) ? trim((string)$_POST['currency_secondary_code']) : $existing['currency_secondary_code']);
+	$data['currency_primary_code'] = $primary;
+	$data['currency_secondary_code'] = $secondary;
+	if (!isset($opts[$primary]) || !isset($opts[$secondary])) {
 		echo "<script>alert('지원하지 않는 통화 코드입니다.');history.back();</script>";
 		exit;
 	}
-	$data['currency_primary_enabled'] = isset($_POST['currency_primary_enabled']) ? '1' : '0';
-	$data['currency_secondary_enabled'] = isset($_POST['currency_secondary_enabled']) ? '1' : '0';
 	$enabled = array();
 	if ($data['currency_primary_enabled'] === '1') $enabled[] = $primary;
 	if ($data['currency_secondary_enabled'] === '1' && !in_array($secondary, $enabled, true)) $enabled[] = $secondary;
 	if (empty($enabled)) {
-		echo "<script>alert('최소 1개 통화는 노출해야 합니다.');history.back();</script>";
+		echo "<script>alert('최소 1개 통화는 사용으로 설정해야 합니다.');history.back();</script>";
 		exit;
 	}
-	if (!in_array($payment, $enabled, true)) {
-		echo "<script>alert('결제 기준 통화는 노출 통화 중에서만 선택할 수 있습니다.');history.back();</script>";
-		exit;
+	if (count($enabled) === 1) {
+		$data['currency_payment_code'] = $enabled[0];
+	} else {
+		$payment = strtoupper(isset($_POST['currency_payment_code']) ? trim((string)$_POST['currency_payment_code']) : $existing['currency_payment_code']);
+		if (!isset($opts[$payment]) || !in_array($payment, $enabled, true)) {
+			echo "<script>alert('결제 기준 통화는 1차·2차 사용 통화 중에서만 선택할 수 있습니다.');history.back();</script>";
+			exit;
+		}
+		$data['currency_payment_code'] = $payment;
 	}
 }
 

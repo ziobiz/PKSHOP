@@ -587,6 +587,29 @@ body {
 	margin-right:0px;
 }
 
+/* 메인 홍보 순환 영역 — float 대신 grid로 4열 정렬 (RECOMMENDED 8개 등 높이 차로 깨짐 방지) */
+.pkshop-promo-rotate {
+	width: 100%;
+}
+
+.pkshop-promo-rotate--best,
+.pkshop-promo-rotate--recommended,
+.pkshop-promo-rotate--all {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	column-gap: 2%;
+	row-gap: 16px;
+}
+
+.pkshop-promo-rotate--best .best_box01,
+.pkshop-promo-rotate--recommended .new_product01,
+.pkshop-promo-rotate--all .all_box01 {
+	float: none;
+	width: auto;
+	margin-right: 0;
+	margin-bottom: 0;
+}
+
 .best_box02{
 	width:200px;
 	float:left;
