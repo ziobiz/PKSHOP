@@ -116,6 +116,45 @@ if (!function_exists('pkshop_ai_append_detail_images_html')) {
     }
 }
 
+if (!function_exists('pkshop_detail_html_has_image_file')) {
+    function pkshop_detail_html_has_image_file($detail, $filename) {
+        $filename = pkshop_ai_resolve_image_filename($filename);
+        if ($filename === '') {
+            return true;
+        }
+        $escaped = preg_quote($filename, '/');
+        return (bool)preg_match('/upload\/' . $escaped . '(?:["\'\s?&]|$)/i', (string)$detail);
+    }
+}
+
+if (!function_exists('pkshop_collect_product_detail_section_images')) {
+    function pkshop_collect_product_detail_section_images($product = array()) {
+        $images = array();
+        if (!is_array($product)) {
+            return $images;
+        }
+        foreach (array('imgm', 'imgb1', 'imgb2', 'imgb3', 'imgb4', 'imgb5') as $field) {
+            $img = isset($product[$field]) ? pkshop_ai_resolve_image_filename($product[$field]) : '';
+            if ($img !== '' && !in_array($img, $images, true)) {
+                $images[] = $img;
+            }
+        }
+        return $images;
+    }
+}
+
+if (!function_exists('pkshop_sync_product_detail_images')) {
+    function pkshop_sync_product_detail_images($detail, $product = array()) {
+        $detail = rtrim((string)$detail);
+        foreach (pkshop_collect_product_detail_section_images($product) as $img) {
+            if (!pkshop_detail_html_has_image_file($detail, $img)) {
+                $detail .= pkshop_ai_detail_image_html($img);
+            }
+        }
+        return $detail;
+    }
+}
+
 if (!function_exists('pkshop_sanitize_product_detail_html')) {
     function pkshop_sanitize_product_detail_html($detail, $product = array()) {
         $detail = (string)$detail;
@@ -132,12 +171,7 @@ if (!function_exists('pkshop_sanitize_product_detail_html')) {
             $detail
         );
 
-        if (!preg_match('/class="view_detail_img"[^>]*>\s*<img[^>]+upload\/[^"\'\s>]+\.(jpg|jpeg|png|gif|webp)/i', $detail)) {
-            $detail = rtrim($detail);
-            $detail .= pkshop_ai_append_detail_images_html(array(), $product);
-        }
-
-        return $detail;
+        return pkshop_sync_product_detail_images($detail, $product);
     }
 }
 

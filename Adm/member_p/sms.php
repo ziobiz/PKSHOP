@@ -121,4 +121,4 @@ function HLength() {
 					</tr>
 				</table> 
 				<br>
-<?php pkshop_admin_shell_end(); ?>				
+<? include "../inc/down_menu.php"; ?>

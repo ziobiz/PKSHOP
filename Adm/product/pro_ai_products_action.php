@@ -79,9 +79,9 @@ $msg = '처리되었습니다.';
 if ($action === 'delete') {
 	$msg = $done . '건의 AI 상품이 삭제되었습니다.';
 } elseif ($action === 'hide') {
-	$msg = $done . '건의 AI 상품 노출이 중지되었습니다.';
+	$msg = $done . '건의 AI 상품이 비공개 처리되었습니다.';
 } elseif ($action === 'show') {
-	$msg = $done . '건의 AI 상품 노출이 재개되었습니다.';
+	$msg = $done . '건의 AI 상품이 공개 처리되었습니다.';
 	$view = 'active';
 }
 

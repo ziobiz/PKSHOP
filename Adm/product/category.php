@@ -15,7 +15,7 @@ $cate1 = $sel['cate1']; $cate2 = $sel['cate2']; $cate3 = $sel['cate3']; $cate4 =
 $code1 = $sel['code1']; $code2 = $sel['code2']; $code3 = $sel['code3']; $code4 = $sel['code4'];
 $cateuid1 = $sel['cateuid1']; $cateuid2 = $sel['cateuid2']; $cateuid3 = $sel['cateuid3']; $cateuid4 = $sel['cateuid4'];
 
-function pkshop_render_cate_panel($level, $title, $items, $sel, $DB, $shop_cate) {
+function pkshop_render_cate_panel($level, $title, $short_label, $items, $sel, $DB, $shop_cate) {
     $lv = intval($level);
     $code1 = $sel['code1'];
     $code2 = $sel['code2'];
@@ -29,22 +29,28 @@ function pkshop_render_cate_panel($level, $title, $items, $sel, $DB, $shop_cate)
     $form_code = ($cur_code !== '') ? $cur_code : $next_code;
     $catenum = count($items) + 1;
     $item_count = count($items);
+    $panel_class = 'cate-col cate-col--lv' . $lv;
+    if (!$parent_ready && $lv > 1) $panel_class .= ' is-locked';
+    if ($cur_uid !== '') $panel_class .= ' has-selection';
 ?>
-    <table class="cate-panel" width="280" border="1" cellspacing="0" cellpadding="8" bordercolor="#88B7DA" bgcolor="#D2DEE8" align="left">
-        <tr>
-            <td valign="top">
-                <div class="cate-panel-title"><?=htmlspecialchars($title)?></div>
+<section class="<?=$panel_class?>" data-level="<?=$lv?>">
+    <header class="cate-col-head">
+        <span class="cate-level-badge"><?=$lv?>차</span>
+        <h3 class="cate-col-title"><?=htmlspecialchars($title, ENT_QUOTES, 'UTF-8')?></h3>
+        <span class="cate-col-count"><?=$item_count?>건</span>
+    </header>
+    <div class="cate-col-body">
 <? if (!$parent_ready && $lv > 1) { ?>
-                <p class="cate-hint">상위 카테고리를 먼저 선택하세요.</p>
+        <p class="cate-hint"><span class="cate-hint-icon">↑</span> 상위 <?=$lv - 1?>차 카테고리를 먼저 선택하세요.</p>
 <? } else { ?>
-                <table class="cate-list" width="100%" border="0" cellspacing="0" cellpadding="2">
-                    <tr class="cate-head">
-                        <td width="22"><a href="javascript:all_chk('<?=$lv?>')" class="cate-all">all</a></td>
-                        <td>카테고리</td>
-                        <td width="88" align="center">순서·관리</td>
-                    </tr>
+        <div class="cate-list-head">
+            <span class="cate-list-head-check"><a href="javascript:all_chk('<?=$lv?>')" class="cate-all" title="전체 선택">all</a></span>
+            <span class="cate-list-head-name">카테고리명</span>
+            <span class="cate-list-head-actions">관리</span>
+        </div>
+        <ul class="cate-item-list">
 <? if ($item_count === 0) { ?>
-                    <tr><td colspan="3" class="cate-empty">등록된 카테고리가 없습니다.</td></tr>
+            <li class="cate-item cate-item--empty">등록된 카테고리가 없습니다.</li>
 <? } ?>
 <? foreach ($items as $pos => $item) {
     $ii = $item['index'];
@@ -54,55 +60,57 @@ function pkshop_render_cate_panel($level, $title, $items, $sel, $DB, $shop_cate)
     $item_code = htmlspecialchars($item['cate_code'], ENT_QUOTES, 'UTF-8');
     $hidden = (intval($item['cate_show']) === 1);
     $selected = ((string)$cur_uid === (string)$uid);
-    $row_class = 'cate-row' . ($selected ? ' cate-row-selected' : '') . ($hidden ? ' cate-row-hidden' : '');
+    $row_class = 'cate-item cate-row' . ($selected ? ' cate-row-selected' : '') . ($hidden ? ' cate-row-hidden' : '');
     $can_up = ($pos > 0);
     $can_down = ($pos < $item_count - 1);
 ?>
-                    <tr class="<?=$row_class?>" id="cate-row-<?=$lv?>-<?=$uid?>" data-level="<?=$lv?>" data-uid="<?=$uid?>">
-                        <td valign="top">
-                            <input type="checkbox" name="catechk<?=$lv?><?=$ii?>" value="Y">
-                        </td>
-                        <td valign="top">
-                            <span class="cate-code"><?=$item_code?></span>
-                            <a href="javascript:selectcate('<?=$lv?>','<?=$uid?>')" class="cate-name" title="하위 카테고리 보기 / 수정 폼에 불러오기"><?=$cate_view?></a>
-                            <? if ($hidden) { ?><span class="cate-badge-hidden">숨김</span><? } ?>
-                            <input type="hidden" name="rank<?=$lv?><?=$ii?>" value="<?=$ii?>">
-                        </td>
-                        <td align="center" nowrap class="cate-actions">
-                            <button type="button" class="cate-btn cate-btn-arrow" title="위로" data-action="move" data-dir="up" data-level="<?=$lv?>" data-uid="<?=$uid?>" <?=$can_up ? '' : 'disabled'?>>▲</button>
-                            <button type="button" class="cate-btn cate-btn-arrow" title="아래로" data-action="move" data-dir="down" data-level="<?=$lv?>" data-uid="<?=$uid?>" <?=$can_down ? '' : 'disabled'?>>▼</button>
-                            <button type="button" class="cate-btn" data-action="edit" data-level="<?=$lv?>" data-uid="<?=$uid?>" data-code="<?=$item_code?>" data-name="<?=$cate_raw?>">수정</button>
-                            <button type="button" class="cate-btn <?=$hidden ? 'cate-btn-show' : 'cate-btn-hide'?>" data-action="toggle" data-level="<?=$lv?>" data-uid="<?=$uid?>"><?=$hidden ? '표시' : '숨김'?></button>
-                            <button type="button" class="cate-btn cate-btn-del" data-action="delete" data-level="<?=$lv?>" data-uid="<?=$uid?>" data-name="<?=$cate_view?>">삭제</button>
-                        </td>
-                    </tr>
-<? } ?>
-                </table>
-                <input type="hidden" name="catenum<?=$lv?>" value="<?=$catenum?>">
-
-                <div class="cate-form-box">
-                    <div class="cate-form-title">추가 / 수정</div>
-                    <table width="100%" border="0" cellspacing="0" cellpadding="2">
-                        <tr>
-                            <td width="70"><b>상품코드</b></td>
-                            <td><input type="text" name="code<?=$lv?>" id="code<?=$lv?>" value="<?=htmlspecialchars($form_code, ENT_QUOTES, 'UTF-8')?>" size="4" maxlength="2" class="adminbttn"></td>
-                        </tr>
-                        <tr>
-                            <td><b>카테고리명</b></td>
-                            <td><input type="text" name="cate<?=$lv?>" id="cate<?=$lv?>" value="<?=htmlspecialchars($cur_cate, ENT_QUOTES, 'UTF-8')?>" size="18" maxlength="15" class="adminbttn"></td>
-                        </tr>
-                    </table>
-                    <input type="hidden" name="cateuid<?=$lv?>" id="cateuid<?=$lv?>" value="<?=htmlspecialchars($cur_uid, ENT_QUOTES, 'UTF-8')?>">
-                    <div class="cate-form-btns">
-                        <input type="button" value="추가" class="adminbttn" onclick="go_up('<?=$lv?>')">
-                        <input type="button" value="수정" class="adminbttn" onclick="go_modify('<?=$lv?>')">
-                        <input type="button" value="선택 삭제" class="adminbttn" onclick="go_delete('<?=$lv?>')">
-                    </div>
+            <li class="<?=$row_class?>" id="cate-row-<?=$lv?>-<?=$uid?>" data-level="<?=$lv?>" data-uid="<?=$uid?>">
+                <label class="cate-item-check">
+                    <input type="checkbox" name="catechk<?=$lv?><?=$ii?>" value="Y">
+                </label>
+                <div class="cate-item-main">
+                    <a href="javascript:selectcate('<?=$lv?>','<?=$uid?>')" class="cate-name" title="<?=htmlspecialchars($cate_view, ENT_QUOTES, 'UTF-8')?> — 하위 보기 / 수정">
+                        <span class="cate-code"><?=$item_code?></span>
+                        <span class="cate-name-text"><?=$cate_view?></span>
+                    </a>
+                    <? if ($hidden) { ?><span class="cate-badge-hidden">숨김</span><? } ?>
+                    <input type="hidden" name="rank<?=$lv?><?=$ii?>" value="<?=$ii?>">
                 </div>
+                <div class="cate-actions">
+                    <button type="button" class="cate-btn cate-btn-arrow" title="위로" data-action="move" data-dir="up" data-level="<?=$lv?>" data-uid="<?=$uid?>" <?=$can_up ? '' : 'disabled'?>>▲</button>
+                    <button type="button" class="cate-btn cate-btn-arrow" title="아래로" data-action="move" data-dir="down" data-level="<?=$lv?>" data-uid="<?=$uid?>" <?=$can_down ? '' : 'disabled'?>>▼</button>
+                    <button type="button" class="cate-btn" data-action="edit" data-level="<?=$lv?>" data-uid="<?=$uid?>" data-code="<?=$item_code?>" data-name="<?=$cate_raw?>">수정</button>
+                    <button type="button" class="cate-btn <?=$hidden ? 'cate-btn-show' : 'cate-btn-hide'?>" data-action="toggle" data-level="<?=$lv?>" data-uid="<?=$uid?>"><?=$hidden ? '표시' : '숨김'?></button>
+                    <button type="button" class="cate-btn cate-btn-del" data-action="delete" data-level="<?=$lv?>" data-uid="<?=$uid?>" data-name="<?=$cate_view?>">삭제</button>
+                </div>
+            </li>
 <? } ?>
-            </td>
-        </tr>
-    </table>
+        </ul>
+        <input type="hidden" name="catenum<?=$lv?>" value="<?=$catenum?>">
+
+        <div class="cate-form-box">
+            <div class="cate-form-title">추가 / 수정</div>
+            <div class="cate-form-grid">
+                <label class="cate-form-field">
+                    <span class="cate-form-label">코드</span>
+                    <input type="text" name="code<?=$lv?>" id="code<?=$lv?>" value="<?=htmlspecialchars($form_code, ENT_QUOTES, 'UTF-8')?>" maxlength="2" class="pg-input cate-input-code">
+                </label>
+                <label class="cate-form-field cate-form-field--grow">
+                    <span class="cate-form-label">카테고리명</span>
+                    <input type="text" name="cate<?=$lv?>" id="cate<?=$lv?>" value="<?=htmlspecialchars($cur_cate, ENT_QUOTES, 'UTF-8')?>" maxlength="15" class="pg-input">
+                </label>
+            </div>
+            <input type="hidden" name="cateuid<?=$lv?>" id="cateuid<?=$lv?>" value="<?=htmlspecialchars($cur_uid, ENT_QUOTES, 'UTF-8')?>">
+            <div class="cate-form-btns">
+                <button type="button" class="pg-btn pg-btn-primary" onclick="go_up('<?=$lv?>')">추가</button>
+                <button type="button" class="pg-btn" onclick="go_modify('<?=$lv?>')">수정</button>
+                <button type="button" class="pg-btn pg-btn-danger" onclick="go_delete('<?=$lv?>')">선택 삭제</button>
+            </div>
+        </div>
+<? } ?>
+    </div>
+</section>
+<? if ($lv < 4) { ?><div class="cate-flow-arrow" aria-hidden="true">›</div><? } ?>
 <?
 }
 
@@ -110,37 +118,13 @@ $items1 = pkshop_cate_fetch_list($DB, $shop_cate, 1, $code1, $code2, $code3);
 $items2 = pkshop_cate_parent_ready(2, $code1, $code2, $code3) ? pkshop_cate_fetch_list($DB, $shop_cate, 2, $code1, $code2, $code3) : array();
 $items3 = pkshop_cate_parent_ready(3, $code1, $code2, $code3) ? pkshop_cate_fetch_list($DB, $shop_cate, 3, $code1, $code2, $code3) : array();
 $items4 = pkshop_cate_parent_ready(4, $code1, $code2, $code3) ? pkshop_cate_fetch_list($DB, $shop_cate, 4, $code1, $code2, $code3) : array();
-?>
-<style>
-.cate-panel { margin-bottom: 8px; font-size: 12px; }
-.cate-panel-title { font-weight: bold; text-align: center; padding: 4px 0 10px; font-size: 13px; }
-.cate-hint { color: #666; text-align: center; padding: 20px 8px; }
-.cate-list { font-size: 11px; }
-.cate-head td { font-weight: bold; border-bottom: 1px solid #88B7DA; padding-bottom: 4px; }
-.cate-empty { color: #888; text-align: center; padding: 12px 4px; }
-.cate-row td { border-bottom: 1px solid #c5d8e8; padding: 5px 2px; vertical-align: middle; }
-.cate-row-selected { background: #fff8dc; }
-.cate-row-hidden .cate-name { color: #999; text-decoration: line-through; }
-.cate-code { display: inline-block; min-width: 22px; color: #336699; font-weight: bold; margin-right: 4px; }
-.cate-name { color: #003366; text-decoration: none; }
-.cate-name:hover { text-decoration: underline; }
-.cate-badge-hidden { display: inline-block; margin-left: 4px; padding: 0 4px; background: #999; color: #fff; font-size: 10px; border-radius: 2px; }
-.cate-actions { white-space: nowrap; line-height: 1.8; }
-.cate-btn { font-size: 10px; padding: 1px 4px; margin: 1px 0; cursor: pointer; border: 1px solid #88B7DA; background: #fff; border-radius: 2px; }
-.cate-btn:hover { background: #eef5fb; }
-.cate-btn:disabled { opacity: 0.35; cursor: default; }
-.cate-btn-arrow { font-size: 9px; padding: 0 5px; font-weight: bold; }
-.cate-btn-del { color: #a00; border-color: #c99; }
-.cate-btn-hide { color: #666; }
-.cate-btn-show { color: #060; }
-.cate-all { font-weight: bold; color: #003366; text-decoration: none; }
-.cate-form-box { margin-top: 12px; padding-top: 10px; border-top: 1px dashed #88B7DA; background: #eaf1f7; padding: 8px; }
-.cate-form-title { font-weight: bold; margin-bottom: 6px; color: #003366; }
-.cate-form-btns { text-align: center; padding-top: 8px; }
-.cate-columns { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; justify-content: flex-start; }
-.cate-col-gap { width: 4px; }
-</style>
 
+$cate_path_parts = array();
+if ($cate1 !== '') $cate_path_parts[] = '1차: ' . htmlspecialchars(stripslashes($cate1), ENT_QUOTES, 'UTF-8') . ($code1 !== '' ? ' (' . $code1 . ')' : '');
+if ($cate2 !== '') $cate_path_parts[] = '2차: ' . htmlspecialchars(stripslashes($cate2), ENT_QUOTES, 'UTF-8') . ($code2 !== '' ? ' (' . $code2 . ')' : '');
+if ($cate3 !== '') $cate_path_parts[] = '3차: ' . htmlspecialchars(stripslashes($cate3), ENT_QUOTES, 'UTF-8') . ($code3 !== '' ? ' (' . $code3 . ')' : '');
+if ($cate4 !== '') $cate_path_parts[] = '4차: ' . htmlspecialchars(stripslashes($cate4), ENT_QUOTES, 'UTF-8') . ($code4 !== '' ? ' (' . $code4 . ')' : '');
+?>
 <script language="javascript">
 function go_up(i) {
     var codeEl = document.getElementById('code' + i);
@@ -216,71 +200,49 @@ function cateAjax(params, reloadOnOk) {
 }
 </script>
 
+<?php adm_ui_page_open('pg-cate-screen'); ?>
 <form name="form" method="post">
-    <table width="1500" border="0" cellpadding="0" cellspacing="0">
-        <tr><td height="30"></td></tr>
-        <tr><td>
-            <table border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                    <td width="60" align="center"><img src="../image/icon1.gif" width="45" height="35" border="0"></td>
-                    <td class="td14">&nbsp;<b>분류등록/수정</b></td>
-                </tr>
-            </table>
-        </td></tr>
-        <tr><td height="3"></td></tr>
-        <tr>
-            <td valign="top" align="left" style="padding-left:10px;">
-                <div class="cate-columns">
-<? pkshop_render_cate_panel(1, '1차 카테고리', $items1, $sel, $DB, $shop_cate); ?>
-<? pkshop_render_cate_panel(2, '2차 카테고리', $items2, $sel, $DB, $shop_cate); ?>
-<? pkshop_render_cate_panel(3, '3차 카테고리', $items3, $sel, $DB, $shop_cate); ?>
-<? pkshop_render_cate_panel(4, '4차 카테고리', $items4, $sel, $DB, $shop_cate); ?>
-                </div>
+<input type="hidden" name="code1" id="code1" value="<?=htmlspecialchars($code1, ENT_QUOTES, 'UTF-8')?>">
+<input type="hidden" name="code2" id="code2" value="<?=htmlspecialchars($code2, ENT_QUOTES, 'UTF-8')?>">
+<input type="hidden" name="code3" id="code3" value="<?=htmlspecialchars($code3, ENT_QUOTES, 'UTF-8')?>">
+<input type="hidden" name="code4" id="code4" value="<?=htmlspecialchars($code4, ENT_QUOTES, 'UTF-8')?>">
+<?php adm_ui_card_open('분류 등록 / 수정'); ?>
 
-                <br>
-                <table border="0" cellspacing="0" cellpadding="0" class="left_margin30">
-                    <tr>
-                        <td valign="top">
-                            <p><b>이용방법</b><br><br></p>
-                            <table width="900" border="0" cellspacing="1" cellpadding="0" bgcolor="#88B7DA">
-                                <tr>
-                                    <td bgcolor="#EBF0F4" style="padding:12px;">
-                                        <p><b>카테고리 추가</b> : 상품코드와 카테고리명을 입력한 후 <b>추가</b> 버튼 클릭</p>
-                                        <p><b>카테고리 수정</b> : 목록에서 <b>수정</b> 버튼 또는 카테고리명 클릭 → 코드·이름 수정 후 <b>수정</b> 버튼 클릭</p>
-                                        <p><b>순서 변경</b> : 각 항목 옆 <b>▲ ▼</b> 화살표로 위·아래 이동 (우선순위 = 사이트 노출 순서)</p>
-                                        <p><b>숨김/표시</b> : 항목 옆 <b>숨김</b>·<b>표시</b> 버튼으로 즉시 전환</p>
-                                        <p><b>카테고리 삭제</b> : 항목 옆 <b>삭제</b> 버튼 또는 체크 후 하단 <b>선택 삭제</b> (전체 선택: <b>all</b>)</p>
-                                    </td>
-                                </tr>
-                            </table>
-                            <br><br>
-                        </td>
-                    </tr>
-                </table>
-                <table border="0" cellspacing="0" cellpadding="0" class="left_margin30">
-                    <tr>
-                        <td valign="top">
-                            <p><b>이용 팁</b><br><br></p>
-                            <table width="900" border="0" cellspacing="1" cellpadding="20" bgcolor="#88B7DA">
-                                <tr>
-                                    <td bgcolor="#EBF0F4">
-                                        <p><b><font color="#990000">우선 순위란?</font></b> : 사이트에서 소개될 카테고리명의 순서</p>
-                                        <p><b><font color="#990000">효과적인 상품코드 이용</font></b> :
-                                        1,2,3,4차 카테고리별로 각각 두자리의 코드를 입력하실 수 있습니다. 이는 어떤 상품을 코드만 보고도 파악할 수 있도록 한 시스템입니다. 카테고리를 3차 까지 사용한 경우
-                                        <font color="#990000">11</font><font color="#CC6633">22</font><font color="#339999">33</font><font color="#0000ff">44</font> (예) 의 코드가 발생하며 상품등록시 3자리의 코드를 추가 입력할 수 있도록
-                                        하여 ( 카테고리당 999개까지 등록 가능 )<font color="#990000">11</font><font color="#CC6633">22</font><font color="#339999">33</font><font color="#0000ff">44</font>001(예)과 같이 9자리의 코드를 사용하실 수 있습니다. 상품 코드 체계를 먼저 설정하시고 사용하시면 효과적으로 사용하실 수 있습니다. 이 체계를 사용하지 않으셔도 무방합니다.</p>
-                                    </td>
-                                </tr>
-                            </table>
-                            <br><br>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr><td height="40"></td></tr>
-    </table>
+<nav class="cate-path-bar" aria-label="선택 경로">
+    <span class="cate-path-label">현재 경로</span>
+<? if (count($cate_path_parts) > 0) { ?>
+    <? foreach ($cate_path_parts as $idx => $part) { ?>
+    <span class="cate-path-sep"><?=$idx > 0 ? '›' : ''?></span>
+    <span class="cate-path-item"><?=$part?></span>
+    <? } ?>
+<? } else { ?>
+    <span class="cate-path-empty">1차 카테고리부터 선택하세요</span>
+<? } ?>
+</nav>
+
+<p class="cate-guide">왼쪽에서 <strong>1차 → 2차 → 3차 → 4차</strong> 순으로 선택하면 하위 분류가 열립니다. 카테고리명을 클릭하면 하위 목록이 표시됩니다.</p>
+
+<div class="cate-cascade">
+<? pkshop_render_cate_panel(1, '대분류', '1차', $items1, $sel, $DB, $shop_cate); ?>
+<? pkshop_render_cate_panel(2, '중분류', '2차', $items2, $sel, $DB, $shop_cate); ?>
+<? pkshop_render_cate_panel(3, '소분류', '3차', $items3, $sel, $DB, $shop_cate); ?>
+<? pkshop_render_cate_panel(4, '세분류', '4차', $items4, $sel, $DB, $shop_cate); ?>
+</div>
+<?php adm_ui_card_close(); ?>
+
+<?php adm_ui_card_open('이용 안내'); ?>
+                <p><b>이용방법</b></p>
+                <ul class="pg-help-list">
+                    <li><b>카테고리 추가</b> : 상품코드와 카테고리명을 입력한 후 <b>추가</b> 버튼 클릭</li>
+                    <li><b>카테고리 수정</b> : 목록에서 <b>수정</b> 버튼 또는 카테고리명 클릭 → 코드·이름 수정 후 <b>수정</b> 버튼 클릭</li>
+                    <li><b>순서 변경</b> : 각 항목 옆 <b>▲ ▼</b> 화살표로 위·아래 이동</li>
+                    <li><b>숨김/표시</b> : 항목 옆 <b>숨김</b>·<b>표시</b> 버튼으로 즉시 전환</li>
+                    <li><b>카테고리 삭제</b> : 항목 옆 <b>삭제</b> 버튼 또는 체크 후 <b>선택 삭제</b></li>
+                </ul>
+                <p><b>이용 팁</b> — 우선순위는 사이트 노출 순서입니다. 1~4차 카테고리별 두 자리 코드 체계(예: 11223344001)를 사용하면 상품 관리가 편리합니다.</p>
+<?php adm_ui_card_close(); ?>
 </form>
+<?php adm_ui_page_close(); ?>
 
 <? include "../inc/down_menu.php"; ?>
 

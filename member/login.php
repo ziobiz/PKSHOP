@@ -1,326 +1,111 @@
 <?
-	include "../include/get_balance.php";
-	$pkshop_head_style = 'shop';
-	$pkshop_page_title = 'Login';
-	$pkshop_login_from_buy = (isset($_GET['from']) && $_GET['from'] === 'buy');
+include "../include/com.php";
+require_once dirname(__FILE__) . '/../include/pkshop_auth_lib.php';
+
+$pkshop_login_from_buy = (isset($_GET['from']) && $_GET['from'] === 'buy');
+$b = pkshop_auth_branding('member');
 ?>
 <!doctype html>
-<html lang="en">
- <head>
-<?php include "../include/pkshop_html_head.php"; ?>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title><?=pkshop_auth_h($b['form_title'])?> — <?=pkshop_auth_h(pkshop_site_setting('site_title', 'Pentakleva'))?></title>
+<?php pkshop_auth_css_link(); ?>
+<script language="JavaScript">
+function login022() {
+	if (!document.relogin22.id.value) {
+		alert('<?=pkshop_auth_h($b['label_id'])?>을(를) 입력하세요!');
+		document.relogin22.id.focus();
+		return;
+	}
+	if (!document.relogin22.passwd.value) {
+		alert('<?=pkshop_auth_h($b['label_password'])?>을(를) 입력하세요!');
+		document.relogin22.passwd.focus();
+		return;
+	}
+	if (document.relogin22.idcheck.checked) {
+		saveLogin(document.relogin22.id.value);
+	} else {
+		saveLogin("");
+	}
+	document.relogin22.submit();
+}
+function EnterCheck011(i) {
+	if (event.keyCode === 13 && i === 1) {
+		document.relogin22.passwd.focus();
+	}
+	if (event.keyCode === 13 && i === 2) {
+		login022();
+	}
+}
+function setsave(name, value, expiredays) {
+	var today = new Date();
+	today.setDate(today.getDate() + expiredays);
+	document.cookie = name + "=" + escape(value) + "; path=/; expires=" + today.toGMTString() + ";";
+}
+function confirmSave(checkbox) {
+	if (checkbox.checked) {
+		var isRemember = confirm("이 PC에 로그인 정보를 저장하시겠습니까? 공용 PC에서는 주의하세요.");
+		if (!isRemember) {
+			checkbox.checked = false;
+		}
+	}
+}
+function saveLogin(id) {
+	if (id !== "") {
+		setsave("userid", id, 7);
+	} else {
+		setsave("userid", id, -1);
+	}
+}
+function getLogin() {
+	var cook = document.cookie + "";
+	var key = "userid";
+	var idx = cook.indexOf(key, 0);
+	var val = "";
+	if (idx !== -1) {
+		cook = cook.substring(idx, cook.length);
+		var begin = cook.indexOf("=", 0) + 1;
+		var end = cook.indexOf(";", begin);
+		val = unescape(cook.substring(begin, end));
+	}
+	if (val !== "") {
+		document.relogin22.id.value = val;
+		document.relogin22.idcheck.checked = true;
+	}
+}
+</script>
+</head>
+<body onload="getLogin();">
+<?php pkshop_auth_chrome_open('member'); ?>
+<h2 class="pk-auth-title"><?=pkshop_auth_h($b['form_title'])?></h2>
 
-  				<script language="JavaScript">
-				<!--
-				function login022() { //v3.0
-					if(!document.relogin22.id.value){
-						alert('Enter your ID!');
-						document.relogin22.id.focus();
-						return;
-					}
-					if(!document.relogin22.passwd.value){
-						alert('Please enter your password!');
-						document.relogin22.passwd.focus();
-						return;
-					}
-					if(relogin22.idcheck.checked){ 
-					saveLogin(relogin22.id.value);
-					
-					}else{
-					saveLogin("");
-					}
-					document.relogin22.submit();
-				}
-				function EnterCheck011(i) {
-					if(event.keyCode ==13 && i==1) 
-					{ 
-						document.relogin22.passwd.focus(); 
-					}
-					if(event.keyCode ==13 && i==2) 
-					{ 
-						if(relogin22.idcheck.checked){ 
-
-						saveLogin(relogin22.id.value);
-						}else{
-						saveLogin("");
-						}
-						document.relogin22.submit();
-					} 
-				} 
-
-				function EnterCheck02(i) {
-					if(event.keyCode ==13 && i==1) 
-					{ 
-						document.relogin3.passwd.focus(); 
-					}
-					if(event.keyCode ==13 && i==2) 
-					{ 
-						if(relogin3.idcheck.checked){ 
-
-						saveLogin(relogin3.id.value);
-						}else{
-						saveLogin("");
-						}
-						document.relogin3.submit();
-					} 
-				} 
-
-
-
-				// -->
-				</script>
-<!-- 				로그인 스크립트 -->
-				<script>
-				function setsave(name, value, expiredays)
-					{
-					 var today = new Date();
-					 today.setDate( today.getDate() + expiredays );
-					 document.cookie = name + "=" + escape( value ) + "; path=/; expires=" + today.toGMTString() + ";"
-					}
-
-					function confirmSave(checkbox)
-					{
-					 var isRemember;
-
-					 if(checkbox.checked)
-					 {
-					 isRemember = confirm("Do you want to save your login information on this PC? Please be careful as personal information may be leaked from public places such as PC rooms.");
-					  if(!isRemember)
-					   checkbox.checked = false;
-					 }
-					}
-
-					function saveLogin(id)
-					{
-					 if(id != "")
-					 {
-					  // userid 쿠키에 id 값을 7일간 저장
-					  setsave("userid", id, 7);
-					 }else{
-					  // userid 쿠키 삭제
-					  setsave("userid", id, -1);
-					 }
-					}
-					function getLogin()
-					{
-					 // userid 쿠키에서 id 값을 가져온다.
-					 var cook = document.cookie + "";
-					 var key = "userid";
-					 var idx = cook.indexOf(key, 0);
-					 var val = "";
-
-					 if(idx != -1)
-					 {
-					  cook = cook.substring(idx, cook.length);
-					  begin = cook.indexOf("=", 0) + 1;
-					  end = cook.indexOf(";", begin);
-					  val = unescape( cook.substring(begin, end) );
-					 }
-
-					 // 가져온 쿠키값이 있으면
-					 if(val!= "")
-					 {
-					  document.relogin22.id.value = val;
-					  document.relogin22.idcheck.checked = true;
-					 }
-					}
-	
-				
-
-				</script>
- </head>
- <body onload="getLogin();">
-	<div id="wrap">
-
-	<!-- 상단(Top) -->
-
-	 
-	  <? include "../include/top.php"; ?>
-
-				
-	<!-- 상단(Top) -->
-
-	<!-- 컨텐츠 시작 -->
-	<div id="content">
-		
-		<!-- 컨텐츠 이너 시작 -->
-		<div class="content_inner">
-
-			<div class="sp90"></div>
-
-			<!-- ㅌ타이틀 -->
-			<div class="member_title">
-				Login
-			</div>
-
-			<div class="sp10"></div>
-			<div class="member_title01">
-			Meet a variety of services and benefits at Pentakleva.
-			</div>
-			<!-- 타이틀종료 -->
-
-			<div class="sp35"></div>
-
-			<hr class="hr_gray"/>
-
-			<div class="sp35"></div>
-
-			<?php if (!empty($pkshop_login_from_buy)) { ?>
-			<div style="max-width:720px;margin:0 auto 20px;padding:14px 18px;border:1px solid #e8b4b4;background:#fff5f5;color:#c3070b;text-align:center;font-size:15px;line-height:1.5;">
-				<strong>Only members can complete a purchase.</strong><br>
-				Please log in to continue.
-			</div>
-			<?php } ?>
-
-			<!-- 로그인시작 -->
-			<div class="login_inner">
-				<div class="sp50"></div>
-				
-				<!-- 회원 로그인 -->
-				
-				<form name="relogin22" action="./logok.php" method="post">
-				<div class="login_box">
-					<div class="login_box_title">
-						Member log-in.
-					</div>
-					<div class="login_title_s">
-						If you log in and use it, you can enjoy more diverse services.
-					</div>
-
-					<div class="sp20"></div>
-
-					<table class="login_table">
-						<tr>
-							<td width="80%">
-							<table class="login_table_in">
-								<tr>								
-									<th width="30%">ID</th>
-									<td width="68%"><input type="text" name="id" class="input_login" OnKeyDown="EnterCheck011(1);"></td>
-						
-								</tr>
-								<tr>
-									<td colspan="2" height="10px"></td>
-								</tr>
-								<tr>								
-									<th width="30%">Password</th>
-									<td width="68%"><input type="password" name="passwd" class="input_login" OnKeyDown="EnterCheck011(2);"></td>
-						
-								</tr>
-							</table>
-							</td>
-
-							<td width="20%"><input type="button" value="Login" class="btn_login" onclick="javascript:login022();"></td>
-						</tr>
-						&nbsp;&nbsp;
-
-
-
-					</table>
-					<div style="margin-left:150px; margint-top:10px;margin-bottom:10px;"><br>
-					<input type="checkbox" name="idcheck" onClick="confirmSave(this)"> <span style="font-face:nanum Gothic; font-size:14px; color:#c3070b">ID SAVED</span>
-					</div>
-				</div>
-				</form>
-				<!-- 회원로그인 종료 -->
-
-				<!-- 비회원 로그인 -->
-				
-
-
-
-				<!-- <form name="relogin3" action="./order_login_ok.php" method="post">
-				<div class="login_box01">
-					<div class="login_box_title">
-						비회원 로그인
-					</div>
-					<div class="login_title_s">
-						비회원 주문조회는 주문하신 성함과 휴대폰번호를 입력하시면 주문/배송을<br/>확인하실 수 있습니다.
-					</div>
-
-					<div class="sp20"></div>
-					
-					<table class="login_table">
-						<tr>
-							<th width="20%">성 함</th>
-							<td width="57%"><input type="text" name="k_name" class="input_login" OnKeyDown="EnterCheck02(1);"></td>
-							<td width="3%" rowspan="3"></td>
-							<td width="20%" rowspan="3"><input type="submit" value="주문조회" class="btn_login01" ></td>
-						</tr>
-						<tr>
-							<td colspan="2" height="10px"></td>
-						</tr>
-						<tr>
-							<th width="10%">휴대폰</th>
-							<td width="50%">
-							<select name="k_ordernum1" class="input_login_tel">
-								<option value="010">010</option>
-								<option value="011">011</option>
-								<option value="019">019</option>
-								<option value="018">018</option>
-								<option value="017">017</option>
-								<option value="016">016</option>
-							</select> - 
-							<input type="text" name="k_ordernum2" class="input_login_tel" OnKeyDown="EnterCheck02(2);"> - <input type="text" name="k_ordernum3" class="input_login_tel" OnKeyDown="EnterCheck02(3);"></td>
-							<td width="2%"></td>
-						</tr>
-					</table>
-				</div>
-				</form> -->
-				<!-- 비회원로그인 종료 -->
-
-				<div class="sp50"></div>
-			</div>
-			<!-- 로그인 종료 -->
-
-			<div class="sp30"></div>
-
-			<hr class="hr_gray"/>
-
-			<div class="sp30"></div>
-
-			<div class="login_btn_box">
-				<div class="login_left">
-					<table class="find_id_table">
-						<tr>
-							<!-- <td width="55%">아이디/비밀번호를 잊으셨나요?<br/>정보를 입력하시면 찾아드립니다!</td>
-							<td width="45%"><a href="find.php"><img src="images/btn_findid.png" alt="아이디찾기"/></a></td> -->
-						</tr>
-					</table>
-				</div>
-
-<div class="sp5"></div>
-				<div class="login_left">
-					<table class="find_id_table">
-						<tr>
-							<td width="60%">Aren't you a member? <br>You can get various benefits by <br>signing up as a member.</td>
-<div class="sp5"></div>
-							<td width="40%"><a href="agree.php" style="background:#c3070b; color: #fff;padding: 8% 12%;border-radius: 15px;">Sign up</a></td>
-						</tr>
-					</table>
-				</div>
-			</div>
-
-		
-		</div>
-		<!-- 컨텐츠_이너 종료 -->
-
-			
-	</div>
-	<!-- 컨텐츠 종료 -->
-
-	<div class="sp50"></div>
-
-
-	<!-- 하단(Copy) -->
-
-	 
-	  <? include "../include/bottom.html"; ?>	  
-				
-				
-	<!-- 하단(Copy) -->
-
-	
-
-
+<?php if (!empty($pkshop_login_from_buy)) { ?>
+<div class="pk-auth-alert pk-auth-alert--warn">
+	<strong>회원만 구매할 수 있습니다.</strong><br>로그인 후 계속 진행해 주세요.
 </div>
+<?php } ?>
+
+<form name="relogin22" action="./logok.php" method="post" autocomplete="off">
+	<div class="pk-auth-field">
+		<label for="member_id"><?=pkshop_auth_h($b['label_id'])?></label>
+		<input type="text" name="id" id="member_id" class="pk-auth-input" onkeydown="EnterCheck011(1);" />
+	</div>
+	<div class="pk-auth-field">
+		<label for="member_passwd"><?=pkshop_auth_h($b['label_password'])?></label>
+		<input type="password" name="passwd" id="member_passwd" onkeydown="EnterCheck011(2);" />
+	</div>
+	<button type="button" class="pk-auth-btn" onclick="login022();"><?=pkshop_auth_h($b['btn_submit'])?></button>
+	<div class="pk-auth-extra">
+		<label><input type="checkbox" name="idcheck" onclick="confirmSave(this)"> ID 저장</label>
+	</div>
+</form>
+
+<div class="pk-auth-links">
+	회원이 아니신가요? <a href="agree.php">회원가입</a>
+</div>
+
+<?php pkshop_auth_chrome_close($b['footer_text']); ?>
 </body>
 </html>

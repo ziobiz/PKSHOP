@@ -3,7 +3,9 @@
 
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_attendance.php";
+
 $query = "SELECT id,ip,signdate FROM $attendance WHERE id='$id' and signdate>'$wdate1' and signdate<'$wdate2' order by signdate desc";
 $DB->get($query,$rs,$rn);
 if(!$result) {
@@ -33,7 +35,6 @@ if($wdate2< 1354201200){
 
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr><td height=30></td></tr>
 					<tr><td height=3></td></tr>
@@ -101,4 +102,4 @@ if($wdate2< 1354201200){
 					</tr>
 				</table>
 				<br><br>
-<?php pkshop_admin_shell_end(); ?>
+<? include "../inc/down_menu.php"; ?>

@@ -1,7 +1,7 @@
 <?
 include "../common/dbconn.php";
 include "../inc/top_menu.php";
-include "../inc/left_menu_product.php";
+include "../inc/left_menu_ai.php";
 
 $keyfield = isset($_REQUEST['keyfield']) ? $_REQUEST['keyfield'] : 'title';
 $key = isset($_REQUEST['key']) ? trim($_REQUEST['key']) : '';
@@ -24,26 +24,20 @@ if ($key !== '') {
 	$tmp_where .= " and $field_safe LIKE '%$key_safe%'";
 }
 
-$query = "SELECT No,code,code1,code2,code3,code4,title,pricec,prices,priced,currnum,signdate,imgl,soldout FROM $shop_goods $tmp_where ORDER BY signdate DESC";
+$query = "SELECT No,code,code1,code2,code3,code4,title,pricec,prices,priced,currnum,signdate,imgl,soldout,country,home,theme_g,theme_n,theme_r,theme_f,theme_x,theme_y,theme_z,theme_s,c_dis FROM $shop_goods $tmp_where ORDER BY signdate DESC";
 $DB->get($query, $rs, $rn);
 
 $total_record = $rn;
-$num_per_page = 15;
+$per_page_info = adm_ui_resolve_per_page();
 $page_per_block = 10;
-
-if (!$total_record) {
-	$first = 0;
-	$last = -1;
-} else {
-	$first = $num_per_page * ($page - 1);
-	$last = $num_per_page * $page - 1;
-	if ($last >= $total_record) {
-		$last = $total_record - 1;
-	}
-}
-$total_page = $total_record > 0 ? ceil($total_record / $num_per_page) : 1;
-$article_num = $total_record - $num_per_page * ($page - 1);
-$mode = "view=$view&keyfield=$keyfield&key=" . urlencode($key);
+$pg = adm_ui_paginate_slice($total_record, $page, $per_page_info);
+$num_per_page = $pg['num_per_page'];
+$first = $pg['first'];
+$last = $pg['last'];
+$total_page = $pg['total_page'];
+$article_num = $pg['article_num'];
+$IsNext = $pg['is_next'];
+$mode = "view=$view&keyfield=$keyfield&key=" . urlencode($key) . '&p_num=' . rawurlencode(adm_ui_per_page_query_value($per_page_info));
 ?>
 <script language="javascript">
 function go_search() {
@@ -84,111 +78,162 @@ function go_delete() {
 	submit_action('delete', '선택한 AI 상품을 삭제하시겠습니까?\n삭제 후에는 복구할 수 없습니다.');
 }
 function go_hide() {
-	submit_action('hide', '선택한 AI 상품의 쇼핑몰 노출을 중지하시겠습니까?');
+	submit_action('hide', '선택한 AI 상품을 비공개 처리하시겠습니까?');
 }
 function go_show() {
-	submit_action('show', '선택한 AI 상품의 쇼핑몰 노출을 재개하시겠습니까?');
+	submit_action('show', '선택한 AI 상품을 공개 처리하시겠습니까?');
 }
 </script>
-					<table width=900 border=0 cellpadding=0 cellspacing=0>
-						<tr><td height=30></td></tr>
-						<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>AI 상품관리</b></td>
-								</tr>
-							</table>
-						</td></tr>
-						<tr><td height=10></td></tr>
-						<tr>
-							<td valign=top style="padding:10px;">
-								<font color="#003366">AI로 자동 등록된 상품 목록입니다. (p_id=admin_ai)</font>
-								<br><br>
-								<form name="search_form" method="get" action="pro_ai_products.php">
-								<input type="hidden" name="view" value="<?=$view?>">
-								<select name="keyfield" class="adminbttn">
-									<option value="title" <?=$keyfield==='title'?'selected':''?>>상품명</option>
-									<option value="code" <?=$keyfield==='code'?'selected':''?>>상품코드</option>
-								</select>
-								<input type="text" name="key" value="<?=htmlspecialchars($key)?>" class="adminbttn" size="30">
-								<input type="button" value="검색" class="adminbttn" onclick="go_search();">
-								&nbsp;
-								<input type="button" value="AI 상품 생성" class="adminbttn" onclick="location.href='pro_ai_generate.php';">
-								&nbsp;
-								<input type="button" value="노출 상품" class="adminbttn" onclick="location.href='pro_ai_products.php?view=active';"<?=$view==='active'?' disabled':''?>>
-								<input type="button" value="노출 중지 상품" class="adminbttn" onclick="location.href='pro_ai_products.php?view=hidden';"<?=$view==='hidden'?' disabled':''?>>
-								</form>
-								<br>
-								<form name="list_form" method="post" action="pro_ai_products_action.php">
-								<input type="hidden" name="bulk_action" value="">
-								<input type="hidden" name="view" value="<?=$view?>">
-								<input type="hidden" name="keyfield" value="<?=htmlspecialchars($keyfield)?>">
-								<input type="hidden" name="key" value="<?=htmlspecialchars($key)?>">
-								<input type="hidden" name="page" value="<?=$page?>">
-								<table width="900" border='0' cellspacing='0' cellpadding='0'>
-									<tr>
-										<td>
-											<?if($view==='hidden'){?>
-											<input type="button" value="선택 노출 재개" class="adminbttn" onclick="go_show();">
-											<?}else{?>
-											<input type="button" value="선택 노출 중지" class="adminbttn" onclick="go_hide();">
-											<?}?>
-											<input type="button" value="선택 삭제" class="adminbttn" onclick="go_delete();" style="border:1px #c9c9c9 solid;background-color:#ffecec;">
-										</td>
-									</tr>
-									<tr><td height="8"></td></tr>
-								</table>
-								<table width="900" border='0' cellspacing='0' cellpadding='0'>
-									<tr><td colspan=10 height=2 bgcolor='#88B7DA'></td></tr>
-									<tr align="center" style="font-weight:bold;background:#f5f5f5;">
-										<td height="30" width="40"><input type="checkbox" name="check_all" onclick="select_all_items(this.checked);"></td>
-										<td width="50">No</td>
-										<td width="60">이미지</td>
-										<td width="110">상품코드</td>
-										<td>상품명</td>
-										<td width="80">가격</td>
-										<td width="50">재고</td>
-										<td width="90">상태</td>
-										<td width="90">등록일</td>
-										<td width="110">관리</td>
-									</tr>
-									<tr><td colspan=10 height=1 bgcolor='#D2DEE8'></td></tr>
+
+<?php adm_ui_page_open('pg-products-screen'); ?>
+
+<?php adm_ui_card_open('검색 조건'); ?>
+<form name="search_form" method="get" action="pro_ai_products.php">
+<div class="pg-screen-search-form pg-products-search-form pg-ai-products-search-form">
+	<div class="pg-search-form-row pg-search-form-row--keyword pg-search-form-row--ai-filter">
+		<div class="pg-search-cell pg-search-cell--with-label">
+			<span class="pg-search-cell-label">검색구분</span>
+			<div class="pg-search-cell-input">
+				<select name="keyfield" class="pg-select">
+					<option value="title" <?=$keyfield === 'title' ? 'selected' : ''?>>상품명</option>
+					<option value="code" <?=$keyfield === 'code' ? 'selected' : ''?>>상품코드</option>
+				</select>
+			</div>
+		</div>
+		<div class="pg-search-cell pg-search-cell--with-label">
+			<span class="pg-search-cell-label">검색어</span>
+			<div class="pg-search-cell-input">
+				<input type="text" name="key" value="<?=htmlspecialchars($key, ENT_QUOTES, 'UTF-8')?>" maxlength="50" class="pg-input">
+			</div>
+		</div>
+		<div class="pg-search-cell pg-search-cell--with-label">
+			<span class="pg-search-cell-label">상태조건</span>
+			<div class="pg-search-cell-input">
+				<select name="view" class="pg-select pg-select--status">
+					<option value="active" <?=$view === 'active' ? 'selected' : ''?>>공개</option>
+					<option value="hidden" <?=$view === 'hidden' ? 'selected' : ''?>>비공개</option>
+				</select>
+				<button type="button" class="pg-btn pg-btn-search" onclick="go_search()">검색</button>
+			</div>
+		</div>
+	</div>
+</div>
+</form>
+<?php adm_ui_notice('AI로 자동 등록된 상품 목록입니다. (p_id=admin_ai)', 'info'); ?>
+<?php adm_ui_card_close(); ?>
+
+<?php adm_ui_card_open('AI 상품 목록'); ?>
+<form name="list_form" method="post" action="pro_ai_products_action.php">
+<input type="hidden" name="bulk_action" value="">
+<input type="hidden" name="view" value="<?=htmlspecialchars($view, ENT_QUOTES, 'UTF-8')?>">
+<input type="hidden" name="keyfield" value="<?=htmlspecialchars($keyfield, ENT_QUOTES, 'UTF-8')?>">
+<input type="hidden" name="key" value="<?=htmlspecialchars($key, ENT_QUOTES, 'UTF-8')?>">
+<input type="hidden" name="page" value="<?=(int)$page?>">
+
+<div class="pg-summary-total-bar" style="margin-bottom:12px;">
+	<?php adm_ui_per_page_bar('pro_ai_products.php', $mode, $per_page_info, $total_record); ?>
+	<span style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+<? if ($view === 'hidden') { ?>
+		<button type="button" class="pg-btn pg-btn-pastel-blue" onclick="go_show()">공개</button>
+<? } else { ?>
+		<button type="button" class="pg-btn pg-btn-pastel-gray" onclick="go_hide()">비공개</button>
+<? } ?>
+		<button type="button" class="pg-btn pg-btn-pastel-red" onclick="go_delete()">삭제</button>
+	</span>
+</div>
+
+<div class="pg-table-responsive">
+<table class="pg-data-grid">
+	<thead>
+		<tr>
+			<th class="pg-col-check"><input type="checkbox" name="check_all" onclick="select_all_items(this.checked);" title="전체 선택"></th>
+			<th class="pg-col-num">No</th>
+			<th class="pg-col-img">상품이미지</th>
+			<th class="pg-col-code">상품코드</th>
+			<th class="pg-col-cate">카테고리</th>
+			<th class="pg-col-country">국가</th>
+			<th class="pg-col-title">상품명</th>
+			<th class="pg-col-price">가격</th>
+			<th class="pg-col-label">MNSS</th>
+			<th class="pg-col-theme-chk">추천</th>
+			<th class="pg-col-theme-chk">베스트</th>
+			<th class="pg-col-theme-chk">HOT</th>
+			<th class="pg-col-qty">재고</th>
+			<th class="pg-col-status">상태</th>
+			<th class="pg-col-date">등록일</th>
+			<th class="pg-col-actions">관리</th>
+		</tr>
+	</thead>
+	<tbody>
 <?
 $ii = 0;
 if ($total_record < 1) {
 ?>
-									<tr><td colspan=10 height=60 align="center"><?=$view==='hidden'?'노출 중지된 AI 상품이 없습니다.':'등록된 AI 상품이 없습니다.'?></td></tr>
+		<tr><td colspan="16" class="pg-table-empty"><?=$view === 'hidden' ? '비공개 AI 상품이 없습니다.' : '등록된 AI 상품이 없습니다.'?></td></tr>
 <?
 } else {
 	for ($i = $first; $i <= $last; $i++) {
-		$No = $rs[$i]['No'];
-		$code = $rs[$i]['code'];
-		$title = htmlspecialchars(stripslashes($rs[$i]['title']));
-		$pricec = $rs[$i]['pricec'];
-		$currnum = $rs[$i]['currnum'];
-		$imgl = $rs[$i]['imgl'];
-		$soldout = $rs[$i]['soldout'];
-		$signdate = date('Y-m-d', $rs[$i]['signdate']);
-		$img_tag = ($imgl != '') ? '<img src="//pentakleva.shop/upload/'.$imgl.'" width="50" height="50" style="object-fit:cover;">' : '-';
-		$status_label = ($soldout === 'Y') ? '<font color="#cc0000">노출중지</font>' : '<font color="#006600">노출중</font>';
+		$No = $rs[$i][0];
+		$code = $rs[$i][1];
+		$code1 = $rs[$i][2];
+		$code2 = $rs[$i][3];
+		$code3 = $rs[$i][4];
+		$code4 = $rs[$i][5];
+		$title = htmlspecialchars(stripslashes($rs[$i][6]), ENT_QUOTES, 'UTF-8');
+		$pricec = $rs[$i][7];
+		$currnum = $rs[$i][10];
+		$imgl = $rs[$i][12];
+		$soldout = $rs[$i][13];
+		$country = isset($rs[$i][14]) ? $rs[$i][14] : '';
+		$home = isset($rs[$i][15]) ? $rs[$i][15] : '';
+		$theme_g = isset($rs[$i][16]) ? $rs[$i][16] : '';
+		$theme_n_raw = isset($rs[$i][17]) ? $rs[$i][17] : '';
+		$theme_r_raw = isset($rs[$i][18]) ? $rs[$i][18] : '';
+		$theme_f_raw = isset($rs[$i][19]) ? $rs[$i][19] : '';
+		$theme_x = isset($rs[$i][20]) ? $rs[$i][20] : '';
+		$theme_y = isset($rs[$i][21]) ? $rs[$i][21] : '';
+		$theme_z = isset($rs[$i][22]) ? $rs[$i][22] : '';
+		$theme_s = isset($rs[$i][23]) ? $rs[$i][23] : '';
+		$c_dis = isset($rs[$i][24]) ? $rs[$i][24] : '';
+		$cate_name = adm_ui_product_cate_name($DB, $shop_cate, $code1, $code2, $code3, $code4);
+		$country_label = adm_ui_country_label($country, $home);
+		$signdate = date('Y-m-d', $rs[$i][11]);
+		$img_tag = ($imgl != '') ? '<img src="//pentakleva.shop/upload/' . htmlspecialchars($imgl, ENT_QUOTES, 'UTF-8') . '" width="50" height="50" style="object-fit:cover;border-radius:4px;">' : '-';
+		$status_label = ($soldout === 'Y') ? '<span style="color:#b91c1c;">비공개</span>' : '<span style="color:#047857;">공개</span>';
+
+		$labels = array();
+		if ($c_dis == 1) $labels[] = '재구매상품';
+		elseif ($theme_g == 'g' || $theme_g == '') $labels[] = '일반상품';
+		if ($theme_n_raw == 'n') $labels[] = '추천상품';
+		if ($theme_r_raw == 'r') $labels[] = '베스트상품';
+		if ($theme_f_raw == 'f') $labels[] = 'HOT상품';
+		if ($theme_x == 'x') $labels[] = '추천상품';
+		if ($theme_y == 'y') $labels[] = '특가상품';
+		if ($theme_z == 'z') $labels[] = '테마';
+		if ($theme_s == 's') $labels[] = '세일상품';
+		$theme_str = implode('<br>', $labels);
 ?>
-									<tr align="center">
-										<td height="45"><input type="checkbox" name="check<?=$ii?>" value="<?=$No?>"></td>
-										<td><?=$article_num?></td>
-										<td><?=$img_tag?></td>
-										<td><?=$code?></td>
-										<td align="left" style="padding-left:8px;"><?=$title?></td>
-										<td><?=number_format($pricec)?></td>
-										<td><?=$currnum?></td>
-										<td><?=$status_label?></td>
-										<td><?=$signdate?></td>
-										<td>
-											<input type="button" value="수정" class="adminbttn" onclick="location.href='pro_info.php?code=<?=$code?>&No=<?=$No?>';">
-											<input type="button" value="보기" class="adminbttn" onclick="window.open('../../sub04/view.php?left_code=<?=$code?>');">
-										</td>
-									</tr>
-									<tr><td colspan=10 height=1 bgcolor='#D2DEE8'></td></tr>
+		<tr class="pg-product-row">
+			<td class="pg-col-check text-center"><input type="checkbox" name="check<?=$ii?>" value="<?=(int)$No?>"></td>
+			<td class="pg-col-num text-center"><?=$article_num?></td>
+			<td class="pg-col-img text-center"><?=$img_tag?></td>
+			<td class="pg-col-code text-center"><?=htmlspecialchars($code, ENT_QUOTES, 'UTF-8')?></td>
+			<td class="pg-col-cate text-center"><?=htmlspecialchars($cate_name, ENT_QUOTES, 'UTF-8')?></td>
+			<td class="pg-col-country text-center"><?=htmlspecialchars($country_label, ENT_QUOTES, 'UTF-8')?></td>
+			<td class="pg-col-title"><?=$title?></td>
+			<td class="pg-col-price text-center"><?=number_format((int)$pricec)?></td>
+			<td class="pg-col-label"><?=$theme_str?></td>
+			<td class="pg-col-theme-chk text-center"><input type="checkbox" class="theme-chk" disabled<?=$theme_n_raw=="n"?" checked":""?>></td>
+			<td class="pg-col-theme-chk text-center"><input type="checkbox" class="theme-chk" disabled<?=$theme_r_raw=="r"?" checked":""?>></td>
+			<td class="pg-col-theme-chk text-center"><input type="checkbox" class="theme-chk" disabled<?=$theme_f_raw=="f"?" checked":""?>></td>
+			<td class="pg-col-qty text-center"><?=htmlspecialchars($currnum, ENT_QUOTES, 'UTF-8')?></td>
+			<td class="pg-col-status text-center"><?=$status_label?></td>
+			<td class="pg-col-date text-center"><?=$signdate?></td>
+			<td class="pg-col-actions text-center pg-row-actions">
+				<button type="button" class="pg-btn pg-btn-sm" onclick="location.href='pro_info.php?No=<?=(int)$No?>&return_url=pro_ai_products.php';">수정</button>
+				<button type="button" class="pg-btn pg-btn-sm pg-btn-outline" onclick="window.open('../../sub04/view.php?left_code=<?=urlencode($code)?>');">보기</button>
+			</td>
+		</tr>
 <?
 		$article_num--;
 		$ii++;
@@ -196,23 +241,14 @@ if ($total_record < 1) {
 }
 $chk_num = $ii;
 ?>
-								</table>
-								<input type="hidden" name="chk_num" value="<?=$chk_num?>">
-								</form>
-								<br>
-								<div align="center">
-<?
-for ($direct_page = 1; $direct_page <= $total_page; $direct_page++) {
-	if ($direct_page == $page) {
-		echo "<b>[$direct_page]</b>&nbsp;";
-	} else {
-		echo "<a href='pro_ai_products.php?$mode&page=$direct_page'>[$direct_page]</a>&nbsp;";
-	}
-}
-?>
-								</div>
-							</td>
-						</tr>
-						<tr><td height=40></td></tr>
-					</table>
+	</tbody>
+</table>
+</div>
+<input type="hidden" name="chk_num" value="<?=(int)$chk_num?>">
+</form>
+
+<?php if ($total_page > 1) { adm_ui_pagination($mode, $page, $total_page, $page_per_block, $IsNext); } ?>
+<?php adm_ui_card_close(); ?>
+
+<?php adm_ui_page_close(); ?>
 <? include "../inc/down_menu.php"; ?>

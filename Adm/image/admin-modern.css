@@ -1,0 +1,363 @@
+/* PKSHOP Admin — modern wide layout (Crypto/PG inspired, legacy PHP compatible) */
+
+body.adm-modern {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Apple SD Gothic Neo", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #374151;
+  background: #eceef1;
+}
+
+body.adm-modern td,
+body.adm-modern input,
+body.adm-modern select,
+body.adm-modern button,
+body.adm-modern textarea {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* Full-width layout — override legacy 980/1100/1500 fixed tables */
+body.adm-modern table[width="980"],
+body.adm-modern table[width="1000"],
+body.adm-modern table[width="1100"],
+body.adm-modern table[width="1500"],
+body.adm-modern .adm-fluid {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+body.adm-modern > table,
+body.adm-modern > table table {
+  max-width: 100%;
+}
+
+/* Top module bar */
+body.adm-modern .adm-top-modules {
+  width: 100% !important;
+}
+
+body.adm-modern .adm-top-modules td {
+  font-size: 15px !important;
+  font-weight: 700;
+  padding: 0 12px;
+}
+
+body.adm-modern .adm-top-modules a {
+  color: #1f2937 !important;
+  text-decoration: none;
+}
+
+body.adm-modern .adm-top-modules a:hover {
+  color: #111827;
+  text-decoration: underline;
+}
+
+/* Left sidebar menu — 15px as requested */
+body.adm-modern .adm-layout-inner {
+  width: 100% !important;
+  table-layout: fixed;
+}
+
+body.adm-modern .adm-left-nav {
+  width: 200px !important;
+  min-width: 200px;
+  background: #565e6d !important;
+  vertical-align: top;
+}
+
+body.adm-modern .adm-left-nav table {
+  width: 100% !important;
+}
+
+body.adm-modern .adm-left-nav td {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  height: auto !important;
+}
+
+body.adm-modern .adm-left-nav a {
+  display: block;
+  padding: 10px 14px;
+  font-size: 15px !important;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+body.adm-modern .adm-left-nav a:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+body.adm-modern .adm-left-nav tr td[width="25"] {
+  display: none;
+}
+
+body.adm-modern .adm-content-cell {
+  width: auto !important;
+  vertical-align: top;
+  padding: 16px 20px 24px !important;
+  background: #eceef1 !important;
+}
+
+/* Main content must fill remaining width beside sidebar */
+body.adm-modern .adm-content-panel {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Page header / breadcrumb — horizontal, full width */
+.adm-page-head {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 14px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.adm-page-title {
+  float: left;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.adm-breadcrumb {
+  float: right;
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.adm-page-head::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* Toolbar / filters */
+.adm-toolbar {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+}
+
+.adm-toolbar-row {
+  margin-bottom: 10px;
+}
+
+.adm-toolbar-row:last-child {
+  margin-bottom: 0;
+}
+
+.adm-toolbar-dates {
+  line-height: 2;
+}
+
+.adm-toolbar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+
+.adm-filter-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.adm-filter-search {
+  margin-left: auto;
+}
+
+.adm-toolbar-actions {
+  text-align: right;
+}
+
+.adm-toolbar .adminbttn,
+.adm-toolbar input[type="button"],
+.adm-toolbar button,
+.adm-toolbar select,
+.adm-toolbar input[type="text"] {
+  min-height: 32px;
+  font-size: 14px;
+}
+
+.adm-stats-line {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+/* Data tables — PG-style */
+.adm-table-wrap {
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+}
+
+table.adm-table {
+  width: 100%;
+  min-width: 1600px;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: #374151;
+  table-layout: auto;
+}
+
+table.adm-table thead th {
+  padding: 10px 8px;
+  border: 1px solid #c5cad3;
+  background: #565e6d;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+table.adm-table tbody td {
+  padding: 10px 8px;
+  border: 1px solid #d8dde5;
+  text-align: center;
+  vertical-align: middle;
+}
+
+table.adm-table tbody td.adm-nowrap {
+  white-space: nowrap;
+}
+
+table.adm-table tbody td.adm-product-name {
+  text-align: left;
+  min-width: 220px;
+  max-width: 360px;
+  line-height: 1.45;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+table.adm-table tbody tr:nth-child(odd) {
+  background: #ffffff;
+}
+
+table.adm-table tbody tr:nth-child(even) {
+  background: #f3f5f8;
+}
+
+table.adm-table tbody tr:hover {
+  background: #eef2f7;
+}
+
+table.adm-table .adm-cell-left {
+  text-align: left;
+}
+
+table.adm-table .adm-opt-line {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+table.adm-table a {
+  color: #1d4ed8;
+}
+
+table.adm-table .adm-order-group-start td {
+  border-top: 2px solid #9ca3af;
+}
+
+/* Legacy pg-table hook for pages already using the class */
+body.adm-modern table.pg-table,
+body.adm-modern table.pg-table-form {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+body.adm-modern table.pg-table th,
+body.adm-modern table.pg-table td,
+body.adm-modern table.pg-table-form th,
+body.adm-modern table.pg-table-form td {
+  padding: 10px 8px;
+  border: 1px solid #d8dde5;
+  text-align: center;
+  vertical-align: middle;
+}
+
+body.adm-modern table.pg-table thead th,
+body.adm-modern table.pg-table tr[bgcolor="#EBF0F4"] td,
+body.adm-modern table.pg-table tr[bgcolor="#ebf0f4"] td {
+  background: #565e6d !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+body.adm-modern table.pg-table tbody tr:nth-child(even) {
+  background: #f3f5f8;
+}
+
+/* pg-admin shell — same table/toolbar rules as adm-modern */
+body.pg-admin .screen-pay-list table.pg-table,
+body.pg-admin .screen-pay-list table.pg-table-form,
+body.pg-admin .screen-pay-list table.adm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+body.pg-admin .screen-pay-list table.pg-table thead th,
+body.pg-admin .screen-pay-list table.pg-table tr[bgcolor="#EBF0F4"] td,
+body.pg-admin .screen-pay-list table.pg-table tr[bgcolor="#ebf0f4"] td,
+body.pg-admin .screen-pay-list table.adm-table thead th {
+  background: var(--pg-table-head-bg, #565e6d) !important;
+  color: var(--pg-table-head-text, #ffffff) !important;
+  font-weight: 600;
+}
+
+body.pg-admin .screen-pay-list table.adm-table tbody tr:nth-child(even),
+body.pg-admin .screen-pay-list table.pg-table tbody tr:nth-child(even) {
+  background: var(--pg-table-zebra-even, #f3f5f8);
+}
+
+body.pg-admin .screen-pay-list .adm-table-wrap {
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+}
+
+/* Pagination */
+.adm-pagination {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.adm-pagination a {
+  display: inline-block;
+  padding: 4px 8px;
+  margin: 0 2px;
+}

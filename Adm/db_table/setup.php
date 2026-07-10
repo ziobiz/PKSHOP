@@ -1,7 +1,8 @@
 <? 
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
-pkshop_admin_auto_shell_begin();
+include "../inc/top_menu.php";
+include "../inc/left_menu_db_table.php";
+
 $setup = $_GET[setup];
 ?>
 

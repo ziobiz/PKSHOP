@@ -1,9 +1,7 @@
 <?include "../common/dbconn.php";?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/user_function.php";
-include_once "../inc/admin_shell_lib.php";
 ########## 데이터베이스에 연결한다. #################################
 	if ($sel_cate==""){
 		$sel_code1="";
@@ -20,7 +18,6 @@ $shop_img="../shop_img/";
 $shop_img_lode="../shop_img/";
 
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_del() {
@@ -79,12 +76,10 @@ for ($i=0;$i<$total_record=$rn;$i++){
 	}
 #####################################################################
 	?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										<option value="<?=$g_code?>" <?=$oselect?>><?=$cate?></option>
 <?         
 }
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										</select>
 										&nbsp;
 										<select name="sel_code2" class="adminbttn" OnChange="go_select('2');">
@@ -110,12 +105,10 @@ for ($i=0;$i<$total_record=$rn;$i++){
 
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										<option value="<?=$g_code?>" <?=$oselect?>><?=$cate?></option>
 <?                  
 }
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										</select>
 										&nbsp;
 										<select name="sel_code3" class="adminbttn" OnChange="go_select('3');">
@@ -141,12 +134,10 @@ for ($i=0;$i<$total_record=$rn;$i++){
 	
 #####################################################################
 	?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										<option value="<?=$g_code?>" <?=$oselect?>><?=$cate?></option>
 <?               
 }
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										</select>
 										<select name="sel_out" class="adminbttn" OnChange="go_select('4');">
 											<option value="N">전체</option>
@@ -173,17 +164,14 @@ if($tday == "") {
 	$cond = "ss.ordernum=so.ordernum and ss.signdate>".$tdate." and ss.signdate <".$ydate." and (so.status = '배송중' or so.status = '배송완료')";	
 }								
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										<select name=tyear>
 										<?
 											for($a=2002;$a<2101;$a++) {
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 											<option value="<?=$a?>" <?if($year_e == $a || $tyear == $a) echo "selected"?>><?echo $a?></option>
 										<?
 											}
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										</select>년&nbsp;
 										<select name=tmonth>
 										<?
@@ -194,12 +182,10 @@ if($tday == "") {
 												$bb = $b;
 											}
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										<option value="<?=$bb?>" <?if($month_e == $bb || $tmonth == $bb) echo "selected"?>><?echo $bb?></option>
 										<?
 											}
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										</select>월&nbsp;
 										<select name=tday>
 										<?
@@ -210,24 +196,20 @@ if($tday == "") {
 												$cc = $c;
 											}
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										<option value="<?=$cc?>" <?if($day_e == $cc || $tday == $cc) echo "selected"?>><?echo $cc?></option>
 										<?
 											}
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										</select>일
 										&nbsp; ~ &nbsp;
 										<select name=eyear>
 										<?
 											for($d=2002;$d<2101;$d++) {
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										<option value="<?echo $d?>" <?if($year_e == $d || $eyear == $d) echo "selected"?>><?echo $d?></option>
 										<?
 											}
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										</select>년&nbsp;
 										<select name=emonth>
 										<?
@@ -238,12 +220,10 @@ if($tday == "") {
 												$ee = $e;
 											}
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										<option value="<?=$ee?>" <?if($month_e == $ee || $emonth == $ee) echo "selected"?>><?echo $ee?></option>
 										<?
 											}
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										</select>월&nbsp;
 										<select name=eday>
 										<?
@@ -254,12 +234,10 @@ if($tday == "") {
 												$ff = $f;
 											}
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										<option value="<?=$ff?>" <?if($day_e == $ff || $eday == $ff) echo "selected"?>><?echo $ff?></option>
 										<?
 											}
 										?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										</select>일&nbsp;
 									</td>
 									<td height="20" width="250"> 
@@ -417,7 +395,6 @@ while($row = mysql_fetch_row($result)){
 
 
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 								<tr align="center"> 
 									<td width="45" height="26">&nbsp;<?=$article_num?></td>
 									<td width="81" height="26">&nbsp;<?=$code?></td>
@@ -428,13 +405,10 @@ if($sel_out=="Y"){
 	$filename = $shop_img.$imgl;
 	if(file_exists($filename)) {
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 											<img src="<?=$filename?>" width=80 height=80>
 											
 <?}}?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 										<?=$title?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 									</td>
 									<td  height="26">&nbsp;<?=$currnum?> / <?=$warnnum?><br><?=$color?></td>
 									<td  height="26">&nbsp;<?=$pricec?></td>
@@ -469,7 +443,6 @@ if($sel_out=="Y"){
 
 								#####################################################################
 								?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 								판매수량 [<?=$count?>]
 								</td>	
 								<td width="206"></td>
@@ -486,7 +459,6 @@ if($sel_out=="Y"){
 $chk_num = $last-$first+1;
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 							</table>
 						</td>
 					</tr>
@@ -509,7 +481,6 @@ $chk_num = $last-$first+1;
  	$page_num = $page - 1;
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 							<a href="products_price.php?<?=$mode?>&page=<?=$page_num?>" onMouseOver="status='이전페이지';return true;" onMouseOut="status=''"><font color="#666666">◀</font></a>
  
  <?
@@ -518,12 +489,10 @@ $chk_num = $last-$first+1;
  for($direct_page = $first_page+1; $direct_page <= $last_page; $direct_page++) {
  	if($page == $direct_page) {
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
  							<font color="#666666">&nbsp;<b><?=$direct_page?></b></font>
 <?
  	} else {
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
  							&nbsp;<a href="products_price.php?<?=$mode?>&page=<?=$direct_page?>" onMouseOver="status='go to page <?=$direct_page?>';return true;" onMouseOut="status=''"><font color="#666666"><?=$direct_page?></font></a>
 <?
 	}
@@ -532,12 +501,10 @@ $chk_num = $last-$first+1;
  if ($IsNext > 0) {
  	$page_num = $page + 1;
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
  							&nbsp;<a href="products_price.php?<?=$mode?>&page=<?=$page_num?>" onMouseOver="status='다음페이지';return true;" onMouseOut="status=''"><font color="#666666">▶</font></a>
  <?
  }
  ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 							 </font>
 						</td>
 					</tr>
@@ -546,5 +513,4 @@ $chk_num = $last-$first+1;
 					</form>
 				</table>
 				<br><br>
-<?php pkshop_admin_shell_end(); ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
+<? include "../inc/down_menu.php"; ?>

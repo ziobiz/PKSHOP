@@ -7,23 +7,18 @@ include "pro_import_lib.php";
 $columns = pkshop_import_columns();
 $cate_data = pkshop_import_get_categories($DB, $shop_cate);
 ?>
-					<table width=800 border=0 cellpadding=0 cellspacing=0>
-						<tr><td height=30></td></tr>
-						<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>상품 일괄등록 (CSV/엑셀)</b></td>
-								</tr>
-							</table>
-						</td></tr>
-						<tr><td height=3></td></tr>
-						<tr>
-							<td valign=top>
 <script language="javascript">
+function onImportFileChange(input) {
+	var display = document.getElementById('import_file_display');
+	if (input.files && input.files.length > 0) {
+		display.value = input.files[0].name;
+	} else {
+		display.value = '';
+	}
+}
 function go_import() {
 	var f = document.form;
-	if (f.import_file.value == "") {
+	if (!f.import_file.value) {
 		alert('업로드할 파일을 선택해주세요.');
 		return;
 	}
@@ -37,46 +32,28 @@ function go_import() {
 	f.submit();
 }
 </script>
-							<table width="800" border='0' cellspacing='0' cellpadding='0'>
-								<form name="form" method="post" action="./pro_import_ok.php" enctype="multipart/form-data">
-									<tr><td colspan=2 height=2 bgcolor='#88B7DA'></td></tr>
-									<tr><td colspan=2 height=10></td></tr>
-									<tr>
-										<td width="150" height="30" align="center">파일 선택</td>
-										<td width="650" height="30" align="left">
-											&nbsp;&nbsp;
-											<input type="file" name="import_file" size="50" class="adminbttn">
-											&nbsp;
-											<input type="button" value="일괄등록 실행" onclick="go_import();" class="adminbttn">
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
-									<tr>
-										<td height="30" align="center">샘플 템플릿</td>
-										<td height="30" align="left">
-											&nbsp;&nbsp;
-											<a href="pro_import_template.php?type=csv" target="_blank">[CSV 템플릿 다운로드]</a>
-											&nbsp;&nbsp;
-											<a href="pro_import_template.php?type=xls" target="_blank">[엑셀 템플릿 다운로드]</a>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
-									<tr>
-										<td height="30" align="center">지원 형식</td>
-										<td height="30" align="left">
-											&nbsp;&nbsp; CSV, XLS, XLSX, TXT (UTF-8 또는 EUC-KR)
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
-									<tr>
-										<td valign="top" align="center" style="padding-top:10px;">입력 항목</td>
-										<td align="left" style="padding:10px;">
-											<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:12px;">
-												<tr bgcolor="#E8F0F8">
-													<td><b>컬럼명</b></td>
-													<td><b>필수</b></td>
-													<td><b>설명</b></td>
-												</tr>
+
+<?php adm_ui_page_open(); ?>
+<form name="form" method="post" action="pro_import_ok.php" enctype="multipart/form-data">
+
+<?php adm_ui_card_open('파일 업로드'); ?>
+<div class="pg-file-attach-toolbar">
+	<div class="pg-file-attach-picker">
+		<input type="text" id="import_file_display" class="pg-input pg-file-attach-name" readonly placeholder="선택된 파일 없음" value="">
+		<label for="import_file" class="pg-btn pg-btn-outline pg-btn-file-browse">파일 선택</label>
+		<input type="file" name="import_file" id="import_file" class="pg-file-attach-hidden" accept=".csv,.xls,.xlsx,.txt" onchange="onImportFileChange(this);">
+	</div>
+	<button type="button" class="pg-btn pg-btn-primary pg-file-attach-submit" onclick="go_import();">일괄등록 실행</button>
+</div>
+<p class="pg-file-attach-hint">허용 파일: CSV, XLS, XLSX, TXT (UTF-8 또는 EUC-KR)</p>
+<?php adm_ui_field_row('샘플 템플릿', '<a href="pro_import_template.php?type=csv" target="_blank">CSV 템플릿 다운로드</a> &nbsp; <a href="pro_import_template.php?type=xls" target="_blank">엑셀 템플릿 다운로드</a>'); ?>
+<?php adm_ui_card_close(); ?>
+
+<?php adm_ui_card_open('입력 항목 안내'); ?>
+<div class="pg-table-responsive">
+<table class="pg-data-grid adm-table">
+<thead><tr><th>컬럼명</th><th>필수</th><th>설명</th></tr></thead>
+<tbody>
 <?
 foreach ($columns as $key => $col) {
 	$req = !empty($col['required']) ? 'O' : '';
@@ -88,60 +65,49 @@ foreach ($columns as $key => $col) {
 	if ($key === 'code2' || $key === 'code3' || $key === 'code4') $desc = '미사용시 00';
 	if (isset($col['default']) && $desc === '') $desc = '기본값: ' . $col['default'];
 ?>
-												<tr>
-													<td><?=$col['label']?> (<?=$key?>)</td>
-													<td align="center"><?=$req?></td>
-													<td><?=$desc?></td>
-												</tr>
-<?
-}
-?>
-											</table>
-											<br>
-											<font color="#003366">* 이미지 파일명(imgl,imgm,imgb1)은 /upload/ 폴더에 미리 업로드된 파일명을 입력하세요.</font>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
-									<tr>
-										<td valign="top" align="center" style="padding-top:10px;">카테고리<br>코드 참고</td>
-										<td align="left" style="padding:10px;">
-											<table border="1" cellpadding="3" cellspacing="0" style="border-collapse:collapse;font-size:11px;">
-												<tr bgcolor="#E8F0F8">
-													<td>code1</td><td>code2</td><td>code3</td><td>code4</td>
-													<td>대분류</td><td>중분류</td><td>소분류</td><td>세분류</td>
-												</tr>
+<tr>
+	<td><?=htmlspecialchars($col['label'], ENT_QUOTES, 'UTF-8')?> (<?=htmlspecialchars($key, ENT_QUOTES, 'UTF-8')?>)</td>
+	<td><?=$req?></td>
+	<td><?=htmlspecialchars($desc, ENT_QUOTES, 'UTF-8')?></td>
+</tr>
+<? } ?>
+</tbody>
+</table>
+</div>
+<?php adm_ui_notice('* 이미지 파일명(imgl,imgm,imgb1)은 /upload/ 폴더에 미리 업로드된 파일명을 입력하세요.', 'info'); ?>
+<?php adm_ui_card_close(); ?>
+
+<?php adm_ui_card_open('카테고리 코드 참고'); ?>
+<div class="pg-table-responsive">
+<table class="pg-data-grid adm-table">
+<thead>
+<tr><th>code1</th><th>code2</th><th>code3</th><th>code4</th><th>대분류</th><th>중분류</th><th>소분류</th><th>세분류</th></tr>
+</thead>
+<tbody>
 <?
 for ($i = 0; $i < $cate_data['count'] && $i < 30; $i++) {
 	$c = $cate_data['rows'][$i];
 ?>
-												<tr>
-													<td><?=$c['code1']?></td>
-													<td><?=$c['code2']?></td>
-													<td><?=$c['code3']?></td>
-													<td><?=$c['code4']?></td>
-													<td><?=htmlspecialchars($c['cate1'])?></td>
-													<td><?=htmlspecialchars($c['cate2'])?></td>
-													<td><?=htmlspecialchars($c['cate3'])?></td>
-													<td><?=htmlspecialchars($c['cate4'])?></td>
-												</tr>
-<?
-}
+<tr>
+	<td><?=htmlspecialchars($c['code1'], ENT_QUOTES, 'UTF-8')?></td>
+	<td><?=htmlspecialchars($c['code2'], ENT_QUOTES, 'UTF-8')?></td>
+	<td><?=htmlspecialchars($c['code3'], ENT_QUOTES, 'UTF-8')?></td>
+	<td><?=htmlspecialchars($c['code4'], ENT_QUOTES, 'UTF-8')?></td>
+	<td><?=htmlspecialchars($c['cate1'], ENT_QUOTES, 'UTF-8')?></td>
+	<td><?=htmlspecialchars($c['cate2'], ENT_QUOTES, 'UTF-8')?></td>
+	<td><?=htmlspecialchars($c['cate3'], ENT_QUOTES, 'UTF-8')?></td>
+	<td><?=htmlspecialchars($c['cate4'], ENT_QUOTES, 'UTF-8')?></td>
+</tr>
+<? }
 if ($cate_data['count'] > 30) {
 ?>
-												<tr><td colspan="8" align="center">... 외 <?=($cate_data['count'] - 30)?>건 (분류등록/수정 메뉴에서 전체 확인)</td></tr>
-<?
-}
-?>
-											</table>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#88B7DA'></td></tr>
-								</form>
-							</table>
-							<br><br>
-							</td>
-						</tr>
-						<tr><td height=40></td></tr>
-					</table>
+<tr><td colspan="8">... 외 <?=($cate_data['count'] - 30)?>건 (분류등록/수정 메뉴에서 전체 확인)</td></tr>
+<? } ?>
+</tbody>
+</table>
+</div>
+<?php adm_ui_card_close(); ?>
 
+</form>
+<?php adm_ui_page_close(); ?>
 <? include "../inc/down_menu.php"; ?>

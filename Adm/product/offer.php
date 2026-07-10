@@ -1,7 +1,9 @@
 <?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_sell.php";
+
 include "../common/user_function.php";
 
 ########## 데이터베이스에 연결한다. #################################
@@ -41,7 +43,6 @@ if ($sel_cate=="" || $sel_cate=="r") {
 
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_reset() {
@@ -575,4 +576,4 @@ $mode="smod=$smod&sel_code1=$sel_code1&sel_code2=$sel_code2&sel_code3=$sel_code3
 					</tr>
 				</table>
 				<br><br>
-<?php pkshop_admin_shell_end(); ?>
+<? include "../inc/down_menu.php"; ?>

@@ -3,8 +3,9 @@
 
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
-pkshop_admin_auto_shell_begin();
+include "../inc/top_menu.php";
+include "../inc/left_menu_center.php";
+
 $encoded_key = urlencode($key);
 $query = "SELECT id,name,passwd,email,signdate,dis1,company,member_cnt,etc1,etc2,handphone from $member_table where dis='$dis' ";
 
@@ -526,4 +527,4 @@ if($page!=$total_page){
 					</form>  
 				</table>
 				<br><br>
-<?php pkshop_admin_shell_end(); ?>
+<? include "../inc/down_menu.php"; ?>

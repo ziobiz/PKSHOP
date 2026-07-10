@@ -17,6 +17,7 @@ if (!function_exists('pkshop_site_settings_defaults')) {
             'og_description' => 'Pentakleva',
             'og_image' => '../images/kakao.jpg?=1',
             'favicon' => 'images/pentakleva.ico',
+            'admin_favicon' => '',
             'logo_pc' => '../images/logo2.png',
             'logo_pc_width' => '200',
             'logo_pc_height' => '60',
@@ -99,6 +100,22 @@ if (!function_exists('pkshop_site_settings_defaults')) {
             'icopay_ccd_merchant_code' => '',
             'icopay_ccd_api_key' => '',
             'icopay_ccd_lang' => 'en',
+            /* 로그인 화면 — CRYPTO 레이아웃 UI + 브랜드 ①~④ (인증 로직은 PKSHOP 기존, OTP/이메일 인증 없음) */
+            'login_auth_logo' => '../images/logo2.png',
+            'login_auth_background' => '',
+            'login_auth_main_text' => "on the line\nGLOBAL\nGLOBAL CRYPTO TRADING PLATFORM",
+            'login_notice_enabled' => '1',
+            'login_notice_title' => '사칭 피해 주의 안내',
+            'login_notice_body' => "최근 당사를 사칭한 리크르트·투자·입금 요구 사기가 발생하고 있습니다.\n당사는 SNS·메신저로 입금을 요구하지 않습니다.\n의심 연락은 고객센터로 확인해 주세요.",
+            'login_footer_text' => '© 2026 Pentakleva by OnTheLine Company. All rights reserved.',
+            'login_member_title' => '로그인',
+            'login_member_label_id' => '아이디',
+            'login_member_label_password' => '비밀번호',
+            'login_member_btn' => '로그인',
+            'login_admin_title' => '로그인',
+            'login_admin_label_id' => '아이디',
+            'login_admin_label_password' => '비밀번호',
+            'login_admin_btn' => '로그인',
         );
     }
 }
@@ -171,6 +188,323 @@ if (!function_exists('pkshop_site_asset_url')) {
         }
         $path = preg_replace('#^(\.\./)+#', '', $path);
         return '/' . ltrim(str_replace('\\', '/', $path), '/');
+    }
+}
+
+if (!function_exists('pkshop_site_upload_field_label')) {
+    function pkshop_site_upload_field_label($field) {
+        $labels = array(
+            'favicon' => '파비콘',
+            'admin_favicon' => '관리자 파비콘',
+            'logo_pc' => 'PC 로고',
+            'logo_mobile' => '모바일 로고',
+            'banner1' => '배너 1',
+            'banner2' => '배너 2',
+            'banner3' => '배너 3',
+            'footer_icon_myinfo' => 'MY INFO 아이콘',
+            'footer_icon_cart' => 'CART 아이콘',
+            'footer_bottom_image' => '하단 이미지',
+            'footer_story_banner1' => '환영 배너 1',
+            'footer_story_banner2' => '환영 배너 2',
+            'login_auth_logo' => '로그인 로고',
+            'login_auth_background' => '로그인 배경',
+        );
+        return isset($labels[$field]) ? $labels[$field] : $field;
+    }
+}
+
+if (!function_exists('pkshop_site_upload_error_message')) {
+    function pkshop_site_upload_error_message($code) {
+        switch ((int)$code) {
+            case UPLOAD_ERR_INI_SIZE:
+                return '파일 크기가 서버 업로드 한도(php.ini upload_max_filesize)를 초과했습니다.';
+            case UPLOAD_ERR_FORM_SIZE:
+                return '파일 크기가 폼 허용 용량을 초과했습니다.';
+            case UPLOAD_ERR_PARTIAL:
+                return '파일이 일부만 업로드되었습니다. 다시 시도해 주세요.';
+            case UPLOAD_ERR_NO_FILE:
+                return '업로드할 파일이 선택되지 않았습니다.';
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return '서버 임시 폴더가 없습니다. 호스팅 관리자에게 문의하세요.';
+            case UPLOAD_ERR_CANT_WRITE:
+                return '서버 디스크에 파일을 쓸 수 없습니다.';
+            case UPLOAD_ERR_EXTENSION:
+                return '서버 PHP 확장에 의해 업로드가 차단되었습니다.';
+            default:
+                return '알 수 없는 업로드 오류(코드 ' . (int)$code . ')가 발생했습니다.';
+        }
+    }
+}
+
+if (!function_exists('pkshop_site_upload_format_bytes')) {
+    function pkshop_site_upload_format_bytes($bytes) {
+        $bytes = (int)$bytes;
+        if ($bytes < 1024) {
+            return $bytes . 'B';
+        }
+        if ($bytes < 1048576) {
+            return round($bytes / 1024, 1) . 'KB';
+        }
+        return round($bytes / 1048576, 1) . 'MB';
+    }
+}
+
+if (!function_exists('pkshop_site_upload_post_overflow_message')) {
+    /**
+     * POST 본문이 php.ini post_max_size를 초과하면 $_POST/$_FILES가 비어 전송 실패가 조용히 발생할 수 있음.
+     */
+    function pkshop_site_upload_post_overflow_message() {
+        if (!empty($_POST)) {
+            return '';
+        }
+        $method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper((string)$_SERVER['REQUEST_METHOD']) : '';
+        if ($method !== 'POST') {
+            return '';
+        }
+        $length = isset($_SERVER['CONTENT_LENGTH']) ? (int)$_SERVER['CONTENT_LENGTH'] : 0;
+        if ($length <= 0) {
+            return '';
+        }
+        $post_max = ini_get('post_max_size');
+        $post_max_bytes = 0;
+        if (preg_match('/^(\d+)([KMG])?$/i', trim((string)$post_max), $m)) {
+            $post_max_bytes = (int)$m[1];
+            $unit = isset($m[2]) ? strtoupper($m[2]) : '';
+            if ($unit === 'K') {
+                $post_max_bytes *= 1024;
+            } elseif ($unit === 'M') {
+                $post_max_bytes *= 1048576;
+            } elseif ($unit === 'G') {
+                $post_max_bytes *= 1073741824;
+            }
+        }
+        if ($post_max_bytes > 0 && $length <= $post_max_bytes) {
+            return '';
+        }
+        return '요청 용량(' . pkshop_site_upload_format_bytes($length) . ')이 서버 허용 한도(post_max_size=' . $post_max . ')를 초과했습니다. 파비콘은 2MB 이하 PNG/ICO(32×32px 권장)로 다시 시도해 주세요.';
+    }
+}
+
+if (!function_exists('pkshop_site_upload_max_bytes_for_field')) {
+    function pkshop_site_upload_max_bytes_for_field($field, $rule) {
+        if (isset($rule['max_bytes']) && (int)$rule['max_bytes'] > 0) {
+            return (int)$rule['max_bytes'];
+        }
+        if ($field === 'favicon' || $field === 'admin_favicon') {
+            return 2 * 1048576;
+        }
+        return 10 * 1048576;
+    }
+}
+
+if (!function_exists('pkshop_site_optimize_brand_favicon')) {
+    /**
+     * 큰 PNG/JPG 등은 64px 이하로 리사이즈해 저장 용량을 줄임.
+     * @return array{0:bool,1:string} [success, error message]
+     */
+    function pkshop_site_optimize_brand_favicon($dest, $ext) {
+        $ext = strtolower((string)$ext);
+        if (!in_array($ext, array('png', 'jpg', 'jpeg', 'gif', 'webp'), true)) {
+            return array(true, '');
+        }
+        if (!function_exists('imagecreatetruecolor')) {
+            return array(true, '');
+        }
+
+        $src = null;
+        if ($ext === 'png' && function_exists('imagecreatefrompng')) {
+            $src = @imagecreatefrompng($dest);
+        } elseif (($ext === 'jpg' || $ext === 'jpeg') && function_exists('imagecreatefromjpeg')) {
+            $src = @imagecreatefromjpeg($dest);
+        } elseif ($ext === 'gif' && function_exists('imagecreatefromgif')) {
+            $src = @imagecreatefromgif($dest);
+        } elseif ($ext === 'webp' && function_exists('imagecreatefromwebp')) {
+            $src = @imagecreatefromwebp($dest);
+        }
+        if (!$src) {
+            return array(true, '');
+        }
+
+        $width = imagesx($src);
+        $height = imagesy($src);
+        if ($width <= 0 || $height <= 0) {
+            imagedestroy($src);
+            return array(false, '이미지 크기를 읽을 수 없습니다.');
+        }
+
+        $max_side = 64;
+        if ($width <= $max_side && $height <= $max_side && @filesize($dest) <= 512 * 1024) {
+            imagedestroy($src);
+            return array(true, '');
+        }
+
+        $scale = min($max_side / $width, $max_side / $height, 1);
+        $new_w = max(1, (int)round($width * $scale));
+        $new_h = max(1, (int)round($height * $scale));
+        $dst = imagecreatetruecolor($new_w, $new_h);
+        if (!$dst) {
+            imagedestroy($src);
+            return array(false, '파비콘 리사이즈에 실패했습니다.');
+        }
+
+        imagealphablending($dst, false);
+        imagesavealpha($dst, true);
+        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+        imagefilledrectangle($dst, 0, 0, $new_w, $new_h, $transparent);
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $new_w, $new_h, $width, $height);
+        imagedestroy($src);
+
+        $ok = false;
+        if ($ext === 'png' && function_exists('imagepng')) {
+            $ok = @imagepng($dst, $dest, 9);
+        } elseif (($ext === 'jpg' || $ext === 'jpeg') && function_exists('imagejpeg')) {
+            $ok = @imagejpeg($dst, $dest, 90);
+        } elseif ($ext === 'gif' && function_exists('imagegif')) {
+            $ok = @imagegif($dst, $dest);
+        } elseif ($ext === 'webp' && function_exists('imagewebp')) {
+            $ok = @imagewebp($dst, $dest, 90);
+        }
+        imagedestroy($dst);
+
+        if (!$ok) {
+            return array(false, '파비콘 저장(리사이즈)에 실패했습니다.');
+        }
+        return array(true, '');
+    }
+}
+
+if (!function_exists('pkshop_favicon_mime_type')) {
+    function pkshop_favicon_mime_type($path) {
+        $ext = strtolower(pathinfo(parse_url((string)$path, PHP_URL_PATH), PATHINFO_EXTENSION));
+        if ($ext === 'png') {
+            return 'image/png';
+        }
+        if ($ext === 'gif') {
+            return 'image/gif';
+        }
+        if ($ext === 'jpg' || $ext === 'jpeg') {
+            return 'image/jpeg';
+        }
+        if ($ext === 'webp') {
+            return 'image/webp';
+        }
+        return 'image/x-icon';
+    }
+}
+
+if (!function_exists('pkshop_admin_favicon_url')) {
+    function pkshop_admin_favicon_url() {
+        $path = trim((string)pkshop_site_setting('admin_favicon', ''));
+        if ($path === '') {
+            return '';
+        }
+        return pkshop_site_asset_url($path);
+    }
+}
+
+if (!function_exists('pkshop_admin_favicon_head_html')) {
+    function pkshop_admin_favicon_head_html() {
+        $url = pkshop_admin_favicon_url();
+        if ($url === '') {
+            return '';
+        }
+        $type = pkshop_favicon_mime_type($url);
+        $url_h = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        $type_h = htmlspecialchars($type, ENT_QUOTES, 'UTF-8');
+        return '<link rel="shortcut icon" type="' . $type_h . '" href="' . $url_h . '">' . "\n"
+            . '<link rel="icon" type="' . $type_h . '" href="' . $url_h . '">';
+    }
+}
+
+if (!function_exists('pkshop_site_process_brand_uploads')) {
+    /**
+     * @return array list of human-readable error strings (empty = all OK or no file selected)
+     */
+    function pkshop_site_process_brand_uploads($upload_dir, $file_fields, &$data) {
+        $errors = array();
+
+        if (!is_dir($upload_dir)) {
+            if (!@mkdir($upload_dir, 0755, true)) {
+                return array('업로드 폴더(images/site)를 생성할 수 없습니다. 서버 폴더 권한을 확인하세요.');
+            }
+        }
+        if (!is_writable($upload_dir)) {
+            return array('업로드 폴더(images/site)에 쓰기 권한이 없습니다. FTP/SSH에서 chmod 755 또는 775를 설정하세요.');
+        }
+
+        foreach ($file_fields as $field => $rule) {
+            $input = 'upload_' . $field;
+            if (!isset($_FILES[$input]) || !is_array($_FILES[$input])) {
+                continue;
+            }
+            $file = $_FILES[$input];
+            $upload_error = isset($file['error']) ? (int)$file['error'] : UPLOAD_ERR_NO_FILE;
+            $orig = isset($file['name']) ? trim((string)$file['name']) : '';
+
+            if ($upload_error === UPLOAD_ERR_NO_FILE) {
+                if ($orig !== '') {
+                    $label = pkshop_site_upload_field_label($field);
+                    $errors[] = '[' . $label . '] 파일이 서버에 전달되지 않았습니다. 용량이 너무 크거나 웹서버 업로드 한도를 초과했을 수 있습니다.';
+                }
+                continue;
+            }
+
+            $label = pkshop_site_upload_field_label($field);
+
+            if ($upload_error !== UPLOAD_ERR_OK) {
+                $errors[] = '[' . $label . '] ' . pkshop_site_upload_error_message($upload_error);
+                continue;
+            }
+
+            if ($orig === '') {
+                $errors[] = '[' . $label . '] 파일 이름이 비어 있습니다.';
+                continue;
+            }
+
+            $ext = strtolower(pathinfo($orig, PATHINFO_EXTENSION));
+            if ($ext === '' || !in_array($ext, $rule['ext'], true)) {
+                $errors[] = '[' . $label . '] 허용되지 않는 형식입니다. 사용 가능: ' . implode(', ', $rule['ext']);
+                continue;
+            }
+
+            $max_bytes = pkshop_site_upload_max_bytes_for_field($field, $rule);
+            $file_size = isset($file['size']) ? (int)$file['size'] : 0;
+            if ($file_size <= 0 && is_file($file['tmp_name'])) {
+                $file_size = (int)@filesize($file['tmp_name']);
+            }
+            if ($file_size > $max_bytes) {
+                $errors[] = '[' . $label . '] 파일 크기(' . pkshop_site_upload_format_bytes($file_size) . ')가 허용 한도(' . pkshop_site_upload_format_bytes($max_bytes) . ')를 초과했습니다.';
+                continue;
+            }
+
+            if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+                $errors[] = '[' . $label . '] 유효한 업로드 파일이 아닙니다.';
+                continue;
+            }
+
+            $fname = $rule['prefix'] . '_' . date('YmdHis') . '_' . substr(md5(uniqid('', true)), 0, 6) . '.' . $ext;
+            $dest = rtrim($upload_dir, '/\\') . DIRECTORY_SEPARATOR . $fname;
+
+            if (!@move_uploaded_file($file['tmp_name'], $dest)) {
+                $errors[] = '[' . $label . '] 파일 저장에 실패했습니다. images/site 폴더 권한과 디스크 용량을 확인하세요.';
+                continue;
+            }
+
+            @chmod($dest, 0644);
+
+            if ($field === 'favicon' || $field === 'admin_favicon') {
+                $optimized = pkshop_site_optimize_brand_favicon($dest, $ext);
+                if (!$optimized[0]) {
+                    @unlink($dest);
+                    $errors[] = '[' . $label . '] ' . $optimized[1];
+                    continue;
+                }
+            }
+
+            $data[$field] = '../images/site/' . $fname;
+        }
+
+        return $errors;
     }
 }
 

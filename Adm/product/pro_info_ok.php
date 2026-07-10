@@ -735,6 +735,16 @@ $imgb1=$imgb1_name;		$imgb2=$imgb2_name;
 $imgb3=$imgb3_name;		$imgb4=$imgb4_name;
 $imgb5=$imgb5_name;
 
+include_once dirname(__FILE__) . '/../../include/product_detail_helper.php';
+$detail = pkshop_sanitize_product_detail_html($detail, array(
+	'imgm'  => $imgm,
+	'imgb1' => $imgb1,
+	'imgb2' => $imgb2,
+	'imgb3' => $imgb3,
+	'imgb4' => $imgb4,
+	'imgb5' => $imgb5,
+));
+
 ####################################################
 //$theme=$theme_g.",".$theme_r.",".$theme_n.",".$theme_b.",".$theme_p;
 $theme = trim($theme_g." ".$theme_r." ".$theme_n." ".$theme_f." ".$theme_x." ".$theme_y." ".$theme_z." ".$theme_s);
@@ -890,10 +900,15 @@ try {
 
 $encoded_key = urlencode($key);
 
-$mode="page=$page&keyfield=$keyfield&key=$encoded_key&sel_code1=$sel_code1&sel_code2=$sel_code2&sel_code3=$sel_code3&chk_order=$chk_order&sel_cate=$sel_cate&code=$code&No=$No";
-
-// $tmpphp = "products.php?$mode";
-$tmpphp = "pro_info.php?$mode";
+$return_url = pkshop_post('return_url');
+if ($return_url !== '' && preg_match('/^[a-z0-9_]+\.php$/i', $return_url)) {
+	$tmpphp = $return_url;
+} else if ($p_id === 'admin_ai') {
+	$tmpphp = 'pro_ai_products.php';
+} else {
+	$mode = "page=$page&keyfield=$keyfield&key=$encoded_key&sel_code1=$sel_code1&sel_code2=$sel_code2&sel_code3=$sel_code3&chk_order=$chk_order&sel_cate=$sel_cate&code=$code&No=$No";
+	$tmpphp = "pro_info.php?$mode";
+}
 header("Location: ./$tmpphp");
 exit;
 ?>

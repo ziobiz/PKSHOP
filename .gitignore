@@ -1,5 +1,6 @@
 lib/icopay_pg_secrets.local.php
 lib/gemini_secrets.local.php
+lib/deploy_secrets.local.ps1
 Adm/product/ai_gen_cache/
 
 # Nested clone / test project (keep out of main repo)

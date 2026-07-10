@@ -6,8 +6,8 @@
 			</tr>
 	
 		</table>
-<?php pkshop_admin_shell_end(); ?>
 <!-- 전체 테이블 end -->
 </div>
 </body>
 </html>
+<? include "../inc/down_menu.php"; ?>

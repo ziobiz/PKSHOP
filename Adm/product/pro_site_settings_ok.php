@@ -46,6 +46,58 @@ foreach ($defaults as $k => $v) {
 	}
 }
 
+if ($section === 'brand') {
+	$upload_only = isset($_POST['upload_only']) ? trim((string)$_POST['upload_only']) : '';
+	if ($upload_only === 'favicon' || $upload_only === 'admin_favicon') {
+		$post_overflow = pkshop_site_upload_post_overflow_message();
+		if ($post_overflow !== '') {
+			echo "<script>alert('" . addslashes($post_overflow) . "');history.back();</script>";
+			exit;
+		}
+		$upload_dir = dirname(__FILE__) . '/../../images/site/';
+		$file_fields = array(
+			$upload_only => array('prefix' => $upload_only, 'ext' => array('ico', 'png', 'jpg', 'jpeg', 'gif', 'webp'), 'max_bytes' => 2 * 1048576),
+		);
+		$data = array();
+		$upload_errors = pkshop_site_process_brand_uploads($upload_dir, $file_fields, $data);
+		if (!empty($upload_errors)) {
+			$upload_msg = implode("\\n", $upload_errors);
+			echo "<script>alert('" . addslashes($upload_msg) . "');history.back();</script>";
+			exit;
+		}
+		if (!isset($data[$upload_only]) || trim((string)$data[$upload_only]) === '') {
+			$label = ($upload_only === 'admin_favicon') ? '관리자 파비콘' : '쇼핑몰 파비콘';
+			echo "<script>alert('" . addslashes($label) . " 파일을 선택한 뒤 업로드해 주세요.');history.back();</script>";
+			exit;
+		}
+		if (!pkshop_site_settings_save($data)) {
+			echo "<script>alert('파비콘 저장에 실패했습니다.');history.back();</script>";
+			exit;
+		}
+		$done_msg = ($upload_only === 'admin_favicon') ? '관리자 파비콘이 업로드되었습니다.' : '쇼핑몰 파비콘이 업로드되었습니다.';
+		echo "<script>alert('" . addslashes($done_msg) . "');location.href='pro_site_settings.php?tab=brand';</script>";
+		exit;
+	}
+
+	$data['login_notice_enabled'] = isset($_POST['login_notice_enabled']) ? '1' : '0';
+	$post_overflow = pkshop_site_upload_post_overflow_message();
+	if ($post_overflow !== '') {
+		echo "<script>alert('" . addslashes($post_overflow) . "');history.back();</script>";
+		exit;
+	}
+
+	if (isset($data['footer_bank_line1'])) {
+		$data['payment_bank_line1'] = $data['footer_bank_line1'];
+	} elseif (isset($data['payment_bank_line1'])) {
+		$data['footer_bank_line1'] = $data['payment_bank_line1'];
+	}
+	if (isset($data['footer_bank_line2'])) {
+		$data['payment_bank_line2'] = $data['footer_bank_line2'];
+	} elseif (isset($data['payment_bank_line2'])) {
+		$data['footer_bank_line2'] = $data['payment_bank_line2'];
+	}
+}
+
 $delete_image_fields = array(
 	'footer_bottom_image',
 	'footer_story_banner1',
@@ -142,12 +194,9 @@ if ($section === 'payment') {
 }
 
 $upload_dir = dirname(__FILE__) . '/../../images/site/';
-if (!is_dir($upload_dir)) {
-	@mkdir($upload_dir, 0755, true);
-}
 
 $file_fields = array(
-	'favicon' => array('prefix' => 'favicon', 'ext' => array('ico', 'png', 'jpg', 'gif')),
+	'favicon' => array('prefix' => 'favicon', 'ext' => array('ico', 'png', 'jpg', 'jpeg', 'gif', 'webp'), 'max_bytes' => 2 * 1048576),
 	'logo_pc' => array('prefix' => 'logo_pc', 'ext' => array('png', 'jpg', 'gif', 'svg')),
 	'logo_mobile' => array('prefix' => 'logo_mobile', 'ext' => array('png', 'jpg', 'gif', 'svg')),
 	'banner1' => array('prefix' => 'banner1', 'ext' => array('jpg', 'jpeg', 'png', 'webp')),
@@ -158,30 +207,13 @@ $file_fields = array(
 	'footer_bottom_image' => array('prefix' => 'footer_bottom', 'ext' => array('png', 'jpg', 'gif', 'webp')),
 	'footer_story_banner1' => array('prefix' => 'story_banner1', 'ext' => array('jpg', 'jpeg', 'png', 'webp')),
 	'footer_story_banner2' => array('prefix' => 'story_banner2', 'ext' => array('jpg', 'jpeg', 'png', 'webp')),
+	'login_auth_logo' => array('prefix' => 'login_logo', 'ext' => array('png', 'jpg', 'gif', 'svg', 'webp')),
+	'login_auth_background' => array('prefix' => 'login_bg', 'ext' => array('jpg', 'jpeg', 'png', 'webp')),
 );
 
-foreach ($file_fields as $field => $rule) {
-	$input = 'upload_' . $field;
-	if (!isset($_FILES[$input]) || $_FILES[$input]['error'] === UPLOAD_ERR_NO_FILE) {
-		continue;
-	}
-	if ($_FILES[$input]['error'] !== UPLOAD_ERR_OK) {
-		continue;
-	}
-	$orig = $_FILES[$input]['name'];
-	$ext = strtolower(pathinfo($orig, PATHINFO_EXTENSION));
-	if (!in_array($ext, $rule['ext'], true)) {
-		continue;
-	}
-	$fname = $rule['prefix'] . '_' . date('YmdHis') . '.' . $ext;
-	$dest = $upload_dir . $fname;
-	if (@move_uploaded_file($_FILES[$input]['tmp_name'], $dest)) {
-		$web_path = '../images/site/' . $fname;
-		if ($field === 'favicon') {
-			$web_path = 'images/site/' . $fname;
-		}
-		$data[$field] = $web_path;
-	}
+$upload_errors = array();
+if ($section === 'brand') {
+	$upload_errors = pkshop_site_process_brand_uploads($upload_dir, $file_fields, $data);
 }
 
 if (!pkshop_site_settings_save($data)) {
@@ -195,5 +227,12 @@ if ($section === 'currency') {
 } elseif ($section === 'payment') {
 	$tab = 'payment';
 }
+
+if (!empty($upload_errors)) {
+	$upload_msg = implode("\\n", $upload_errors);
+	echo "<script>alert('환경설정은 저장되었으나, 아래 파일 업로드에 실패했습니다.\\n\\n" . addslashes($upload_msg) . "');location.href='pro_site_settings.php?tab=" . $tab . "';</script>";
+	exit;
+}
+
 echo "<script>alert('환경설정이 저장되었습니다.');location.href='pro_site_settings.php?tab=" . $tab . "';</script>";
 ?>

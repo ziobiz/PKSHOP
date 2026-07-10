@@ -3,7 +3,9 @@
 
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_member.php";
+
 $query = "SELECT passwd,name,jumin,sex,job,email,tel,handphone,zip,address,info,point,dis,dis1,company,recommend,comnum,etc1,etc2,cont,solar,admail,adsms,c_jisa from $member_table WHERE id='$id'";
 
 $DB->get($query,$rs,$rn);
@@ -58,7 +60,6 @@ $point_cur = $row_p[point_cur];
 
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
   <script language="javascript">
 	<!--
 	function go_modify() {      
@@ -563,6 +564,5 @@ function check(fm){
 								</table>
 								</td></tr>
 							</table>
-							<BR><BR> 
-
-<?php pkshop_admin_shell_end(); ?>
+							<BR><BR>
+<? include "../inc/down_menu.php"; ?>

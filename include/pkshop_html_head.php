@@ -24,9 +24,11 @@ $og_image = pkshop_site_asset_url(pkshop_site_setting('og_image', '../images/kak
 <meta property="og:image:height" content="400"/>
 <meta property="og:description" content="<?=htmlspecialchars(pkshop_site_setting('og_description'), ENT_QUOTES, 'UTF-8')?>">
 <title><?=htmlspecialchars($document_title, ENT_QUOTES, 'UTF-8')?></title>
-<?php if ($favicon !== '') { ?>
-<link rel="shortcut icon" type="image/x-icon" href="<?=htmlspecialchars($favicon, ENT_QUOTES, 'UTF-8')?>">
-<link rel="icon" href="<?=htmlspecialchars($favicon, ENT_QUOTES, 'UTF-8')?>">
+<?php if ($favicon !== '') {
+	$favicon_type = function_exists('pkshop_favicon_mime_type') ? pkshop_favicon_mime_type($favicon) : 'image/x-icon';
+?>
+<link rel="shortcut icon" type="<?=htmlspecialchars($favicon_type, ENT_QUOTES, 'UTF-8')?>" href="<?=htmlspecialchars($favicon, ENT_QUOTES, 'UTF-8')?>">
+<link rel="icon" type="<?=htmlspecialchars($favicon_type, ENT_QUOTES, 'UTF-8')?>" href="<?=htmlspecialchars($favicon, ENT_QUOTES, 'UTF-8')?>">
 <?php } ?>
 <link rel="stylesheet" href="../include/reset.css">
 <?php if ($pkshop_head_style === 'main') { ?>

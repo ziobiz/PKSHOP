@@ -1,0 +1,261 @@
+/* PKSHOP — CRYPTO/TINPASS 레이아웃 로그인 (UI only, 아이디+비밀번호) */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.pk-auth-root {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+.pk-auth-hero {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 120px;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #0f172a 100%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.pk-auth-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+
+.pk-auth-hero-text {
+  position: absolute;
+  left: 8%;
+  top: 38%;
+  z-index: 2;
+  max-width: 48%;
+  transform: translateY(-50%);
+  font-size: clamp(1.25rem, 3vw, 2.625rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  color: #0f172a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.35);
+  white-space: pre-line;
+}
+
+.pk-auth-panel {
+  flex: 0 0 360px;
+  width: 360px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  overflow-y: auto;
+}
+
+.pk-auth-panel-inner {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px 18px 24px;
+}
+
+.pk-auth-logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.pk-auth-logo {
+  max-height: 52px;
+  max-width: 220px;
+  object-fit: contain;
+}
+
+.pk-auth-notice {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  font-size: 12px;
+  line-height: 1.55;
+  color: #4b5563;
+}
+
+.pk-auth-notice-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.pk-auth-notice-body {
+  white-space: pre-wrap;
+}
+
+.pk-auth-form-wrap {
+  flex: 1 1 auto;
+}
+
+.pk-auth-title {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.pk-auth-field {
+  margin-bottom: 14px;
+}
+
+.pk-auth-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.pk-auth-field input[type="text"],
+.pk-auth-field input[type="password"],
+.pk-auth-field input[type="email"] {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  color: #111827;
+}
+
+.pk-auth-field input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.pk-auth-btn {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 8px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  cursor: pointer;
+}
+
+.pk-auth-btn:hover {
+  background: #1d4ed8;
+}
+
+.pk-auth-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pk-auth-extra {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.pk-auth-extra label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.pk-auth-alert {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.pk-auth-alert--info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+
+.pk-auth-alert--warn {
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.pk-auth-links {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #f3f4f6;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.pk-auth-links a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.pk-auth-links a:hover {
+  text-decoration: underline;
+}
+
+.pk-auth-footer {
+  margin: 24px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid #f3f4f6;
+  text-align: center;
+  font-size: 11px;
+  color: #9ca3af;
+  line-height: 1.45;
+}
+
+@media (max-width: 768px) {
+  .pk-auth-root {
+    flex-direction: column;
+  }
+
+  .pk-auth-hero {
+    min-height: 140px;
+    flex: 0 0 auto;
+  }
+
+  .pk-auth-hero-text {
+    left: 5%;
+    top: 50%;
+    max-width: 90%;
+    font-size: 1.1rem;
+  }
+
+  .pk-auth-panel {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}

@@ -1,7 +1,8 @@
-include_once "../inc/admin_shell_lib.php";
 <? 
+include "../inc/top_menu.php"; 
+include "../inc/left_menu_member.php";
+
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
  <!--
  function checkIt(path) {
@@ -177,4 +178,4 @@ include_once "../inc/admin_shell_lib.php";
 					</tr>
 				</table> 
 				<br>
-<?php pkshop_admin_shell_end(); ?>				
+<? include "../inc/down_menu.php"; ?>

@@ -438,12 +438,37 @@ if (strcmp($imgm,"")){
 
 }
 
-$imgl=$File_namel;			$imgm=$File_namem;
-$imgb1=$File_name1;		$imgb2=$File_name2;
-$imgb3=$File_name3;		$imgb4=$File_name4;
-$imgb5=$File_name5;
+if (isset($File_namel) && $File_namel !== '') {
+	$imgl = $File_namel;
+}
+if (isset($File_namem) && $File_namem !== '') {
+	$imgm = $File_namem;
+}
+if (isset($File_name1) && $File_name1 !== '') {
+	$imgb1 = $File_name1;
+}
+if (isset($File_name2) && $File_name2 !== '') {
+	$imgb2 = $File_name2;
+}
+if (isset($File_name3) && $File_name3 !== '') {
+	$imgb3 = $File_name3;
+}
+if (isset($File_name4) && $File_name4 !== '') {
+	$imgb4 = $File_name4;
+}
+if (isset($File_name5) && $File_name5 !== '') {
+	$imgb5 = $File_name5;
+}
 
-
+include_once dirname(__FILE__) . '/../../include/product_detail_helper.php';
+$detail = addslashes(pkshop_sanitize_product_detail_html(stripslashes($detail), array(
+	'imgm'  => $imgm,
+	'imgb1' => $imgb1,
+	'imgb2' => $imgb2,
+	'imgb3' => $imgb3,
+	'imgb4' => $imgb4,
+	'imgb5' => $imgb5,
+)));
 
 #################################################
 //$theme=$theme_g.",".$theme_r.",".$theme_n.",".$theme_b.",".$theme_p;

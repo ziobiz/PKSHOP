@@ -3,7 +3,9 @@
 
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_attendance.php";
+
 if($ydate1=='')  $ydate1=date('Y');
 if($mdate1=='')  $mdate1=date('m');
 if($ddate1=='')  $ddate1=date('d');
@@ -69,7 +71,6 @@ $mode="keyfield=$keyfield&key=$encoded_key&sex=$sex&job=$job&dis=$dis&ydate1=$yd
 
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_del() {
@@ -248,4 +249,4 @@ if($total_block <= $block) {
 					</form>  
 				</table>
 				<br><br>
-<?php pkshop_admin_shell_end(); ?>
+<? include "../inc/down_menu.php"; ?>

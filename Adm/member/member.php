@@ -5,7 +5,9 @@
 
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_member.php";
+
 $encoded_key = urlencode($key);
 $query = "SELECT *from $member_table where 1=1 ";
 
@@ -61,7 +63,6 @@ $mode="keyfield=$keyfield&key=$encoded_key&sex=$sex&job=$job&dis=$dis&member_cou
 
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_del() {
@@ -553,4 +554,4 @@ if($page!=$total_page){
 					</form>  
 				</table>
 				<br><br>
-<?php pkshop_admin_shell_end(); ?>
+<? include "../inc/down_menu.php"; ?>

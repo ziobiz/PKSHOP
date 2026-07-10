@@ -1,134 +1,25 @@
-include_once "../inc/admin_shell_lib.php";
-<html>
-<head>
-<title>관리자모드</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" href="../image/style.css" type="text/css">
-<head>
+<?php
+include "../common/dbconn.php";
+include "../inc/top_menu.php";
+require_once dirname(__FILE__) . '/../../include/site_settings_lib.php';
+require_once dirname(__FILE__) . '/../inc/adm_ui_lib.php';
 
-
-
-<? include "../inc/top_menu.php"; 
-
-$query = "SELECT * from su_info WHERE idx='1'";
-
-$DB->get($query,$rs,$rn);
-// print_r($rs)
+$s = pkshop_site_settings();
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
-<tr><td>
-<table width='100%' border=0 cellpadding=0 cellspacing=0>
-<tr>
-	<td><!-- 컨텐츠 부분 -->
-		<table width=1000 border=0 cellpadding=0 cellspacing=0 bgcolor='#ffffff'>
-			<tr>
-				<td width=170 bgcolor='#F1F1F1' valign=top rowspan=2><!-- 좌측 메뉴부분 -->
-					<? include "../inc/left_menu.php"; ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
-				</td>
-				<td align=center valign=top><!-- 우측 컨텐츠 부분 -->
-
-				<table width="800" border="0" cellspacing="0" cellpadding="0" class="left_margin30">
-				<form name="form" method="post">
-					<tr><td height=30></td></tr>
-					<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>관리자변경</b></td>
-								</tr>
-							</table>
-					</td></tr>
-					<tr><td height=3></td></tr>
-					<tr>
-						<td>	
-<script language="JavaScript">
-<!--
-function check()
-{
-
-	 if(!document.form.c_bank.value)
-			{
-				alert('은행명을 입력하세요!');
-				document.form.c_bank.focus();
-				return;
-			}
-	 if(!document.form.c_banknum.value)
-			{
-				alert('계좌번호를 입력하세요!');
-				document.form.c_banknum.focus();
-				return;
-			}
-	 if(!document.form.c_bankname.value)
-			{
-				alert('예금주를 입력하세요!');
-				document.form.c_bankname.focus();
-				return;
-			}
-
-		document.form.action = "bank_change_do.php";
-		
-		document.form.submit();
-}
--->
-</script>
-<TABLE cellSpacing=0 borderColorDark=#ffffff cellPadding=1 width=420 align=center bgColor=#eeeeee borderColorLight=#000000 border=1>
-  <TR>
-		
-    <TD width=400 > 
-	<form name="form" method="post" >
-      <TABLE cellSpacing=0 borderColorDark=#ffffff cellPadding=1 width=438 align=center borderColorLight=#999999 border=1>
-        
-		<input type="hidden" name="admin_cid" value="admin">
-		<TR>
-		    <TD  align=center height="46"  colspan=2><FONT SIZE=4><B>계좌번호 변경<B></FONT></TD>		
-		</TR>
-
-		<TR>
-		    <TD width=146 align=center height="67" >은행명 설정</TD>		
-		    <TD width=400 height=67 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-              <input type="text" name="c_bank" value="<?=$rs[0]["c_bank"]?>"  style="HEIGHT:20; BORDER:gray 1px solid; WIDTH: 150"></TD>
-		</TR>
-		<TR>
-		    <TD width=146 align=center height="67" >계좌번호 설정</TD>		
-		    <TD width=400 height=67 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-              <input type="text" name="c_banknum" value="<?=$rs[0]["c_banknum"]?>"  style="HEIGHT:20; BORDER:gray 1px solid; WIDTH: 150"></TD>
-		</TR>
-		<TR>
-		    <TD width=146 align=center height="67" >예금주 설정</TD>		
-		    <TD width=400 height=67 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-              <input type="text" name="c_bankname"  value="<?=$rs[0]["c_bankname"]?>" style="HEIGHT:20; BORDER:gray 1px solid; WIDTH: 150"></TD>
-		</TR>
-		<TR>
-		    <TD align=center height="67" colspan=2><input type="button" value=" 비밀번호 변경 " onclick="javascript:check();"></TD>
-		</TR>
-		
-		</TABLE>
-		</form>	
-		</TD>
-	</TR>
-</TABLE>
-
-<BR>
-						</td>
-					</tr>
-					</table>
-				</td>
-			</tr>
-			<tr>
-				<td height=70 align=center bgcolor='#EFF3F6'>
-					
-				</td>
-			</tr>
-		</table>
-	</td>
-</tr>
-</table>
-
-</td></tr>
-<?php pkshop_admin_shell_end(); ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
-<!-- 전체 테이블 end -->
+<?php adm_ui_page_open('pg-site-settings-screen pg-bank-change-screen'); ?>
+<?php adm_ui_card_open('계좌변경'); ?>
+<?php adm_ui_notice('브랜드설정의 <strong>하단 정보 블록 · 銀行口座情報</strong> 및 <strong>현금결제 은행정보</strong>와 동일한 데이터입니다. 여기서 저장하면 브랜드설정에도 바로 반영됩니다.', 'info'); ?>
+<form name="form" method="post" action="bank_change_do.php">
+<div class="pg-bank-change-row">
+<?php
+adm_ui_field_row('銀行口座情報 제목', '<input type="text" name="footer_bank_title" value="' . adm_ui_h($s['footer_bank_title']) . '" class="pg-input">', false, true);
+adm_ui_field_row('은행 표시 1행', '<input type="text" name="footer_bank_line1" value="' . adm_ui_h($s['footer_bank_line1']) . '" class="pg-input"><p class="pg-field-hint">푸터·결제 화면 1행</p>', false, true);
+adm_ui_field_row('은행 표시 2행', '<input type="text" name="footer_bank_line2" value="' . adm_ui_h($s['footer_bank_line2']) . '" class="pg-input"><p class="pg-field-hint">푸터·결제 화면 2행</p>', false, true);
+adm_ui_field_row('은행 표시 3행', '<input type="text" name="payment_bank_line3" value="' . adm_ui_h($s['payment_bank_line3']) . '" class="pg-input"><p class="pg-field-hint">결제 화면 추가 행 (선택)</p>', false, true);
+?>
 </div>
-</body>
-</html>
+<?php adm_ui_form_actions('<input type="submit" value="계좌 저장" class="pg-btn pg-btn-primary">'); ?>
+</form>
+<?php adm_ui_card_close(); ?>
+<?php adm_ui_page_close(); ?>
+<?php include "../inc/down_menu.php"; ?>

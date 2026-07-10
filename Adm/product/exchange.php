@@ -1,7 +1,9 @@
 <?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_product.php";
+
 include "../common/user_function.php";
 
 ########## 데이터베이스에 연결한다. #################################
@@ -11,7 +13,6 @@ $value = mysql_fetch_row($result);
 $exchange = $value[0];
 
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 				<table width="700" border="0" cellspacing="0" cellpadding="0">
 					<tr><td height=30></td></tr>
 					<tr><td>

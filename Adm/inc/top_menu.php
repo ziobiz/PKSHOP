@@ -1,62 +1,53 @@
-<? 
+<?php
 include "../common/dbconn.php";
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>관리자</title>
-<link rel="stylesheet" href="../image/style.css" type="text/css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<? 
-$idok = $_SESSION["idok"];
-if($PATH_TRANSLATED!='../Adm/login/login.html'){
+require_once __DIR__ . '/admin_shell_lib.php';
+require_once dirname(__FILE__) . '/../../include/site_settings_lib.php';
 
-if($idok!="yes"){?>
+$idok = isset($_SESSION["idok"]) ? $_SESSION["idok"] : '';
+if ($PATH_TRANSLATED != '../Adm/login/login.html') {
+    if ($idok != "yes") {
+?>
 <SCRIPT LANGUAGE="JavaScript">
 <!--
 alert("관리자만 접근하실수 있습니다.");
 location="../login/login.php";
 //-->
 </SCRIPT>
-<?
-exit;	
+<?php
+        exit;
+    }
 }
-}?>
+
+$ADM_SHELL_CTX = adm_shell_resolve_context();
+$ADM_SHELL_MENU_JSON = adm_shell_json_menu_info();
+?>
+<!DOCTYPE html>
+<html lang="ko" data-shell-theme="default">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title><?=adm_shell_h($ADM_SHELL_CTX['title'])?> — Pentakleva Admin</title>
+<?=pkshop_admin_favicon_head_html()?>
+<link rel="stylesheet" href="../image/style.css" type="text/css" />
+<link rel="stylesheet" href="../image/pg_admin.css?v=20260710logofix" type="text/css" />
+<link rel="stylesheet" href="../image/admin-modern.css?v=20260710cards" type="text/css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+window.PKSHOP_SHELL_INIT = <?=json_encode($ADM_SHELL_CTX, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP)?>;
+window.PKSHOP_MENU_INFO = <?=json_encode($ADM_SHELL_MENU_JSON, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP)?>;
+</script>
+<script src="../inc/admin_shell.js?v=20260710fileui" defer></script>
+<script src="../inc/pkshop_date_picker.js?v=20260710datepicker" defer></script>
 </head>
-
-<body>
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td width="194" height="73" bgcolor="#ffc105">
-<!-- 	<img src="../image/logo3.png" width="194" height="73" /> -->
-	</td>
-    <td colspan="2" align="right" valign="bottom" bgcolor="#ffc105"><span class="headtext"></span><a href='../login/logout.php'><img src="../img/logout.gif" width="56" height="20" border="0"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-  </tr>
-   <tr>
-    <td height="49" colspan="3" bgcolor="#dfdfdd"><table width="980" border="0" align="left" cellpadding="0" cellspacing="0">
-     <tr>
-        <td width="194" height="49" align="center" bgcolor="#dfdfdd"><a href='../product/category.php'><B>상품관리</B></a></td>
-        <td width="2" height="49"><img src="img/pawm_line.gif" width="2" height="49" /></td>
-		<td width="194" height="49" align="center" bgcolor="#dfdfdd"><a href='../product/pro_order.php?sel_status=주문접수'><B>주문배송관리</B></a></td>
-        <td width="2" height="49"><img src="img/pawm_line.gif" width="2" height="49" /></td>
-		<td width="194" height="49" align="center" bgcolor="#dfdfdd"><a href='../product/order_day.php'><B>매출관리</B></a></td>
-        <!-- <td width="2" height="49"><img src="img/pawm_line.gif" width="2" height="49" /></td>
-		<td width="194" height="49" align="center" bgcolor="#dfdfdd"><a href='https://admin7.allthegate.com/chaMng/login/login.jsp' target="_blank"><B>카드결제확인</B></a></td>
-        <td width="2" height="49"><img src="img/pawm_line.gif" width="2" height="49" /></td>
-		<td width="194" height="49" align="center" bgcolor="#dfdfdd"><a href='../admin_board_03/list.php'><B>후기관리</B></a></td> -->
-        <td width="2" height="49"><img src="img/pawm_line.gif" width="2" height="49" /></td>        
-        <td width="194" height="49" align="center" bgcolor="#dfdfdd"><a href='../member/member.php?dis=0'><B>회원관리</B></a></td>
-        <td width="2" height="49"><img src="img/pawm_line.gif" width="2" height="49" /></td>
-        <!-- <td width="194" height="49" align="center" bgcolor="#dfdfdd"><a href='../admin_board_01/list.php'><B>게시판관리</B></a></td> 
-		<td width="2" height="49"><img src="img/pawm_line.gif" width="2" height="49" /></td> -->
-        <!-- <td width="194" height="49" align="center" bgcolor="#dfdfdd"><a href='../admin_board_popup/list.php'><B>팝업창관리</B></a></td>
-		<td width="2" height="49"><img src="img/pawm_line.gif" width="2" height="49" /></td> -->
-        <td width="194" height="49" align="center" bgcolor="#dfdfdd"><a href='../admin_pass/bank_change.php'><B>계좌변경</B></a></td>
-
-		<!--<td width="194" height="49" align="center" bgcolor="#dfdfdd"><a href='../center/center
-		_list.php'><B>센터등록</B></a></td>-->
-        <td width="2" bgcolor="#dfdfdd"><img src="img/pawm_line.gif" width="2" height="49" /></td>
-      </tr>
-    </table></td>
-  </tr>
+<body class="pg-admin">
+<div class="pg-shell">
+<?php adm_shell_render_sidebar(); ?>
+<div class="pg-workspace">
+<?php adm_shell_render_session_bar(); ?>
+<div id="pg-tab-bar" class="pg-tab-bar"></div>
+<main class="pg-main">
+<div class="pg-frame">
+<?php adm_shell_render_frame_head($ADM_SHELL_CTX); ?>
+<div class="pg-frame-body">
+<div class="adm-content-panel pg-admin-content">

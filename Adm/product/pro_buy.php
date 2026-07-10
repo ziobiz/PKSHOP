@@ -1,7 +1,9 @@
 <?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_product.php";
+
 include "../common/user_function.php";
 include "../inc/set_com.php";
 ########## 데이터베이스에 연결한다. #################################
@@ -23,7 +25,6 @@ if ($sel_cate=="") {
 
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_del() {
@@ -205,4 +206,4 @@ $chk_num = $last-$first+1;
 					<input type="hidden" name="buy_chk" value="Y">      
 					<input type="hidden" name="chk_num" value="<?=$chk_num?>">      
 					</form>
-<?php pkshop_admin_shell_end(); ?>
+<? include "../inc/down_menu.php"; ?>

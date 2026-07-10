@@ -1,7 +1,9 @@
 <?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_sell.php";
+
 include "../common/user_function.php";
 
 ########## 데이터베이스에 연결한다. #################################
@@ -11,6 +13,14 @@ $tyear = $_REQUEST["tyear"];
 $emonth = $_REQUEST["emonth"];
 $eday = $_REQUEST["eday"];
 $eyear = $_REQUEST["eyear"];
+
+adm_ui_apply_pg_date_range_request(adm_ui_sales_day_date_field_map());
+$tyear = isset($_REQUEST['tyear']) ? $_REQUEST['tyear'] : '';
+$tmonth = isset($_REQUEST['tmonth']) ? $_REQUEST['tmonth'] : '';
+$tday = isset($_REQUEST['tday']) ? $_REQUEST['tday'] : '';
+$eyear = isset($_REQUEST['eyear']) ? $_REQUEST['eyear'] : '';
+$emonth = isset($_REQUEST['emonth']) ? $_REQUEST['emonth'] : '';
+$eday = isset($_REQUEST['eday']) ? $_REQUEST['eday'] : '';
 
 if($kkid!=""){
 	$kk_query=" and so.id='$kkid'";
@@ -45,9 +55,15 @@ $DB->get($query,$rs,$rn);
 
 $total_record = $rn;
 
+$order_day_disp_from = array('y' => $tyear, 'm' => $tmonth, 'd' => $tday);
+$order_day_disp_to = array('y' => $eyear, 'm' => $emonth, 'd' => $eday);
+if ($tday === '' || $tday === null) {
+	$order_day_disp_from = array('y' => date('Y'), 'm' => date('m'), 'd' => date('d'));
+	$order_day_disp_to = $order_day_disp_from;
+}
+
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go() {
@@ -81,85 +97,17 @@ function move() {
 							<form name=dform action="./order_day.php" method=post>
 							<table width="850" border='0' cellspacing='0' cellpadding='0'>
 								<tr>
-									<td align=center colspan=11 >
-										<select name=tyear>
-										<?
-											for($a=2002;$a<2101;$a++) {
+									<td align=center colspan=11 class="pg-order-day-search">
+										<span class="pg-order-day-search-label">조회기간</span>
+										<?php
+										echo adm_ui_pg_date_range_html(
+											$order_day_disp_from,
+											$order_day_disp_to,
+											adm_ui_sales_day_date_field_map()
+										);
 										?>
-											<option value="<?=$a?>" <?if($year_e == $a || $tyear == $a) echo "selected"?>><?echo $a?></option>
-										<?
-											}
-										?>
-										</select>년&nbsp;
-										<select name=tmonth>
-										<?
-											for($b=1;$b<13;$b++) {
-											if($b<10) {
-											$bb = "0".$b;
-											}else {
-												$bb = $b;
-											}
-										?>
-										<option value="<?=$bb?>" <?if($month_e == $bb || $tmonth == $bb) echo "selected"?>><?echo $bb?></option>
-										<?
-											}
-										?>
-										</select>월&nbsp;
-										<select name=tday>
-										<?
-											for($c=1;$c<32;$c++) {
-											if($c<10) {
-												$cc = "0".$c;
-											}else {
-												$cc = $c;
-											}
-										?>
-										<option value="<?=$cc?>" <?if($day_e == $cc || $tday == $cc) echo "selected"?>><?echo $cc?></option>
-										<?
-											}
-										?>
-										</select>일
-										&nbsp; ~ &nbsp;
-										<select name=eyear>
-										<?
-											for($d=2002;$d<2101;$d++) {
-										?>
-										<option value="<?echo $d?>" <?if($year_e == $d || $eyear == $d) echo "selected"?>><?echo $d?></option>
-										<?
-											}
-										?>
-										</select>년&nbsp;
-										<select name=emonth>
-										<?
-											for($e=1;$e<13;$e++) {
-											if($e<10) {
-												$ee = "0".$e;
-											}else {
-												$ee = $e;
-											}
-										?>
-										<option value="<?=$ee?>" <?if($month_e == $ee || $emonth == $ee) echo "selected"?>><?echo $ee?></option>
-										<?
-											}
-										?>
-										</select>월&nbsp;
-										<select name=eday>
-										<?
-											for($f=1;$f<32;$f++) {
-											if($f<10) {
-												$ff = "0".$f;
-											}else {
-												$ff = $f;
-											}
-										?>
-										<option value="<?=$ff?>" <?if($day_e == $ff || $eday == $ff) echo "selected"?>><?echo $ff?></option>
-										<?
-											}
-										?>
-										</select>일&nbsp;
-										<!-- <input type="text" name="kkid" value="<?=$kkid?>"> --> <!-- 아이디검색 -->
-										<input type="text" name="kkid1" value="<?=$kkid1?>"> <!-- 상품검색 -->
-										<input type=button value=" 조 회 " onclick="move()">
+										<input type="text" name="kkid1" value="<?=adm_ui_h($kkid1)?>" class="pg-input" placeholder="상품명 검색">
+										<input type="button" value=" 조 회 " class="pg-btn" onclick="move()">
 									</td>
 								</tr>
 								<tr><td colspan=12 height=3 bgcolor='#88B7DA'></td></tr>
@@ -270,4 +218,4 @@ for($i = 0; $i < $total_record; $i++) {
 					</tr>
 
 				</table>
-<?php pkshop_admin_shell_end(); ?>
+<? include "../inc/down_menu.php"; ?>

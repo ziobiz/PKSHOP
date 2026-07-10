@@ -4,7 +4,9 @@
 
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_order.php";
+
 include "../common/user_function.php";
 include "../inc/set_com.php";
 ########## 데이터베이스에 연결한다. #################################
@@ -24,7 +26,6 @@ include "../inc/set_com.php";
 //}
 
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_del() {
@@ -67,290 +68,295 @@ function select_all(){
 		}
 	} 
 }
+function go_reset() {
+	location.href = 'pro_order.php?sel_status=<?=urlencode($sel_status)?>';
+}
+
+function set_quick_date(range) {
+	var now = new Date();
+	var y1 = now.getFullYear(), m1 = now.getMonth() + 1, d1 = now.getDate();
+	var y2 = y1, m2 = m1, d2 = d1;
+	if (range === 'day') {
+		// today
+	} else if (range === 'month') {
+		m1 = m2 = m1;
+		d1 = 1;
+	} else if (range === 'prevDay') {
+		var p = new Date(now.getTime() - 86400000);
+		y1 = y2 = p.getFullYear();
+		m1 = m2 = p.getMonth() + 1;
+		d1 = d2 = p.getDate();
+	} else if (range === 'week') {
+		var w = new Date(now.getTime() - 6 * 86400000);
+		y1 = w.getFullYear(); m1 = w.getMonth() + 1; d1 = w.getDate();
+	} else if (range === 'week2') {
+		var w2 = new Date(now.getTime() - 13 * 86400000);
+		y1 = w2.getFullYear(); m1 = w2.getMonth() + 1; d1 = w2.getDate();
+	} else if (range === 'prevMonth') {
+		var pm = new Date(y1, m1 - 2, 1);
+		y1 = y2 = pm.getFullYear();
+		m1 = m2 = pm.getMonth() + 1;
+		d1 = 1;
+		d2 = new Date(y2, m2, 0).getDate();
+	}
+	if (window.pkshopSetIsoDateRange) {
+		pkshopSetIsoDateRange(pkshopIsoFromYmd(y1, m1, d1), pkshopIsoFromYmd(y2, m2, d2));
+	}
+	document.querySelectorAll('.pg-quick-date').forEach(function(btn) {
+		btn.classList.toggle('is-active', btn.getAttribute('data-range') === range);
+	});
+}
 //-->
 </script>
 
+<?php
+adm_ui_apply_pg_date_range_request(adm_ui_order_date_field_map());
+$ydate1 = isset($_REQUEST['ydate1']) ? $_REQUEST['ydate1'] : (isset($ydate1) ? $ydate1 : '');
+$mdate1 = isset($_REQUEST['mdate1']) ? $_REQUEST['mdate1'] : (isset($mdate1) ? $mdate1 : '');
+$ddate1 = isset($_REQUEST['ddate1']) ? $_REQUEST['ddate1'] : (isset($ddate1) ? $ddate1 : '');
+$ydate2 = isset($_REQUEST['ydate2']) ? $_REQUEST['ydate2'] : (isset($ydate2) ? $ydate2 : '');
+$mdate2 = isset($_REQUEST['mdate2']) ? $_REQUEST['mdate2'] : (isset($mdate2) ? $mdate2 : '');
+$ddate2 = isset($_REQUEST['ddate2']) ? $_REQUEST['ddate2'] : (isset($ddate2) ? $ddate2 : '');
 
-				<table width="1500" border="0" cellspacing="0" cellpadding="0">
-				<form name="form" method="post" action="pro_order.php">
-					<input type="hidden" name="sel_status" value="<?=$sel_status?>">
-					
-					<tr><td height=30></td></tr>
-					<tr><td height=3></td></tr>
-					<tr> 
-						<td> 							
-							<table width="1500" border="0" cellspacing="0" cellpadding="4">
-<?
-#####################################################################
+$adm_status_label = ($sel_status !== '') ? $sel_status : '전체';
 
-if($ydate1=='')  $ydate1=date('Y');
-if($mdate1=='')  $mdate1=date('m')-1;
-if($ddate1=='')  $ddate1=date('d');
+if ($ydate1 == '') $ydate1 = date('Y');
+if ($mdate1 == '') $mdate1 = date('m') - 1;
+if ($ddate1 == '') $ddate1 = date('d');
+if ($ydate2 == '') $ydate2 = date('Y');
+if ($mdate2 == '') $mdate2 = date('m');
+if ($ddate2 == '') $ddate2 = date('d');
 
-if($ydate2=='')  $ydate2=date('Y');
-if($mdate2=='')  $mdate2=date('m');
-if($ddate2=='')  $ddate2=date('d');
+$wdate1 = mktime(0, 0, 0, $mdate1, $ddate1, $ydate1);
+$wdate2 = mktime(23, 59, 59, $mdate2, $ddate2, $ydate2);
+$where_date1 = ($wdate1 != '') ? " and signdate > '$wdate1'" : '';
+$where_date2 = ($mdate2 != '' || $ddate2 != '' || $ydate2 != '') ? " and signdate < '$wdate2'" : '';
 
-$wdate1 = mktime(0,0,0,$mdate1,$ddate1,$ydate1);
-$wdate2 = mktime(23,59,59,$mdate2,$ddate2,$ydate2);
+$year_e = date('Y');
+$month_e = date('m');
+$day_e = date('d');
+$timestamp_s = mktime(0, 0, 0, $month_e, $day_e, $year_e);
+$timestamp_e = mktime(23, 59, 59, $month_e, $day_e, $year_e);
+$query = "SELECT count(ordernum) FROM $shop_order WHERE signdate>$timestamp_s and signdate<$timestamp_e and status!='주문대기'";
+$DB->get($query, $rs, $rn);
+$cnt1 = $rs[0][0];
 
+$timestamp_s = mktime(0, 0, 0, $month_e, 1, $year_e);
+$timestamp_e = mktime(0, 0, 0, $month_e + 1, 1, $year_e);
+$query = "SELECT count(ordernum) FROM $shop_order WHERE signdate>$timestamp_s and signdate<$timestamp_e and status!='주문대기'";
+$DB->get($query, $rs, $rn);
+$cnt2 = $rs[0][0];
 
-if($wdate1 !=""){
-	$where_date1 = " and signdate > '$wdate1'";
-}else{
-	$where_date1 = "";
-}
+$query = "SELECT count(ordernum) FROM $shop_order WHERE status='주문취소'";
+$DB->get($query, $rs, $rn);
+$cnt3 = $rs[0][0];
 
-if($mdate2!='' || $ddate2!='' || $ydate2!=''){
-	if($where_date1==''){
-		$where_date2 = " and signdate < '$wdate2'";
-	}else{
-		$where_date2 = " and signdate < '$wdate2'";
-	}
-}else{
-	$where_date2 = "";
-}
+$where_sql = '';
+if ($sel_kind != '') $where_sql = "and kind='$sel_kind'";
+if ($sel_status != '') $where_sql .= " and status='$sel_status'";
 
-
-	$year_e = date("Y");
-	$month_e = date("m");
-	$day_e = date("d");
-
-	$timestamp_s = mktime(0,0,0,$month_e,$day_e,$year_e);
-	$timestamp_e = mktime(23,59,59,$month_e,$day_e,$year_e);
-
-	$query = "SELECT count(ordernum) FROM $shop_order WHERE signdate>$timestamp_s and signdate<$timestamp_e and status!='주문대기'";
-	
-	$DB->get($query,$rs,$rn);
-
-	
-	
-	$cnt1 = $rs[0][0];
-
-	$timestamp_s = mktime(0,0,0,$month_e,1,$year_e);
-	$timestamp_e = mktime(0,0,0,$month_e+1,1,$year_e);
-	$query = "SELECT count(ordernum) FROM $shop_order WHERE signdate>$timestamp_s and signdate<$timestamp_e and status!='주문대기'";
-	$DB->get($query,$rs,$rn);
-	
-
-	
-	$cnt2 = $rs[0][0];
-	
-	$query = "SELECT count(ordernum) FROM $shop_order WHERE status='주문취소'";
-	$DB->get($query,$rs,$rn);
-	
-	
-	$cnt3 = $rs[0][0];
-		
-	
-#####################################################################
-?>
-<tr>
-<td height="20"> 
-											<select name="ydate1" class="formbox3">
-											<? for($i=2017;$i<=Date("Y");$i++){?>
-											<option value="<?=$i?>" <?if($ydate1==$i){?>selected<?}?>><?=$i?></option>
-											<?}?>
-											</select><span class="text2">년</span>&nbsp;
-
-											<select name="mdate1" class="formbox3">
-											<?for($i=1;$i<13;$i++){?>
-											<option value="<?=$i?>" <?if($mdate1==$i){?>selected<?}?>><?=$i?></option>
-											<?}?>
-											</select><span class="text2">월</span>&nbsp;
-
-											<select name="ddate1" class="formbox3">
-											<?for($i=1;$i<32;$i++){?>
-											<option value="<?=$i?>" <?if($ddate1==$i){?>selected<?}?>><?=$i?></option>
-											<?}?>
-											</select><span class="text2">일</span>&nbsp;
-											~
-											<select name="ydate2" class="formbox3">
-											<? for($i=2017;$i<=Date("Y");$i++){?>
-											<option value="<?=$i?>" <?if($ydate2==$i){?>selected<?}?>><?=$i?></option>
-											<?}?>
-											</select><span class="text2">년</span>&nbsp;
-
-											<select name="mdate2" class="formbox3">
-											<?for($i=1;$i<13;$i++){?>
-											<option value="<?=$i?>" <?if($mdate2==$i){?>selected<?}?>><?=$i?></option>
-											<?}?>
-											</select><span class="text2">월</span>&nbsp;
-
-											<select name="ddate2" class="formbox3">
-											<?for($i=1;$i<32;$i++){?>
-											<option value="<?=$i?>" <?if($ddate2==$i){?>selected<?}?>><?=$i?></option>
-											<?}?>
-											</select><span class="text2">일</span>&nbsp;
-
-											&nbsp;&nbsp;
-											<!-- <select name="keyfield">
-											<option value="ip" <?if ($keyfield=='ip') echo("selected");?>>아이피</option>
-											</select>
-											<input type="text" name="key" value="<?=$key?>"size="16" maxlength="16" class="adminbttn"> -->
-											
-											<input type="button"  value="검색" class="adminbttn" onClick="javascript:go_search()">
-											<input type="hidden" name="level_l" value="<?=$level_l?>">
-											<? $file_name=mktime(date("H"),date("i"),date("s"),date("Y"),date("m"),date("d"));?>
-											<input type="hidden" name ="file_name" value="<?=$file_name?>">
-											<input type="button" value="<?=$level_l?> 엑셀다운로드" onClick="javascript:go_excel();">
-										</td>
-</td>
-								<tr> 
-									<td height="20" align="center">
-										오늘 주문한 고객 [ <?=$cnt1?> ]
-										&nbsp;&nbsp;이달에 주문한 고객 [ <?=$cnt2?> ]
-										&nbsp;&nbsp;주문 취소한 고객 [ <?=$cnt3?> ]
-									</td>
-								</tr>
-							</table>
-							<table width="1500" border="0" cellspacing="0" cellpadding="4">
-								<tr> 
-									<td height="20" width="462">
-										결제 방법 
-										&nbsp;<select name="sel_kind" style="font-size:12px;">
-										<option value="" <?if ($sel_kind=='') echo("selected")?>>전체</option>
-                         				<option value="2" <?if ($sel_kind=='2') echo("selected")?>>무통장</option>
-										<option value="1" <?if ($sel_kind=='1') echo("selected")?>>신용카드</option>
-										<option value="5" <?if ($sel_kind=='5') echo("selected")?>>포인트</option>
-										</select>
-										&nbsp;&nbsp;처리현황
-										&nbsp;<select name="sel_status" style="font-size:12px;">
-										<option value="">전체</option>
-										<option value="주문접수" <?if ($sel_status=='주문접수'){ echo("selected");}?>>주문접수</option>										
-										<option value="결제완료" <?if ($sel_status=='결제완료'){ echo("selected");}?>>결제완료</option>
-										<option value="주문취소" <?if ($sel_status=='주문취소'){ echo("selected");}?>>주문취소</option>
-										<option value="주문자취소" <?if ($sel_status=='주문자취소'){ echo("selected");}?>>주문자취소</option>
-										<option value="배송중" <?if ($sel_status=='배송중'){ echo("selected");}?>>배송중</option>
-										<option value="배송완료" <?if ($sel_status=='배송완료'){ echo("selected");}?>>배송완료</option>
-										<option value="구매확정" <?if ($sel_status=='구매확정'){ echo("selected");}?>>구매확정</option>
-										<option value="반송" <?if ($sel_status=='반송'){ echo("selected");}?>>반송</option>
-										<option value="반품" <?if ($sel_status=='반품'){ echo("selected");}?>>반품</option>
-										</select>
-										&nbsp;&nbsp; 
-										&nbsp;&nbsp; 
-										<input type="button" value="정렬" class="adminbttn" onClick="go_search()">
-									</td>
-									<td height="20" width="322"> 
-										&nbsp;<select name="keyfield" style="font-size:12px;">
-										<option value="id" <?if ($keyfield=='id') echo("selected")?>>아이디</option>
-										<option value="pay_name" <?if ($keyfield=='pay_name') echo("selected")?>>주문자</option>
-										<option value="pay_mobile" <?if ($keyfield=='pay_mobile') echo("selected")?>>휴대폰번호</option>
-										<option value="receive_name" <?if ($keyfield=='receive_name') echo("selected")?>>수취인</option>
-										
-										
-										
-										</select>
-										<input type="text" name="key" value="<?=$key?>" size="16" maxlength="16" class="adminbttn">
-										<input type="button" value="검색" class="adminbttn" onClick="go_search()" >
-									</td>
-								</tr>
-								<tr>
-									<td colspan="2" align="right">
-									<select name="select_status"> -->
-										<option value="주문접수" <?if($sel_status=="주문접수"){?>selected<?}?>  style="color:#000000;">주문접수</option>
-										<option value="결제완료" <?if($sel_status=="결제완료"){?>selected<?}?> style="color:#cc0066;">결제완료</option>
-										<option value="준비중" <?if($sel_status=="준비중"){?>selected<?}?> style="color:#339933;">준비중</option>
-										<option value="배송중" <?if($sel_status=="배송중"){?>selected<?}?> style="color:#0033ff;">배송중</option>
-										
-										<option value="배송완료" <?if($sel_status=="배송완료"){?>selected<?}?> style="color:#000000;">배송완료</option>
-										<option value="구매확정" <?if($sel_status=="구매확정"){?>selected<?}?> style="color:#000000;">구매확정</option> 
-										<option value="주문취소" <?if($sel_status=="주문취소"){?>selected<?}?> style="color:#cc0066;">주문취소</option>
-										<option value="주문자취소" <?if($sel_status=="주문자취소"){?>selected<?}?> style="color:#339933;">주문자취소</option> 
-										<option value="반송" <?if($sel_status=="반송"){?>selected<?}?> style="color:#000000;">반송</option>
-										<option value="반품" <?if($sel_status=="반품"){?>selected<?}?> style="color:#000000;">반품</option>
-										<option value="주문대기" <?if($sel_status=="주문대기"){?>selected<?}?> style="color:#000000;">대기</option>
-										<option value="취소" <?if($sel_status=="취소"){?>selected<?}?> style="color:#000000;">취소</option> -->
-									 </select>
-									<input type="button" value="변경" onClick="javascript:go_modify()" class="adminbttn">
-									</td>
-								</tr>
-							</table>
-							<table width="1500" border='0' cellspacing='0' cellpadding='0'>
-								<tr><td colspan=9 height=3 bgcolor='#88B7DA'></td></tr>
-								<tr align="center" bgcolor='#EBF0F4'>  
-									<td width="64" height="25">주문번호</td>
-									<td width="99" height="25">주문날짜</td>
-									<td width="119" height="25">주문ID</td>
-									<td width="117" height="25">주문자</td>
-									<td width="118" height="25">주문자전화</td>
-									
-									<td width="115" height="25">결제방법</td>
-									<td width="118" height="25">입금자명</td>
-                                    
-									<td width="118" height="25">입금금액(포인트사용)</td>
-									<td width="103" height="25"><input type="checkbox" name="checkbox" onclick="select_all()"></td>
-									<?if($sel_status=="주문취소" || $sel_status=="취소" || $sel_status=="주문자취소"){?>
-									<td width="77" height="25">
-										<a href="javascript:all_chk();" OnFocus="this.blur()">
-										<B>all</B></a>
-										<input type="button" value="삭제" onClick="javascript:go_del()" class="adminbttn">
-									</td>
-									<?}?>
-								</tr>
-								<tr><td colspan=9 height=1 bgcolor='#f0f0f0'></td></tr>
-								<tr align="center" bgcolor='#EBF0F4'> 
-									<td colspan="3" height="25" width="146">제품명</td>
-									<td height="25" width="50">수량</td>
-									<td height="25" width="50">입금일</td>
-									<td height="25" width="50">색상</td>
-									
-									<td width="118" height="25" colspan="2">매출내역</td>
-
-									<td height="25" width="90">판매가격</td>
-								</tr>
-								
-								<tr align="center" bgcolor='#EBF0F4'> 
-									<td colspan=9 height=25>옵션사항</td>
-								</tr>
-
-
-								<tr><td colspan=9 height=1 bgcolor='#D2DEE8'></td></tr>
-								<tr><td colspan=9 height=3></td></tr>
-
-<?
-#####################################################################
-
-if ($sel_kind!="") $where_sql = "and kind='$sel_kind'";
-if ($sel_status!="") $where_sql .= " and status='$sel_status'";
-
-if($key=="") {
+if ($key == '') {
 	$query = "SELECT * FROM $shop_order WHERE ordernum!='' $where_sql $where_date1 $where_date2 ORDER BY signdate DESC";
+	$encoded_key = '';
 } else {
 	$encoded_key = urlencode($key);
 	$query = "SELECT * FROM $shop_order WHERE ordernum!='' and $keyfield LIKE '%$key%' $where_sql $where_date1 $where_date2 $theme_sql ORDER BY signdate DESC";
 }
+$DB->get($query, $rs, $rn);
+$total_record = $rn;
 
-
-$DB->get($query,$rs,$rn);
-$total_record =$rn;
-
-
-if ($page=="") $page=1;
-$num_per_page = 10;
+if ($page == '') $page = 1;
+$per_page_info = adm_ui_resolve_per_page();
 $page_per_block = 10;
+$pg = adm_ui_paginate_slice($total_record, $page, $per_page_info);
+$num_per_page = $pg['num_per_page'];
+$first = $pg['first'];
+$last = $pg['last'];
+$IsNext = $pg['is_next'];
+$total_page = $pg['total_page'];
+$article_num = $pg['article_num'];
+$file_name = mktime(date('H'), date('i'), date('s'), date('Y'), date('m'), date('d'));
 
-if(!$total_record) {
- 	$first = 1;
- 	$last = 0;   
-} else {
- 	$first = $num_per_page*($page-1);
- 	$last = $num_per_page*$page;
- 
- 	$IsNext = $total_record - $last;
- 	if($IsNext > 0) {
- 		$last -= 1;
- 	} else {
- 		$last = $total_record - 1;
- 	}      
+$adm_status_counts = array();
+$adm_status_defs = array(
+	array('label' => '오늘 주문', 'tone' => 'other', 'count' => $cnt1),
+	array('label' => '이달 주문', 'tone' => 'month', 'count' => $cnt2),
+	array('label' => '주문취소', 'tone' => 'cancel', 'count' => $cnt3),
+	array('label' => '주문접수', 'tone' => 'other', 'status' => '주문접수'),
+	array('label' => '결제완료', 'tone' => 'success', 'status' => '결제완료'),
+	array('label' => '배송중', 'tone' => 'progress', 'status' => '배송중'),
+	array('label' => '배송완료', 'tone' => 'success', 'status' => '배송완료'),
+	array('label' => '구매확정', 'tone' => 'success', 'status' => '구매확정'),
+	array('label' => '반품', 'tone' => 'refund', 'status' => '반품'),
+);
+foreach ($adm_status_defs as $def) {
+	if (isset($def['count'])) {
+		$adm_status_counts[] = $def;
+		continue;
+	}
+	$st = $def['status'];
+	$query = "SELECT count(ordernum) FROM $shop_order WHERE status='$st'";
+	$DB->get($query, $rs_st, $rn_st);
+	$def['count'] = (int) $rs_st[0][0];
+	$adm_status_counts[] = $def;
 }
- 
-$total_page = ceil($total_record/$num_per_page);
-$article_num = $total_record - $num_per_page*($page-1);
-$ii=0;
+?>
+<div class="adm-content-panel-inner">
 
-for($i = $first; $i <= $last; $i++) { 
-	$ordernum =$rs[$i]["ordernum"];
+<form name="form" method="post" action="pro_order.php">
+<input type="hidden" name="level_l" value="<?=$level_l?>">
+<input type="hidden" name="file_name" value="<?=$file_name?>">
+
+<div class="pg-screen-search-form pay-mng-search-form">
+	<div class="pg-search-form-row">
+		<div class="pg-search-cell pg-search-cell--with-label">
+			<span class="pg-search-cell-label">주문일자</span>
+			<div class="pg-search-cell-input pg-search-cell-input--daterange">
+				<?php
+				echo adm_ui_pg_date_range_html(
+					array('y' => $ydate1, 'm' => $mdate1, 'd' => $ddate1),
+					array('y' => $ydate2, 'm' => $mdate2, 'd' => $ddate2),
+					adm_ui_order_date_field_map()
+				);
+				?>
+			</div>
+		</div>
+		<div class="pg-search-cell">
+			<div class="pg-search-cell-input">
+				<button type="button" class="pg-quick-date" data-range="day" onclick="set_quick_date('day')">당일</button>
+				<button type="button" class="pg-quick-date" data-range="month" onclick="set_quick_date('month')">당월</button>
+				<button type="button" class="pg-quick-date" data-range="prevDay" onclick="set_quick_date('prevDay')">전일</button>
+				<button type="button" class="pg-quick-date" data-range="week" onclick="set_quick_date('week')">1주</button>
+				<button type="button" class="pg-quick-date" data-range="week2" onclick="set_quick_date('week2')">2주</button>
+				<button type="button" class="pg-quick-date" data-range="prevMonth" onclick="set_quick_date('prevMonth')">전월</button>
+			</div>
+		</div>
+		<div class="pg-search-cell pg-search-cell--with-label">
+			<span class="pg-search-cell-label">결제방법</span>
+			<div class="pg-search-cell-input">
+				<select name="sel_kind" class="pg-select pg-select--wide">
+					<option value="" <?if ($sel_kind == '') echo('selected')?>>전체</option>
+					<option value="2" <?if ($sel_kind == '2') echo('selected')?>>무통장</option>
+					<option value="1" <?if ($sel_kind == '1') echo('selected')?>>신용카드</option>
+					<option value="5" <?if ($sel_kind == '5') echo('selected')?>>포인트</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class="pg-search-form-row">
+		<div class="pg-search-cell pg-search-cell--with-label">
+			<span class="pg-search-cell-label">검색구분</span>
+			<div class="pg-search-cell-input">
+				<select name="keyfield" class="pg-select">
+					<option value="id" <?if ($keyfield == 'id') echo('selected')?>>아이디</option>
+					<option value="pay_name" <?if ($keyfield == 'pay_name') echo('selected')?>>주문자</option>
+					<option value="pay_mobile" <?if ($keyfield == 'pay_mobile') echo('selected')?>>휴대폰번호</option>
+					<option value="receive_name" <?if ($keyfield == 'receive_name') echo('selected')?>>수취인</option>
+				</select>
+			</div>
+		</div>
+		<div class="pg-search-cell pg-search-cell--with-label">
+			<span class="pg-search-cell-label">검색어</span>
+			<div class="pg-search-cell-input">
+				<input type="text" name="key" value="<?=htmlspecialchars($key, ENT_QUOTES, 'UTF-8')?>" maxlength="64" class="pg-input">
+			</div>
+		</div>
+		<div class="pg-search-cell pg-search-cell--with-label">
+			<span class="pg-search-cell-label">상태구분</span>
+			<div class="pg-search-cell-input pg-search-cell-input--with-actions">
+				<select name="sel_status" class="pg-select pg-select--wide">
+					<option value="">전체</option>
+					<option value="주문접수" <?if ($sel_status == '주문접수') echo('selected')?>>주문접수</option>
+					<option value="결제완료" <?if ($sel_status == '결제완료') echo('selected')?>>결제완료</option>
+					<option value="준비중" <?if ($sel_status == '준비중') echo('selected')?>>준비중</option>
+					<option value="주문취소" <?if ($sel_status == '주문취소') echo('selected')?>>주문취소</option>
+					<option value="주문자취소" <?if ($sel_status == '주문자취소') echo('selected')?>>주문자취소</option>
+					<option value="배송중" <?if ($sel_status == '배송중') echo('selected')?>>배송중</option>
+					<option value="배송완료" <?if ($sel_status == '배송완료') echo('selected')?>>배송완료</option>
+					<option value="구매확정" <?if ($sel_status == '구매확정') echo('selected')?>>구매확정</option>
+					<option value="반송" <?if ($sel_status == '반송') echo('selected')?>>반송</option>
+					<option value="반품" <?if ($sel_status == '반품') echo('selected')?>>반품</option>
+				</select>
+				<div class="pg-search-actions pg-search-actions--inline">
+					<button type="button" class="pg-btn pg-btn-search" onclick="go_search()">검색</button>
+					<button type="button" class="pg-btn pg-btn-outline" onclick="go_reset()">검색 초기화</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="pg-screen-summary-action-row">
+	<div class="pg-summary-total-bar">
+		<?php
+		$order_list_mode = "keyfield=$keyfield&key=$encoded_key&sel_kind=$sel_kind&sel_status=$sel_status&ydate1=$ydate1&mdate1=$mdate1&ddate1=$ddate1&ydate2=$ydate2&mdate2=$mdate2&ddate2=$ddate2&p_num=" . rawurlencode(adm_ui_per_page_query_value($per_page_info));
+		adm_ui_per_page_bar('pro_order.php', $order_list_mode, $per_page_info, $total_record);
+		?>
+	</div>
+	<div class="pg-screen-action-buttons">
+		<button type="button" class="pg-btn pg-btn-outline" onclick="location.reload()">새로고침</button>
+		<button type="button" class="pg-btn pg-btn-info" onclick="go_excel()"><?=htmlspecialchars($level_l, ENT_QUOTES, 'UTF-8')?> 엑셀다운로드</button>
+		<button type="button" class="pg-btn pg-btn-primary" onclick="go_modify()">상태 변경</button>
+<?if ($sel_status == '주문취소' || $sel_status == '취소' || $sel_status == '주문자취소') {?>
+		<button type="button" class="pg-btn pg-btn-outline" onclick="all_chk()">전체선택</button>
+		<button type="button" class="pg-btn pg-btn-secondary" onclick="go_del()">삭제</button>
+<?}?>
+	</div>
+</div>
+
+<div class="pg-aggregate-stack">
+	<div class="pg-status-bar__inner--grid">
+<?
+$metric_chunks = array_chunk($adm_status_counts, 3);
+foreach ($metric_chunks as $chunk) {
+?>
+		<div class="pg-status-bar__row">
+<?foreach ($chunk as $metric) {?>
+			<div class="pg-status-bar__pill pg-status-bar__pill--<?=$metric['tone']?>">
+				<span class="pg-status-bar__lbl"><?=htmlspecialchars($metric['label'], ENT_QUOTES, 'UTF-8')?></span>
+				<span class="pg-status-bar__cnt">[<?=number_format($metric['count'])?>건]</span>
+			</div>
+<?}?>
+		</div>
+<?}?>
+	</div>
+</div>
+
+<div class="pg-table-responsive">
+<table class="pg-data-grid adm-table" cellspacing="0" cellpadding="0">
+<thead>
+<tr>
+	<th width="40"><input type="checkbox" name="checkbox" onclick="select_all()"></th>
+	<th>주문번호</th>
+	<th>주문일시</th>
+	<th>주문ID</th>
+	<th>주문자</th>
+	<th>연락처</th>
+	<th>결제방법</th>
+	<th>입금자명</th>
+	<th>포인트사용</th>
+	<th>상품명</th>
+	<th>수량</th>
+	<th>입금일</th>
+	<th>색상/옵션</th>
+	<th>금액</th>
+	<th>상태</th>
+<?if ($sel_status == '주문취소' || $sel_status == '취소' || $sel_status == '주문자취소') {?>
+	<th width="56">삭제</th>
+<?}?>
+</tr>
+</thead>
+<tbody>
+<?
+$ii = 0;
+if (!$total_record) {
+	$colspan = ($sel_status == '주문취소' || $sel_status == '취소' || $sel_status == '주문자취소') ? 16 : 15;
+?>
+<tr><td colspan="<?=$colspan?>" class="pg-empty-cell">조회된 데이터가 없습니다.</td></tr>
+<?
+} else {
+for ($i = $first; $i <= $last; $i++) {
+	$ordernum = $rs[$i]['ordernum'];
 	$id =$rs[$i][1];
 	$pay_name =$rs[$i]["pay_name"];
 	$kind =$rs[$i]["kind"];
@@ -374,41 +380,9 @@ for($i = $first; $i <= $last; $i++) {
 	else if($kind=="5")$kind="포인트";
 	else if($kind=="9")$kind="포인트결제";
 
-	$signdate = date("Y-m-d H:i",$signdate);
-
-	$status1=$status;
-	if($status == "결제완료") {
-				$status="<font color=#B60000>$status</font>";
-	}else if($status == "주문접수" ) {
-				$status="<font color=#33CC00>$status</font>";
-	}else if($status == "결제실패" ) {
-				$status="<font color=#FF0000>$status</font>";
-	}else if($status == "입금확인") {
-				$status="<font color=#0066CC>$status</font>";
-	}else if($status == "입금완료") {
-				$status="<font color=#993399>$status</font>";
-	}else if($status == "입금확인메일발송") {
-				$status="<font color=#CC9900>$status</font>";
-	}else if($status == "주문취소") {
-				$status="<font color=#000000>$status</font>";
-	}else if($status == "배송예정") {
-				$status="<font color=#CC66FF>$status</font>";
-			
-	}else if($status == "배송확인메일발송") {
-				$status="<font color=#CC9900>$status</font>";
-	}else if($status == "배송중") {
-				$status="<font color=#009900>$status</font>";
-	}	else if($status == "배송완료") {
-				$status="<font color=#CC3300>$status</font>";
-	}else if($status == "구매확정") {
-				$status="<font color=#CC66FF>$status</font>";
-	}	else if($status == "반송") {
-				$status="<font color=#0099FF>$status</font>";
-	}	else if($status == "반품") {
-				$status="<font color=#006699>$status</font>";
-	}else {
-				$status="<font color=#555555>$status</font>";
-	}
+	$signdate = date('Y-m-d H:i', $signdate);
+	$status1 = $status;
+	$status_pill = adm_order_status_pill($status1);
 #####################################################################
 // 마이페이지 매출 내역 가져오기 
 //
@@ -439,131 +413,104 @@ for($i = $first; $i <= $last; $i++) {
 //	$addr =  $value_select_wallet[0];
 //	echo($addr);
 // 코인 입금확인 end
-?>
-								<tr align="center"> 
-									<td height="26">&nbsp;<?=$ordernum?></a></td>
-									<td height="26"><?=$signdate?></td>
-									<td height="26"><a href="buyer_info.php?cmenu=order&ordernum=<?=$ordernum?>" class="text02"> &nbsp;<?=$id?></td>
-									<td height="26">
-										<a href="buyer_info.php?cmenu=order&ordernum=<?=$ordernum?>" class="text02"><?=$pay_name?><!-- <br>(<?=$company?>) --></a>
-
-<?
-// $query_etc = "SELECT etc1,etc2 from $member_table WHERE id='$id'";
-// $DB->get($query_etc,$rs_etc,$rn_etc);
-
-// $etc1 = $rs_etc[0][0];
-// $etc2 = $rs_etc[0][1];
-
-// If(strlen($etc1)>12){
-// $klen=12-1;
-// while(ord($etc1[$klen]) & 0x80) {$klen--;}
-// 	$etc1=substr($etc1,0,12-((12+$klen+1)%2)).".";
-// 	}else{
-// 	$etc1=$etc1;
-// }
-?>
-<!-- <?if($etc1!=""){?><font onclick="window.open('../member/member_event.php?id=<?=$id?>','','width=500,height=400')" style="cursor:hand;color:#ff6633" >[<?=$etc1?>]</font><?}?>
-<?if($etc2!=""){?><font onclick="window.open('../member/member_event.php?id=<?=$id?>','','width=500,height=400')" style="cursor:hand;color:#0066ff">[기타1]</font><?}?>
-<?if($etc1=="" && $etc2==""){?><font onclick="window.open('../member/member_event.php?id=<?=$id?>','','width=500,height=400')" style="cursor:hand;">[기타2]</font><?}?> -->
-									</td>
-									<td height="26"><?=$pay_tel?></td>
-									<td height="26"><?=$kind?></td>
-									<td height="26"><?=$in_name?></td>
-                                        <td><?=number_format($qty)?> (<?=number_format($usepoint)?>)</td>
-									<td height="26">
-									<?=$status?>
-									<input type="checkbox" name="check2<?=$ii?>" value="<?=$ordernum?>">
-									<input type="hidden" name="check3<?=$ii?>" value="<?=$id?>">
-									<input type="hidden" name="check4<?=$ii?>" value="<?=$status1?>">
-									<input type="hidden" name="check5<?=$ii?>" value="<?=$signdate?>">
-
-
-								
-
-									
-									</td>
-                                
-									<?if($sel_status=="주문취소" || $sel_status=="취소"){?>
-									<td align="center"><input type="checkbox" name="check<?=$ii?>" value="<?=$ordernum?>"></td>
-									<?}?>
-								</tr>
-<?
-#####################################################################
 
 $query_cc = "SELECT code,title,money,point,count,opt1,opt2,new_opt1,new_opt2,new_opt3,new_opt4,new_opt5 FROM $shop_sell WHERE ordernum='$ordernum'";
 $DB->get($query_cc,$rs_cc,$rn_cc);
 $total_record_cc = $rn_cc;
-$total_money_cc=0;
-for ($i_cc=0;$i_cc<$total_record_cc;$i_cc++) {
-	
-	$code_cc = $rs_cc[$i_cc][0];						$title_cc = $rs_cc[$i_cc][1];	
-	$money_cc = $rs_cc[$i_cc][2];					$point2_cc = $rs_cc[$i_cc][3];
-	$count_cc = $rs_cc[$i_cc][4];					$opt1_cc = $rs_cc[$i_cc][5];
-	$opt2_cc = $rs_cc[$i_cc][6];						$new_opt1_cc = $rs_cc[$i_cc][7];
-	$new_opt2_cc = $rs_cc[$i_cc][8];				$new_opt3_cc = $rs_cc[$i_cc][8];
-	$new_opt4_cc = $rs_cc[$i_cc][10];				$new_opt5_cc = $rs_cc[$i_cc][11];					
-					
-	$sum_money_cc = $money_cc * $count_cc;						$point2_cc = $point2_cc * $count_cc;
-	$total_money_cc = $total_money_cc + $sum_money_cc;	
+$total_money_cc = 0;
+$total_money_num = 0;
+
+if ($total_record_cc < 1) {
+	$total_record_cc = 1;
+	$rs_cc = array(array());
+}
+
+for ($i_cc = 0; $i_cc < $total_record_cc; $i_cc++) {
+	$code_cc = isset($rs_cc[$i_cc][0]) ? $rs_cc[$i_cc][0] : '';
+	$title_cc = isset($rs_cc[$i_cc][1]) ? stripslashes($rs_cc[$i_cc][1]) : '-';
+	$money_cc = isset($rs_cc[$i_cc][2]) ? $rs_cc[$i_cc][2] : 0;
+	$point2_cc = isset($rs_cc[$i_cc][3]) ? $rs_cc[$i_cc][3] : 0;
+	$count_cc = isset($rs_cc[$i_cc][4]) ? $rs_cc[$i_cc][4] : 0;
+	$opt1_cc = isset($rs_cc[$i_cc][5]) ? $rs_cc[$i_cc][5] : '';
+	$opt2_cc = isset($rs_cc[$i_cc][6]) ? $rs_cc[$i_cc][6] : '';
+	$new_opt1_cc = isset($rs_cc[$i_cc][7]) ? $rs_cc[$i_cc][7] : '';
+	$new_opt2_cc = isset($rs_cc[$i_cc][8]) ? $rs_cc[$i_cc][8] : '';
+	$new_opt3_cc = isset($rs_cc[$i_cc][9]) ? $rs_cc[$i_cc][9] : '';
+	$new_opt4_cc = isset($rs_cc[$i_cc][10]) ? $rs_cc[$i_cc][10] : '';
+	$new_opt5_cc = isset($rs_cc[$i_cc][11]) ? $rs_cc[$i_cc][11] : '';
+
+	$sum_money_cc = $money_cc * $count_cc;
+	$point2_cc = $point2_cc * $count_cc;
+	$total_money_cc += $sum_money_cc;
 	$total_money_num = $total_money_cc;
-	$title_cc = stripslashes($title_cc);
-	$money_cc =  number_format($money_cc);				$sum_money_cc =  number_format($sum_money_cc);
+	$sum_money_cc_fmt = number_format($sum_money_cc);
+	$total_point = $total_point + $point2_cc;
 
+	$option_t1 = $option_t2 = $option_t3 = $option_t4 = $option_t5 = '';
+	if ($code_cc !== '') {
+		$query_o = "SELECT option_t1,option_t2,option_t3,option_t4,option_t5 from $shop_goods WHERE code='$code_cc'";
+		$DB->get($query_o,$rs_o,$rn_o);
+		if ($rn_o > 0) {
+			$option_t1 = $rs_o[0]["option_t1"];
+			$option_t2 = $rs_o[0]["option_t2"];
+			$option_t3 = $rs_o[0]["option_t3"];
+			$option_t4 = $rs_o[0]["option_t4"];
+			$option_t5 = $rs_o[0]["option_t5"];
+		}
+	}
 
-$query_o = "SELECT option_t1,option_t2,option_t3,option_t4,option_t5 from $shop_goods WHERE code='$code_cc'";
-
-$DB->get($query_o,$rs_o,$rn_o);
-
-$option_t1 = $rs_o[0]["option_t1"];
-$option_t2 = $rs_o[0]["option_t2"];
-$option_t3 = $rs_o[0]["option_t3"];
-$option_t4 = $rs_o[0]["option_t4"];
-$option_t5 = $rs_o[0]["option_t5"];
-
-$total_point=$total_point+$point2;//포인트 합계 표시용
-#####################################################################
+	$opt_lines = array();
+	if ($new_opt1_cc != "") $opt_lines[] = '<b>'.htmlspecialchars($option_t1, ENT_QUOTES, 'UTF-8').'</b> : '.htmlspecialchars($new_opt1_cc, ENT_QUOTES, 'UTF-8');
+	if ($new_opt2_cc != "") $opt_lines[] = '<b>'.htmlspecialchars($option_t2, ENT_QUOTES, 'UTF-8').'</b> : '.htmlspecialchars($new_opt2_cc, ENT_QUOTES, 'UTF-8');
+	if ($new_opt3_cc != "") $opt_lines[] = '<b>'.htmlspecialchars($option_t3, ENT_QUOTES, 'UTF-8').'</b> : '.htmlspecialchars($new_opt3_cc, ENT_QUOTES, 'UTF-8');
+	if ($new_opt4_cc != "") $opt_lines[] = '<b>'.htmlspecialchars($option_t4, ENT_QUOTES, 'UTF-8').'</b> : '.htmlspecialchars($new_opt4_cc, ENT_QUOTES, 'UTF-8');
+	if ($new_opt5_cc != "") $opt_lines[] = '<b>'.htmlspecialchars($option_t5, ENT_QUOTES, 'UTF-8').'</b> : '.htmlspecialchars($new_opt5_cc, ENT_QUOTES, 'UTF-8');
+	$opt_html = '';
+	if (!empty($opt_lines)) {
+		$opt_html = '<div class="pg-opt-line">'.implode('<br>', $opt_lines).'</div>';
+	}
 ?>
-								<tr><td colspan=9 height=1 bgcolor='#f0f0f0'></td></tr>
-								<tr align="center"> 
-									<td colspan="3" height="26" width="146"><?=$title_cc?></td>
-									<td height="25" width="50"><?=$count_cc?> EA</td>
-									<td height="25" width="50"><?=$in_day?></td>
-									<td height="25" width="50" colspan="2"><?=$opt2_cc?></td>
-									<td> <?
-									if ($i_cc == 0)
-									{
-									// echo $json_data['ALL_CASH'];
-									}
-									?></td>
-
-									<td height="25" width="90"><?=$sum_money_cc?></td>
-									
-								</tr>
-								<?if($new_opt1_cc!=""){?>
-								<tr align="left" style="padding-left:170px;"> 
-									<td colspan="9" height="26"><?if($new_opt1_cc!=""){?><b><?=$option_t1?></b> : <?=$new_opt1_cc?><?}?><?if($new_opt2_cc!=""){?> <br> <b><?=$option_t2?></b> : <?=$new_opt2_cc?><?}?><?if($new_opt3_cc!=""){?> <br> <b><?=$option_t3?></b> : <?=$new_opt3_cc?><?}?><?if($new_opt4_cc!=""){?> <br> <b><?=$option_t4?></b> : <?=$new_opt4_cc?><?}?><?if($new_opt5_cc!=""){?> <br> <b><?=$option_t5?></b> : <?=$new_opt5?><?}?></td>
-								</tr>
-								<?}?>
+								<tr class="<?=$i_cc === 0 ? 'adm-order-group-start' : ''?>">
+									<td><?if ($i_cc === 0) {?><input type="checkbox" name="check2<?=$ii?>" value="<?=$ordernum?>"><?}?></td>
+									<td class="adm-nowrap"><?=htmlspecialchars($ordernum, ENT_QUOTES, 'UTF-8')?></td>
+									<td class="adm-nowrap"><?=htmlspecialchars($signdate, ENT_QUOTES, 'UTF-8')?></td>
+									<td class="adm-nowrap"><a href="buyer_info.php?cmenu=order&ordernum=<?=$ordernum?>"><?=htmlspecialchars($id, ENT_QUOTES, 'UTF-8')?></a></td>
+									<td class="adm-nowrap"><a href="buyer_info.php?cmenu=order&ordernum=<?=$ordernum?>"><?=htmlspecialchars($pay_name, ENT_QUOTES, 'UTF-8')?></a></td>
+									<td class="adm-nowrap"><?=htmlspecialchars($pay_tel, ENT_QUOTES, 'UTF-8')?></td>
+									<td class="adm-nowrap"><?=htmlspecialchars($kind, ENT_QUOTES, 'UTF-8')?></td>
+									<td class="adm-nowrap"><?=htmlspecialchars($in_name, ENT_QUOTES, 'UTF-8')?></td>
+									<td class="adm-nowrap"><?=number_format($usepoint)?></td>
+									<td class="adm-product-name"><?=htmlspecialchars($title_cc, ENT_QUOTES, 'UTF-8')?><?=$opt_html?></td>
+									<td><?=$count_cc > 0 ? number_format($count_cc).' EA' : '-'?></td>
+									<td><?=htmlspecialchars($in_day, ENT_QUOTES, 'UTF-8')?></td>
+									<td><?=htmlspecialchars($opt2_cc, ENT_QUOTES, 'UTF-8')?></td>
+									<td><?=$sum_money_cc_fmt?></td>
+									<td><?=$i_cc === 0 ? $status_pill : ''?></td>
+<?if($sel_status=="주문취소" || $sel_status=="취소" || $sel_status=="주문자취소"){?>
+									<td><?if ($i_cc === 0) {?><input type="checkbox" name="check<?=$ii?>" value="<?=$ordernum?>"><?}?></td>
 <?}?>
-							<input type="hidden" name="check6<?=$ii?>" value="<?=$total_money_num?>">
-								<tr><td colspan=9 height=1 bgcolor='#D2DEE8'></td></tr>
+								</tr>
+<?
+}
+?>
+<input type="hidden" name="check3<?=$ii?>" value="<?=$id?>">
+<input type="hidden" name="check4<?=$ii?>" value="<?=$status1?>">
+<input type="hidden" name="check5<?=$ii?>" value="<?=$signdate?>">
+<input type="hidden" name="check6<?=$ii?>" value="<?=$total_money_num?>">
 <?
 
-   $article_num--;      
+   $article_num--;
    $ii++;
 }
-$chk_num = $last-$first+1;
+}
+$chk_num = ($total_record > 0) ? ($last - $first + 1) : 0;
 ?>
-							</table>
-						</td>
-					</tr>
-				</table>
-				<table width="1500" border="0" cellspacing="0" cellpadding="4" class="left_margin30">
-					<tr> 
-						<td height="20" align="center"><font color="#666666">
- <?
-#####################################################################
+</tbody>
+</table>
+</div>
 
+<div class="pg-pagination">
+<?
  $total_block = ceil($total_page/$page_per_block);
  $block = ceil($page/$page_per_block);
  $first_page = ($block-1)*$page_per_block;
@@ -572,25 +519,24 @@ $chk_num = $last-$first+1;
  	$last_page = $total_page;
  }
  
- $mode="keyfield=$keyfield&key=$encoded_key&sel_kind=$sel_kind&sel_status=$sel_status&ydate1=$ydate1&mdate1=$mdate1&ddate1=$ddate1&ydate2=$ydate2&mdate2=$mdate2&ddate2=$ddate2";
+ $mode=$order_list_mode;
 
  
   if ($page > 1) {
  	$page_num = $page - 1;
 ?>
-							<a href="pro_order.php?<?=$mode?>&page=<?=$page_num?>" onMouseOver="status='이전페이지';return true;" onMouseOut="status=''">◀</a>
-
+	<a href="pro_order.php?<?=$mode?>&page=<?=$page_num?>">◀</a>
 <?
  }
  
  for($direct_page = $first_page+1; $direct_page <= $last_page; $direct_page++) {
  	if($page == $direct_page) {
 ?>
- 							<font color="#666666">&nbsp;<b><?=$direct_page?></b></font>
+	<span class="is-active"><?=$direct_page?></span>
 <?	
 	} else {
 ?>
-							&nbsp;<a href="pro_order.php?<?=$mode?>&page=<?=$direct_page?>" onMouseOver="status='go to page $direct_page';return true;" onMouseOut="status=''"><font color="#666666"><?=$direct_page?></font></a>
+	<a href="pro_order.php?<?=$mode?>&page=<?=$direct_page?>"><?=$direct_page?></a>
  <?	
 	}
  }
@@ -598,17 +544,15 @@ $chk_num = $last-$first+1;
  if ($IsNext > 0) {
  	$page_num = $page + 1;
 ?>
-							&nbsp;<a href="pro_order.php?<?=$mode?>&page=<?=$page_num?>" onMouseOver="status='다음페이지';return true;" onMouseOut="status=''">▶</a>
- 
- <?
+	<a href="pro_order.php?<?=$mode?>&page=<?=$page_num?>">▶</a>
+<?
  }
  ?>
-							</font>
-						</td>
-					</tr>
-					<input type="hidden" name="page" value="<?=$page?>">   
-					<input type="hidden" name="chk_num" value="<?=$chk_num?>">   
-					</form>  
-				</table>
-				<br><br>
-<?php pkshop_admin_shell_end(); ?>
+</div>
+
+<input type="hidden" name="page" value="<?=$page?>">
+<input type="hidden" name="chk_num" value="<?=$chk_num?>">
+</form>
+</div><!-- adm-content-panel-inner -->
+
+<? include "../inc/down_menu.php"; ?>

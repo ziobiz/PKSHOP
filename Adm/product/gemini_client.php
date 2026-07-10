@@ -378,6 +378,192 @@ function gemini_gender_options() {
     );
 }
 
+function gemini_ethnicity_option_groups() {
+    return array(
+        array(
+            'label' => '동양 (개별)',
+            'options' => array(
+                'korean'   => '한국인',
+                'japanese' => '일본인',
+                'chinese'  => '중국인',
+                'thai'     => '태국인',
+            ),
+        ),
+        array(
+            'label' => '기타',
+            'options' => array(
+                'european'        => '유럽인',
+                'american'        => '미국인',
+                'african'         => '아프리카인',
+                'latin'           => '라틴아메리카인',
+                'middle_eastern'  => '중동·아랍인',
+                'south_asian'     => '남아시아인',
+                'southeast_asian' => '동남아시아인',
+            ),
+        ),
+        array(
+            'label' => '혼합',
+            'options' => array(
+                'mix_european'   => '유럽인 혼합',
+                'mix_american'   => '미국인 혼합',
+                'mix_east_asian' => '동양인 혼합',
+            ),
+        ),
+    );
+}
+
+function gemini_model_ethnicity_main_options() {
+    return array(
+        ''                => '전체 (미선택)',
+        'european'        => '유럽인',
+        'american'        => '미국인',
+        'african'         => '아프리카인',
+        'latin'           => '라틴아메리카인',
+        'middle_eastern'  => '중동·아랍인',
+        'south_asian'     => '남아시아인',
+        'southeast_asian' => '동남아시아인',
+        'east_asian'      => '동양인',
+        'mix_european'    => '유럽인 혼합',
+        'mix_american'    => '미국인 혼합',
+        'mix_east_asian'  => '동양인 혼합',
+    );
+}
+
+function gemini_east_asian_detail_options() {
+    return array(
+        ''         => '선택',
+        'korean'   => '한국인',
+        'japanese' => '일본인',
+        'chinese'  => '중국인',
+        'thai'     => '태국인',
+        'mix'      => '혼합',
+    );
+}
+
+function gemini_resolve_ethnicity_from_form($main, $detail = '') {
+    $main = trim((string)$main);
+    $detail = trim((string)$detail);
+    if ($main === '' || $main === 'all') {
+        return array();
+    }
+    if ($main === 'east_asian') {
+        if ($detail === 'mix') {
+            return array('mix_east_asian');
+        }
+        $allowed = array('korean', 'japanese', 'chinese', 'thai');
+        if (in_array($detail, $allowed, true)) {
+            return array($detail);
+        }
+        return array();
+    }
+    $allowed_main = array(
+        'european', 'american', 'african', 'latin', 'middle_eastern',
+        'south_asian', 'southeast_asian', 'mix_european', 'mix_american', 'mix_east_asian',
+    );
+    if (in_array($main, $allowed_main, true)) {
+        return array($main);
+    }
+    return array();
+}
+
+function gemini_ethnicity_flat_options() {
+    $flat = array();
+    foreach (gemini_ethnicity_option_groups() as $group) {
+        foreach ($group['options'] as $val => $label) {
+            $flat[$val] = $label;
+        }
+    }
+    return $flat;
+}
+
+function gemini_normalize_ethnicity_selection($raw) {
+    $allowed = gemini_ethnicity_flat_options();
+    $selected = array();
+    if (!is_array($raw)) {
+        if (is_string($raw) && trim($raw) !== '') {
+            $raw = array($raw);
+        } else {
+            return $selected;
+        }
+    }
+    foreach ($raw as $val) {
+        $val = trim((string)$val);
+        if ($val !== '' && isset($allowed[$val]) && !in_array($val, $selected, true)) {
+            $selected[] = $val;
+        }
+    }
+    return $selected;
+}
+
+function gemini_ethnicity_labels($selected) {
+    $flat = gemini_ethnicity_flat_options();
+    $labels = array();
+    foreach (gemini_normalize_ethnicity_selection($selected) as $val) {
+        if (isset($flat[$val])) {
+            $labels[] = $flat[$val];
+        }
+    }
+    return $labels;
+}
+
+function gemini_ethnicity_english_map() {
+    return array(
+        'korean'          => 'Korean East Asian',
+        'japanese'        => 'Japanese East Asian',
+        'chinese'         => 'Chinese East Asian',
+        'thai'            => 'Thai Southeast Asian',
+        'european'        => 'European',
+        'american'        => 'American',
+        'african'         => 'African',
+        'latin'           => 'Latin American',
+        'middle_eastern'  => 'Middle Eastern',
+        'south_asian'     => 'South Asian',
+        'southeast_asian' => 'Southeast Asian',
+        'mix_european'    => 'mixed European ethnicities (diverse European models)',
+        'mix_american'    => 'mixed American ethnicities (diverse US models)',
+        'mix_east_asian'  => 'mixed East Asian ethnicities (Korean, Japanese, Chinese, Thai, etc.)',
+    );
+}
+
+function gemini_ethnicity_prompt_line($selected) {
+    $selected = gemini_normalize_ethnicity_selection($selected);
+    if (count($selected) === 0) {
+        return '';
+    }
+    $map = gemini_ethnicity_english_map();
+    $parts = array();
+    foreach ($selected as $val) {
+        if (isset($map[$val])) {
+            $parts[] = $map[$val];
+        }
+    }
+    if (count($parts) === 0) {
+        return '';
+    }
+    if (count($parts) === 1) {
+        return 'Model ethnicity/appearance: ' . $parts[0] . '.';
+    }
+    return 'Model ethnicity/appearance: vary among ' . implode(', ', $parts) . '.';
+}
+
+function gemini_product_types_using_model() {
+    return array('clothing', 'jewelry', 'beauty', 'sports');
+}
+
+function gemini_options_use_model_shots($options) {
+    $types = isset($options['product_types']) ? $options['product_types'] : array('clothing');
+    if (!is_array($types)) {
+        $types = array($types);
+    }
+    $model_types = gemini_product_types_using_model();
+    foreach ($types as $t) {
+        if (in_array($t, $model_types, true)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function gemini_season_options() {
     return array(
         'spring'     => '봄',
@@ -415,6 +601,11 @@ function gemini_build_product_plan_prompt($count, $options = array(), $batch_off
     $gender_label = isset($gender_map[$gender]) ? $gender_map[$gender] : '전체';
     $season_label = isset($season_map[$season]) ? $season_map[$season] : '사계절';
     $country_info = isset($country_map[$country_code]) ? $country_map[$country_code] : $country_map['1'];
+
+    $ethnicities = gemini_normalize_ethnicity_selection(isset($options['ethnicities']) ? $options['ethnicities'] : array());
+    $ethnicity_labels = gemini_ethnicity_labels($ethnicities);
+    $ethnicity_prompt = gemini_ethnicity_prompt_line($ethnicities);
+    $use_model_shots = gemini_options_use_model_shots($options);
 
     $types = isset($options['product_types']) ? $options['product_types'] : array('clothing');
     if (!is_array($types)) {
@@ -464,6 +655,7 @@ Generate exactly ' . intval($count) . ' unique product entries' . $offset_note .
 - Season: ' . $season_label . '
 - Country/Market: ' . $country_info['name'] . ' (' . $country_info['label'] . ')
 - Product categories: ' . $types_str . '
+' . (count($ethnicity_labels) > 0 ? '- Model ethnicity (for fashion/model product shots): ' . implode(', ', $ethnicity_labels) . "\n" : '') . '
 ' . ($memo !== '' ? '- Additional notes from manager: ' . $memo . "\n" : '') . '
 Return ONLY valid JSON array (no markdown). Each item schema:
 {
@@ -495,6 +687,7 @@ Return ONLY valid JSON array (no markdown). Each item schema:
 Rules:
 - Products MUST match the categories: ' . $types_str . '
 - Gender target: ' . $gender_label . ', Season: ' . $season_label . '
+' . ($ethnicity_prompt !== '' && $use_model_shots ? '- For model/fashion images and model_info: ' . $ethnicity_prompt . "\n" : '') . '
 ' . $price_rules . '- editors_notes, features, measurements, composition_care, designer must be realistic for the actual product (like a real fashion e-commerce listing).
 - features: 4-6 bullet points without leading dash in JSON (dash added on display).
 - measurements: 4-6 realistic inch measurements appropriate for product type.
@@ -563,8 +756,9 @@ function gemini_generate_products_plan($count, $options) {
 
 function gemini_image_prompt_enhance($prompt, $product_title, $options = array(), $image_index = 0) {
     $types = isset($options['product_types']) ? $options['product_types'] : array('clothing');
-    $is_fashion = in_array('clothing', $types) || in_array('jewelry', $types);
+    $is_fashion = in_array('clothing', $types) || in_array('jewelry', $types) || in_array('beauty', $types) || in_array('sports', $types);
     $gender = isset($options['gender']) ? $options['gender'] : 'female';
+    $ethnicity_line = gemini_ethnicity_prompt_line(isset($options['ethnicities']) ? $options['ethnicities'] : array());
 
     if ($is_fashion) {
         if ($image_index === 0) {
@@ -580,6 +774,9 @@ function gemini_image_prompt_enhance($prompt, $product_title, $options = array()
             $style = str_replace('female model', 'male model', $style);
         } elseif ($gender === 'children') {
             $style = str_replace('female model', 'child model', $style);
+        }
+        if ($ethnicity_line !== '' && $image_index <= 1) {
+            $style .= ' ' . $ethnicity_line;
         }
     } else {
         $style = 'Professional e-commerce product photography, white background, centered product, portrait orientation 3:4.';

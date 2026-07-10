@@ -2,8 +2,9 @@
 #####################################################################
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
-pkshop_admin_auto_shell_begin();
+include "../inc/top_menu.php";
+include "../inc/left_menu_member.php";
+
 #####################################################################
 
 
@@ -190,4 +191,4 @@ function open_addr(url){
 
 
 
-<?php pkshop_admin_shell_end(); ?>
+<? include "../inc/down_menu.php"; ?>

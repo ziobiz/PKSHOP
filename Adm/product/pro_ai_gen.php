@@ -1,6 +1,8 @@
 <?
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_product.php";
+
 include "pro_import_lib.php";
 include "gemini_client.php";
 
@@ -9,7 +11,6 @@ $season_opts = gemini_season_options();
 $country_opts = gemini_country_options();
 $type_opts = gemini_product_type_options();
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 					<table class="pg-table pg-table-form" width="100%" border=0 cellpadding=0 cellspacing=0>
 						<tr><td height=30></td></tr>
 						<tr><td height=10></td></tr>
@@ -60,7 +61,7 @@ foreach ($season_opts as $val => $label) {
 											<select id="country" class="adminbttn">
 <?
 foreach ($country_opts as $code => $info) {
-	$sel = ($code === '82') ? 'selected' : '';
+	$sel = ((string)$code === '1') ? 'selected' : '';
 ?>
 												<option value="<?=$code?>" <?=$sel?>><?=$info['name']?> (<?=$info['label']?>)</option>
 <?
@@ -329,4 +330,3 @@ async function startGeneration() {
 	document.getElementById('btn_start').disabled = false;
 }
 </script>
-<?php pkshop_admin_shell_end(); ?>

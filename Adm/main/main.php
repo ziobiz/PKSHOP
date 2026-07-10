@@ -1,8 +1,9 @@
 <? 
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_main.php";
+
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 					<table width=720 border=0 cellpadding=0 cellspacing=0>
 						<tr>
 							<td width=330 valign="top"><!-- 공지사항 -->
@@ -16,4 +17,4 @@ include_once "../inc/admin_shell_lib.php";
 							</td>
 						</tr>
 					</table>
-<?php pkshop_admin_shell_end(); ?>			
+<? include "../inc/down_menu.php"; ?>

@@ -50,6 +50,18 @@ if (!function_exists('pkshop_cate_list_sql')) {
     }
 }
 
+if (!function_exists('pkshop_db_cell')) {
+    function pkshop_db_cell($row, $key, $index) {
+        if (is_array($row) && array_key_exists($key, $row) && $row[$key] !== null && $row[$key] !== '') {
+            return $row[$key];
+        }
+        if (is_array($row) && array_key_exists($index, $row)) {
+            return $row[$index];
+        }
+        return '';
+    }
+}
+
 if (!function_exists('pkshop_cate_fetch_list')) {
     function pkshop_cate_fetch_list($DB, $shop_cate, $level, $code1, $code2, $code3) {
         $sql = pkshop_cate_list_sql($shop_cate, $level, $code1, $code2, $code3);
@@ -59,13 +71,14 @@ if (!function_exists('pkshop_cate_fetch_list')) {
         $DB->get($sql, $rs, $rn);
         $items = array();
         for ($i = 0; $i < $rn; $i++) {
+            $row = $rs[$i];
             $items[] = array(
-                'uid'         => $rs[$i]['uid'],
-                'cate_name'   => $rs[$i]['cate_name'],
-                'cate_code'   => $rs[$i]['cate_code'],
-                'rank'        => $rs[$i]['rank'],
-                'cate_show'   => $rs[$i]['cate_show'],
-                'order_rank'  => $rs[$i]['order_rank'],
+                'uid'         => pkshop_db_cell($row, 'uid', 0),
+                'cate_name'   => pkshop_db_cell($row, 'cate_name', 1),
+                'cate_code'   => pkshop_db_cell($row, 'cate_code', 2),
+                'rank'        => pkshop_db_cell($row, 'rank', 3),
+                'cate_show'   => pkshop_db_cell($row, 'cate_show', 4),
+                'order_rank'  => pkshop_db_cell($row, 'order_rank', 5),
                 'index'       => $i + 1,
             );
         }
@@ -83,7 +96,18 @@ if (!function_exists('pkshop_cate_load_by_uid')) {
         if ($rn < 1) {
             return null;
         }
-        return $rs[0];
+        $row = $rs[0];
+        return array(
+            'uid'   => pkshop_db_cell($row, 'uid', 0),
+            'cate1' => pkshop_db_cell($row, 'cate1', 1),
+            'cate2' => pkshop_db_cell($row, 'cate2', 2),
+            'cate3' => pkshop_db_cell($row, 'cate3', 3),
+            'cate4' => pkshop_db_cell($row, 'cate4', 4),
+            'code1' => pkshop_db_cell($row, 'code1', 5),
+            'code2' => pkshop_db_cell($row, 'code2', 6),
+            'code3' => pkshop_db_cell($row, 'code3', 7),
+            'code4' => pkshop_db_cell($row, 'code4', 8),
+        );
     }
 }
 

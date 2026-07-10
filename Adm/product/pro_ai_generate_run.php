@@ -164,6 +164,18 @@ if ($action === 'start') {
     if ($image_count > 8) $image_count = 8;
     $product_type_custom = isset($_POST['product_type_custom']) ? trim($_POST['product_type_custom']) : '';
 
+    $ethnicities = array();
+    if (isset($_POST['model_ethnicity'])) {
+        $ethnicities = gemini_resolve_ethnicity_from_form(
+            isset($_POST['model_ethnicity']) ? $_POST['model_ethnicity'] : '',
+            isset($_POST['east_asian_detail']) ? $_POST['east_asian_detail'] : ''
+        );
+    } elseif (isset($_POST['ethnicities']) && is_array($_POST['ethnicities'])) {
+        $ethnicities = gemini_normalize_ethnicity_selection($_POST['ethnicities']);
+    } elseif (isset($_POST['ethnicities']) && $_POST['ethnicities'] !== '') {
+        $ethnicities = gemini_normalize_ethnicity_selection(array($_POST['ethnicities']));
+    }
+
     $product_types = array();
     if (isset($_POST['product_types']) && is_array($_POST['product_types'])) {
         $product_types = $_POST['product_types'];
@@ -190,6 +202,7 @@ if ($action === 'start') {
 
     $options = array(
         'gender'             => $gender,
+        'ethnicities'        => $ethnicities,
         'season'             => $season,
         'country'            => $country,
         'memo'               => $memo,

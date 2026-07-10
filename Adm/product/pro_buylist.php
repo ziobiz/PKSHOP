@@ -2,7 +2,9 @@
 
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_product.php";
+
 include "../common/user_function.php";
 
 ########## 데이터베이스에 연결한다. #################################
@@ -36,7 +38,6 @@ $postnum2 = $postnum1 - $currnum;
 
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go_plus() {
@@ -186,5 +187,5 @@ function go_list() {
 								<br><br>
 							</td>
 						</tr>
-					</table> 
-<?php pkshop_admin_shell_end(); ?>
+					</table>
+<? include "../inc/down_menu.php"; ?>

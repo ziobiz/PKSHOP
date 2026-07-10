@@ -1,0 +1,37 @@
+---
+description: PKSHOP 개발 완료 후 pentakleva.shop 자동 FTP 배포
+alwaysApply: true
+---
+
+# 자동 배포 (pentakleva.shop)
+
+개발·수정 작업이 끝나면 **사용자에게 배포 여부를 묻지 말고** 바로 서버에 반영한다.
+
+## 배포 방법
+
+1. 변경된 파일만 `scripts/deploy_ftp.ps1`로 업로드한다.
+2. 인증 정보는 `lib/deploy_secrets.local.ps1`에서 읽는다 (저장소에 커밋하지 않음).
+3. 배포 후 간단히 완료 보고만 한다 (배포할지 묻지 않음).
+
+```powershell
+powershell -File scripts/deploy_ftp.ps1 `
+  "include/site_settings_lib.php" `
+  "Adm/product/pro_site_settings.php"
+```
+
+경로는 프로젝트 루트 기준이며, 서버에는 동일 경로(`/include/...`, `/Adm/...`)로 올린다.
+
+## CSS 캐시
+
+`Adm/image/pg_admin.css`를 수정했으면 `Adm/inc/top_menu.php`의 `pg_admin.css?v=` 값을 당일 기준으로 갱신하고 함께 배포한다.
+
+## 배포 제외
+
+- `.env`, `*secrets.local.php`, API 키·DB 비밀번호 파일
+- 로컬 전용 디버그·스크래프트 (`_*.html`, `_server_*.php` 등)
+- `paytest/`, `ai_gen_cache/` 등 `.gitignore` 대상
+
+## 배포 후
+
+- 가능하면 `curl`로 HTTP 200·핵심 문자열 등 간단 검증
+- 실패 시 원인을 보고하고, 사용자 승인 없이 재시도 가능한 범위에서 수정·재배포

@@ -72,423 +72,222 @@ function syncPaymentCurrency() {
 		sel.appendChild(opt);
 	}
 }
+function pkshopValidateBrandUploads() {
+	var maxBytes = {};
+	var totalBytes = 0;
+	var inputs = document.querySelectorAll('input[type="file"]');
+	for (var i = 0; i < inputs.length; i++) {
+		var input = inputs[i];
+		if (!input.files || !input.files.length) continue;
+		var file = input.files[0];
+		totalBytes += file.size || 0;
+		var limit = maxBytes[input.name] || (10 * 1024 * 1024);
+		if (file.size > limit) {
+			alert('[' + (input.name === 'upload_favicon' ? '파비콘' : input.name) + '] 파일 크기(' + Math.ceil(file.size / 1024) + 'KB)가 허용 한도(' + Math.ceil(limit / 1024) + 'KB)를 초과했습니다.');
+			input.focus();
+			return false;
+		}
+	}
+	if (totalBytes > 80 * 1024 * 1024) {
+		alert('선택한 파일 전체 용량이 너무 큽니다. 파비콘은 2MB 이하, 배너는 개별 10MB 이하로 줄여 주세요.');
+		return false;
+	}
+	return true;
+}
+function pkshopValidateFaviconUpload(formId) {
+	var form = document.getElementById(formId);
+	if (!form) return false;
+	var input = form.querySelector('input[type="file"]');
+	if (!input || !input.files || !input.files.length) {
+		alert('파비콘 파일을 선택하세요.');
+		return false;
+	}
+	var file = input.files[0];
+	if (file.size > 2 * 1024 * 1024) {
+		alert('파비콘 파일 크기(' + Math.ceil(file.size / 1024) + 'KB)가 허용 한도(2048KB)를 초과했습니다.');
+		return false;
+	}
+	return true;
+}
+function pkshopOnFaviconFileChange(input, displayId, btnId, previewId) {
+	var display = document.getElementById(displayId);
+	var btn = document.getElementById(btnId);
+	var preview = document.getElementById(previewId);
+	if (!input || !input.files || !input.files.length) {
+		if (display) display.value = '';
+		if (btn) btn.disabled = true;
+		if (preview) preview.style.display = 'none';
+		return;
+	}
+	var file = input.files[0];
+	if (display) display.value = file.name;
+	if (btn) btn.disabled = false;
+	if (preview && file.type.indexOf('image/') === 0) {
+		preview.src = URL.createObjectURL(file);
+		preview.style.display = 'block';
+	} else if (preview) {
+		preview.style.display = 'none';
+	}
+}
 </script>
-					<table width=900 border=0 cellpadding=0 cellspacing=0>
-						<tr><td height=30></td></tr>
-						<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>환경설정</b></td>
-								</tr>
-							</table>
-						</td></tr>
-						<tr><td height=10></td></tr>
-						<tr>
-							<td valign=top style="padding:10px;">
-								<input type="button" value="A. AI 설정" class="adminbttn" onclick="location.href='pro_site_settings.php?tab=ai';"<?=$tab==='ai'?' style="font-weight:bold;"':''?>>
-								<input type="button" value="B. 브랜드" class="adminbttn" onclick="location.href='pro_site_settings.php?tab=brand';"<?=$tab==='brand'?' style="font-weight:bold;"':''?>>
-								<input type="button" value="C. 통화" class="adminbttn" onclick="location.href='pro_site_settings.php?tab=currency';"<?=$tab==='currency'?' style="font-weight:bold;"':''?>>
-								<input type="button" value="D. 결제연동" class="adminbttn" onclick="location.href='pro_site_settings.php?tab=payment';"<?=$tab==='payment'?' style="font-weight:bold;"':''?>>
-								<input type="button" value="E. 홍보설정" class="adminbttn" onclick="location.href='pro_site_settings.php?tab=promo';"<?=$tab==='promo'?' style="font-weight:bold;"':''?>>
-								<br><br>
+<?php
+$page_screen_class = 'pg-site-settings-screen';
+adm_ui_page_open($page_screen_class); ?>
 
-<? if ($tab === 'ai') { ?>
-								<table width="860" border='0' cellspacing='0' cellpadding='0'>
-									<tr><td colspan=2 height=2 bgcolor='#88B7DA'></td></tr>
-									<tr><td colspan=2 style="padding:10px;background:#f9f9f9;font-weight:bold;">A. AI 설정 (제미나이 API)</td></tr>
-									<tr>
-										<td width="140" height="35" align="center">API 키</td>
-										<td align="left" style="padding:10px;">
-											현재: <span id="api_key_masked" style="font-family:monospace;color:#003366;">
-<? if ($api_key_status['configured']) {
-	echo htmlspecialchars($api_key_status['masked']);
-} else { ?>
-												<font color="#cc0000">미설정</font>
-<? } ?>
-											</span><br><br>
-											<input type="password" id="api_key_input" size="50" class="adminbttn" placeholder="Google AI Studio API 키 (AIzaSy...)" autocomplete="off">
-											<input type="button" value="API 키 저장" class="adminbttn" onclick="saveApiKey();">
-											<font color="#666"> lib/gemini_secrets.local.php 에 저장됩니다.</font>
-										</td>
-									</tr>
-									<tr><td colspan=2 style="padding:10px;">
-										<font color="#003366">AI 상품 생성은 <a href="pro_ai_generate.php">AI 상품 생성</a> 메뉴에서 진행합니다.</font>
-									</td></tr>
-								</table>
+<? if ($tab === 'ai') {
+	$api_status_html = '<span id="api_key_masked" style="font-family:monospace;color:#003366;">';
+	if ($api_key_status['configured']) {
+		$api_status_html .= adm_ui_h($api_key_status['masked']);
+	} else {
+		$api_status_html .= '<span style="color:#dc3545;">미설정</span>';
+	}
+	$api_status_html .= '</span>';
+	$api_input_html = '<div class="pg-api-key-field">';
+	$api_input_html .= '<div class="pg-field-hint" style="margin-bottom:8px;">현재: ' . $api_status_html . '</div>';
+	$api_input_html .= '<div class="pg-input-unit pg-input-unit--inline-hint">';
+	$api_input_html .= '<input type="password" id="api_key_input" class="pg-input pg-input--w-title" placeholder="Google AI Studio API 키 (AIzaSy...)" autocomplete="off">';
+	$api_input_html .= '<button type="button" class="pg-btn pg-btn-primary" onclick="saveApiKey();">API 키 저장</button>';
+	$api_input_html .= '</div>';
+	$api_input_html .= '<p class="pg-field-hint">lib/gemini_secrets.local.php 에 저장됩니다.</p>';
+	$api_input_html .= '</div>';
+?>
+<?php adm_ui_card_open('AI 설정'); ?>
+<?php adm_ui_notice('AI 상품생성은 <a href="pro_ai_generate.php">AI 상품생성</a> 메뉴에서 진행합니다.', 'info'); ?>
+<?php adm_ui_settings_col_open(); ?>
+<?php adm_ui_field_row('API 키', $api_input_html, true, true); ?>
+<?php adm_ui_settings_col_close(); ?>
+<?php adm_ui_card_close(); ?>
 
 <? } elseif ($tab === 'brand') { ?>
-								<form method="post" action="pro_site_settings_ok.php" enctype="multipart/form-data">
+<?php require dirname(__FILE__) . '/inc/pro_site_settings_favicon_form.php'; ?>
+								<form method="post" action="pro_site_settings_ok.php" enctype="multipart/form-data" onsubmit="return pkshopValidateBrandUploads();">
 								<input type="hidden" name="section" value="brand">
-								<table width="860" border='0' cellspacing='0' cellpadding='0'>
-									<tr><td colspan=2 height=2 bgcolor='#88B7DA'></td></tr>
-									<tr><td colspan=2 style="padding:8px;background:#f9f9f9;font-weight:bold;">기본 / 브라우저</td></tr>
-									<tr><td width="160" align="center">브라우저 타이틀</td><td style="padding:6px;"><input type="text" name="browser_title" value="<?=htmlspecialchars($s['browser_title'])?>" size="60" class="adminbttn"></td></tr>
-									<tr><td align="center">페이지 타이틀</td><td style="padding:6px;"><input type="text" name="site_title" value="<?=htmlspecialchars($s['site_title'])?>" size="60" class="adminbttn"></td></tr>
-									<tr><td align="center">OG 타이틀/설명</td><td style="padding:6px;">
-										<input type="text" name="og_title" value="<?=htmlspecialchars($s['og_title'])?>" size="25" class="adminbttn">
-										<input type="text" name="og_description" value="<?=htmlspecialchars($s['og_description'])?>" size="30" class="adminbttn">
-									</td></tr>
-									<tr><td align="center">파비콘</td><td style="padding:6px;">
-										현재: <?=htmlspecialchars($s['favicon'])?><br>
-										<input type="file" name="upload_favicon" class="adminbttn"> <font color="#666">권장 .ico (32×32)</font>
-									</td></tr>
-
-									<tr><td colspan=2 style="padding:8px;background:#f9f9f9;font-weight:bold;">상단 로고</td></tr>
-									<tr><td align="center">PC 로고</td><td style="padding:6px;">
-										현재: <?=htmlspecialchars($s['logo_pc'])?>
-										가로 <input type="text" name="logo_pc_width" value="<?=htmlspecialchars($s['logo_pc_width'])?>" size="4" class="adminbttn"> px
-										세로 <input type="text" name="logo_pc_height" value="<?=htmlspecialchars($s['logo_pc_height'])?>" size="4" class="adminbttn"> px<br>
-										<input type="file" name="upload_logo_pc" class="adminbttn">
-									</td></tr>
-									<tr><td align="center">모바일 로고</td><td style="padding:6px;">
-										현재: <?=htmlspecialchars($s['logo_mobile'])?>
-										가로 <input type="text" name="logo_mobile_width" value="<?=htmlspecialchars($s['logo_mobile_width'])?>" size="4" class="adminbttn"> px
-										세로 <input type="text" name="logo_mobile_height" value="<?=htmlspecialchars($s['logo_mobile_height'])?>" size="4" class="adminbttn"> px<br>
-										<input type="file" name="upload_logo_mobile" class="adminbttn">
-									</td></tr>
-
-									<tr><td colspan=2 style="padding:8px;background:#f9f9f9;font-weight:bold;">메인 배너 (슬라이드 3장)</td></tr>
-									<tr><td align="center">배너 권장 사이즈</td><td style="padding:6px;">
-										가로 <input type="text" name="banner_width" value="<?=htmlspecialchars($s['banner_width'])?>" size="4" class="adminbttn"> ×
-										세로 <input type="text" name="banner_height" value="<?=htmlspecialchars($s['banner_height'])?>" size="4" class="adminbttn"> px
-									</td></tr>
-<? for ($bi = 1; $bi <= 3; $bi++) { $bk = 'banner' . $bi; ?>
-									<tr><td align="center">배너 <?=$bi?></td><td style="padding:6px;">
-										현재: <?=htmlspecialchars($s[$bk])?><br>
-										<input type="file" name="upload_<?=$bk?>" class="adminbttn">
-									</td></tr>
-<? } ?>
-									<tr><td align="center">메인 문구</td><td style="padding:6px;">
-										BEST <input type="text" name="main_welcome_best" value="<?=htmlspecialchars($s['main_welcome_best'])?>" size="50" class="adminbttn"><br>
-										REC <input type="text" name="main_welcome_recommended" value="<?=htmlspecialchars($s['main_welcome_recommended'])?>" size="50" class="adminbttn"><br>
-										ALL <input type="text" name="main_welcome_all" value="<?=htmlspecialchars($s['main_welcome_all'])?>" size="50" class="adminbttn">
-									</td></tr>
-
-									<tr><td colspan=2 style="padding:8px;background:#f9f9f9;font-weight:bold;">푸터 위 환영 배너 (메인 하단 story-box)</td></tr>
-									<tr><td align="center">환영 배너 1</td><td style="padding:6px;">
-										현재: <?=htmlspecialchars($s['footer_story_banner1'])?>
-										<?php if (!empty($s['footer_story_banner1'])) { ?><br><img src="<?=htmlspecialchars($s['footer_story_banner1'])?>" alt="" style="max-width:320px;max-height:80px;margin:6px 0;"><?php } ?><br>
-										<input type="file" name="upload_footer_story_banner1" class="adminbttn">
-										<label><input type="checkbox" name="delete_footer_story_banner1" value="1"> 삭제</label>
-										<font color="#666"> (푸터 顧客センター 블록 바로 위)</font>
-									</td></tr>
-									<tr><td align="center">환영 배너 2</td><td style="padding:6px;">
-										현재: <?=htmlspecialchars($s['footer_story_banner2'])?>
-										<?php if (!empty($s['footer_story_banner2'])) { ?><br><img src="<?=htmlspecialchars($s['footer_story_banner2'])?>" alt="" style="max-width:320px;max-height:80px;margin:6px 0;"><?php } ?><br>
-										<input type="file" name="upload_footer_story_banner2" class="adminbttn">
-										<label><input type="checkbox" name="delete_footer_story_banner2" value="1"> 삭제</label>
-										<font color="#666"> (슬라이드 2번째, 선택)</font>
-									</td></tr>
-									<tr><td align="center">배너 고정 사이즈</td><td style="padding:6px;">
-										가로 <input type="text" name="footer_story_banner_width" value="<?=htmlspecialchars($s['footer_story_banner_width'])?>" size="4" class="adminbttn"> px
-										× 세로 <input type="text" name="footer_story_banner_height" value="<?=htmlspecialchars($s['footer_story_banner_height'])?>" size="4" class="adminbttn"> px
-										<font color="#666"> 기본 1200 × 420</font>
-									</td></tr>
-
-									<tr><td colspan=2 style="padding:8px;background:#f9f9f9;font-weight:bold;">하단 정보 블록 (일본어 항목명·내용)</td></tr>
-									<tr><td align="center">顧客センター</td><td style="padding:6px;">
-										제목 <input type="text" name="footer_cs_title" value="<?=htmlspecialchars($s['footer_cs_title'])?>" size="20" class="adminbttn"><br>
-										<input type="text" name="footer_cs_line1" value="<?=htmlspecialchars($s['footer_cs_line1'])?>" size="70" class="adminbttn"><br>
-										<input type="text" name="footer_cs_line2" value="<?=htmlspecialchars($s['footer_cs_line2'])?>" size="70" class="adminbttn">
-									</td></tr>
-									<tr><td align="center">銀行口座情報</td><td style="padding:6px;">
-										제목 <input type="text" name="footer_bank_title" value="<?=htmlspecialchars($s['footer_bank_title'])?>" size="20" class="adminbttn"><br>
-										<input type="text" name="footer_bank_line1" value="<?=htmlspecialchars($s['footer_bank_line1'])?>" size="70" class="adminbttn"><br>
-										<input type="text" name="footer_bank_line2" value="<?=htmlspecialchars($s['footer_bank_line2'])?>" size="70" class="adminbttn">
-									</td></tr>
-									<tr><td align="center">購入履歴情報</td><td style="padding:6px;">
-										제목 <input type="text" name="footer_history_title" value="<?=htmlspecialchars($s['footer_history_title'])?>" size="20" class="adminbttn">
-									</td></tr>
-									<tr><td align="center">配送情報</td><td style="padding:6px;">
-										제목 <input type="text" name="footer_delivery_title" value="<?=htmlspecialchars($s['footer_delivery_title'])?>" size="20" class="adminbttn"><br>
-										<input type="text" name="footer_delivery_line1" value="<?=htmlspecialchars($s['footer_delivery_line1'])?>" size="70" class="adminbttn">
-									</td></tr>
-									<tr><td align="center">하단 링크</td><td style="padding:6px;">
-										<input type="text" name="footer_link_home" value="<?=htmlspecialchars($s['footer_link_home'])?>" size="12" class="adminbttn">
-										<input type="text" name="footer_link_terms" value="<?=htmlspecialchars($s['footer_link_terms'])?>" size="22" class="adminbttn">
-										<input type="text" name="footer_link_policy" value="<?=htmlspecialchars($s['footer_link_policy'])?>" size="18" class="adminbttn">
-									</td></tr>
-
-									<tr><td colspan=2 style="padding:8px;background:#f9f9f9;font-weight:bold;">About company</td></tr>
-									<tr><td align="center">회사 정보</td><td style="padding:6px;">
-										<input type="text" name="footer_about_title" value="<?=htmlspecialchars($s['footer_about_title'])?>" size="20" class="adminbttn"> (섹션 제목)<br>
-										회사명 <input type="text" name="footer_company_name" value="<?=htmlspecialchars($s['footer_company_name'])?>" size="40" class="adminbttn"><br>
-										대표 <input type="text" name="footer_ceo" value="<?=htmlspecialchars($s['footer_ceo'])?>" size="30" class="adminbttn"><br>
-										주소 <input type="text" name="footer_address" value="<?=htmlspecialchars($s['footer_address'])?>" size="70" class="adminbttn"><br>
-										Tel <input type="text" name="footer_tel" value="<?=htmlspecialchars($s['footer_tel'])?>" size="20" class="adminbttn">
-										Fax <input type="text" name="footer_fax" value="<?=htmlspecialchars($s['footer_fax'])?>" size="20" class="adminbttn"><br>
-										사업자번호 <input type="text" name="footer_biz_no" value="<?=htmlspecialchars($s['footer_biz_no'])?>" size="20" class="adminbttn"><br>
-										Copyright <input type="text" name="footer_copyright" value="<?=htmlspecialchars($s['footer_copyright'])?>" size="60" class="adminbttn">
-									</td></tr>
-									<tr><td align="center">약관 회사명</td><td style="padding:6px;">
-										<input type="text" name="agree_company_name" value="<?=htmlspecialchars($s['agree_company_name'])?>" size="40" class="adminbttn">
-										<font color="#666"> agree.php 내 회사명 치환</font><br>
-										주소 <input type="text" name="agree_company_address" value="<?=htmlspecialchars($s['agree_company_address'])?>" size="60" class="adminbttn">
-									</td></tr>
-									<tr><td align="center">하단 아이콘·이미지</td><td style="padding:6px;">
-										MY INFO <input type="file" name="upload_footer_icon_myinfo" class="adminbttn"> (현재: <?=htmlspecialchars($s['footer_icon_myinfo'])?>)<br>
-										CART <input type="file" name="upload_footer_icon_cart" class="adminbttn"> (현재: <?=htmlspecialchars($s['footer_icon_cart'])?>)<br><br>
-										<b>회사정보(About company) 아래 이미지</b><br>
-										현재: <?=htmlspecialchars($s['footer_bottom_image'])?>
-										<?php if (!empty($s['footer_bottom_image'])) { ?><br><img src="<?=htmlspecialchars($s['footer_bottom_image'])?>" alt="" style="max-width:320px;max-height:80px;margin:6px 0;"><?php } ?><br>
-										<input type="file" name="upload_footer_bottom_image" class="adminbttn">
-										<label><input type="checkbox" name="delete_footer_bottom_image" value="1"> 삭제</label><br>
-										가로 <input type="text" name="footer_bottom_image_width" value="<?=htmlspecialchars($s['footer_bottom_image_width'])?>" size="4" class="adminbttn"> px
-										× 세로 <input type="text" name="footer_bottom_image_height" value="<?=htmlspecialchars($s['footer_bottom_image_height'])?>" size="4" class="adminbttn"> px
-										<font color="#666"> 가로 기본 1200px (0=자동높이)</font>
-									</td></tr>
-
-									<tr><td colspan=2 style="padding:8px;background:#f9f9f9;font-weight:bold;">현금결제 은행정보 (주문페이지)</td></tr>
-									<tr><td align="center">은행 표시</td><td style="padding:6px;">
-										<input type="text" name="payment_bank_line1" value="<?=htmlspecialchars($s['payment_bank_line1'])?>" size="70" class="adminbttn"><br>
-										<input type="text" name="payment_bank_line2" value="<?=htmlspecialchars($s['payment_bank_line2'])?>" size="70" class="adminbttn"><br>
-										<input type="text" name="payment_bank_line3" value="<?=htmlspecialchars($s['payment_bank_line3'])?>" size="70" class="adminbttn">
-									</td></tr>
-
-									<tr><td colspan=2 align="center" style="padding:15px;">
-										<input type="submit" value="브랜드 설정 저장" class="adminbttn" style="padding:8px 20px;">
-									</td></tr>
-								</table>
+<?php adm_ui_card_open('로그인 화면 (레이아웃)'); ?>
+<?php adm_ui_notice('CRYPTO/TINPASS와 <strong>동일한 화면 구성(UI)</strong>만 적용합니다. <strong>① 로고 ② 공지 ③ 폼 문구 ④ 푸터</strong> 순서로 노출됩니다.<br>로그인 방식은 기존 PKSHOP과 동일합니다 — <strong>아이디 + 비밀번호</strong>만 사용하며, 이메일·OTP 인증은 포함하지 않습니다.', 'info'); ?>
+<?php adm_ui_settings_col_open(); ?>
+<?php
+adm_ui_field_row('① 로그인 로고', '<div class="pg-field-stack"><div>현재: ' . adm_ui_h($s['login_auth_logo']) . '</div><input type="file" name="upload_login_auth_logo" class="pg-input"><p class="pg-field-hint">우측 패널 상단, 권장 PNG</p></div>', false, true);
+adm_ui_field_row('배경 이미지', '<div class="pg-field-stack"><div>현재: ' . adm_ui_h($s['login_auth_background']) . '</div><input type="file" name="upload_login_auth_background" class="pg-input"><p class="pg-field-hint">좌측 전체 배경</p></div>', false, true);
+adm_ui_field_row('배경 문구', '<textarea name="login_auth_main_text" rows="3" class="pg-input pg-input--w-memo">' . adm_ui_h($s['login_auth_main_text']) . '</textarea>', false, true);
+adm_ui_field_row('② 공지 사용', '<label class="pg-check-item"><input type="checkbox" name="login_notice_enabled" value="1"' . ($s['login_notice_enabled'] !== '0' ? ' checked' : '') . '> 로그인 패널에 공지 표시</label>', false, true);
+adm_ui_field_row('② 공지 제목', '<input type="text" name="login_notice_title" value="' . adm_ui_h($s['login_notice_title']) . '" class="pg-input pg-input--w-title">', false, true);
+adm_ui_field_row('② 공지 내용', '<textarea name="login_notice_body" rows="4" class="pg-input pg-input--w-memo">' . adm_ui_h($s['login_notice_body']) . '</textarea>', false, true);
+adm_ui_field_row('④ 푸터 문구', '<input type="text" name="login_footer_text" value="' . adm_ui_h($s['login_footer_text']) . '" class="pg-input pg-input--w-title">', false, true);
+adm_ui_settings_col_close();
+?>
+<div class="pg-screen-notice pg-screen-notice--info" style="margin-top:8px;"><strong>③ 일반회원 로그인</strong> (member/login.php)</div>
+<?php adm_ui_settings_row_open(); ?>
+<?php
+adm_ui_field_row('폼 제목', '<input type="text" name="login_member_title" value="' . adm_ui_h($s['login_member_title']) . '" class="pg-input">', false, true);
+adm_ui_field_row('ID 라벨', '<input type="text" name="login_member_label_id" value="' . adm_ui_h($s['login_member_label_id']) . '" class="pg-input">', false, true);
+?>
+<?php adm_ui_settings_row_close(); ?>
+<?php adm_ui_settings_row_open(); ?>
+<?php
+adm_ui_field_row('비밀번호 라벨', '<input type="text" name="login_member_label_password" value="' . adm_ui_h($s['login_member_label_password']) . '" class="pg-input">', false, true);
+adm_ui_field_row('버튼 문구', '<input type="text" name="login_member_btn" value="' . adm_ui_h($s['login_member_btn']) . '" class="pg-input">', false, true);
+?>
+<?php adm_ui_settings_row_close(); ?>
+<div class="pg-screen-notice pg-screen-notice--info"><strong>③ 관리자 로그인</strong> (Adm/login/login.php)</div>
+<?php adm_ui_settings_row_open(); ?>
+<?php
+adm_ui_field_row('폼 제목', '<input type="text" name="login_admin_title" value="' . adm_ui_h($s['login_admin_title']) . '" class="pg-input">', false, true);
+adm_ui_field_row('ID 라벨', '<input type="text" name="login_admin_label_id" value="' . adm_ui_h($s['login_admin_label_id']) . '" class="pg-input">', false, true);
+?>
+<?php adm_ui_settings_row_close(); ?>
+<?php adm_ui_settings_row_open(); ?>
+<?php
+adm_ui_field_row('비밀번호 라벨', '<input type="text" name="login_admin_label_password" value="' . adm_ui_h($s['login_admin_label_password']) . '" class="pg-input">', false, true);
+adm_ui_field_row('버튼 문구', '<input type="text" name="login_admin_btn" value="' . adm_ui_h($s['login_admin_btn']) . '" class="pg-input">', false, true);
+?>
+<?php adm_ui_settings_row_close(); ?>
+<?php adm_ui_card_close(); ?>
+<?php require dirname(__FILE__) . '/inc/pro_site_settings_brand_ui.php'; ?>
 								</form>
 
 <? } elseif ($tab === 'currency') { ?>
 								<form method="post" action="pro_site_settings_ok.php" onsubmit="syncPaymentCurrency();">
 								<input type="hidden" name="section" value="currency">
-								<table width="860" border='0' cellspacing='0' cellpadding='0'>
-									<tr><td colspan=2 height=2 bgcolor='#88B7DA'></td></tr>
-									<tr><td colspan=2 style="padding:10px;background:#f9f9f9;">
-										<b>C. 통화 설정</b> — 상품 DB 가격은 USD 기준입니다. Yahoo Finance 환율로 변환·표시합니다.
-									</td></tr>
-									<tr>
-										<td width="160" align="center">1차 통화</td>
-										<td style="padding:8px;">
-											<label><input type="checkbox" name="currency_primary_enabled" id="currency_primary_enabled" value="1" <?=$s['currency_primary_enabled']!=='0'?'checked':''?> onchange="syncPaymentCurrency();"></label>
-											<select name="currency_primary_code" id="currency_primary_code" class="adminbttn" onchange="syncPaymentCurrency();">
-<? foreach ($currency_opts as $code => $info) { ?>
-												<option value="<?=$code?>" <?=$s['currency_primary_code']===$code?'selected':''?>><?=$info['label']?></option>
-<? } ?>
-											</select>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">2차 통화</td>
-										<td style="padding:8px;">
-											<label><input type="checkbox" name="currency_secondary_enabled" id="currency_secondary_enabled" value="1" <?=$s['currency_secondary_enabled']!=='0'?'checked':''?> onchange="syncPaymentCurrency();"></label>
-											<select name="currency_secondary_code" id="currency_secondary_code" class="adminbttn" onchange="syncPaymentCurrency();">
-<? foreach ($currency_opts as $code => $info) { ?>
-												<option value="<?=$code?>" <?=$s['currency_secondary_code']===$code?'selected':''?>><?=$info['label']?></option>
-<? } ?>
-											</select>
-											<font color="#666">미사용 시 1개 통화만 노출·결제</font>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">결제 기준 통화</td>
-										<td style="padding:8px;">
-											<select name="currency_payment_code" id="currency_payment_code" class="adminbttn">
-<? foreach ($enabled_codes as $code) { ?>
-												<option value="<?=$code?>" <?=$s['currency_payment_code']===$code?'selected':''?>><?=$code?> (ICOPAY·카드결제)</option>
-<? } ?>
-											</select>
-											<font color="#666">노출 통화 중에서만 선택 가능</font>
-										</td>
-									</tr>
-									<tr><td colspan=2 style="padding:10px;">
-										예시 (USD 430 기준): <b><?=htmlspecialchars(pkshop_format_display_price(430))?></b><br>
-										결제 금액 예시: <b><?=pkshop_format_currency_amount(pkshop_payment_amount_from_usd(430), pkshop_get_payment_currency())?></b>
-									</td></tr>
-									<tr><td colspan=2 align="center" style="padding:15px;">
-										<input type="submit" value="통화 설정 저장" class="adminbttn" style="padding:8px 20px;">
-									</td></tr>
-								</table>
+<?php adm_ui_card_open('통화 설정'); ?>
+<?php adm_ui_notice('상품 DB 가격은 USD 기준입니다. Yahoo Finance 환율로 변환·표시합니다.', 'info'); ?>
+<?php adm_ui_settings_col_open(); ?>
+<?php
+$primary_curr = '<label class="pg-check-item"><input type="checkbox" name="currency_primary_enabled" id="currency_primary_enabled" value="1"' . ($s['currency_primary_enabled'] !== '0' ? ' checked' : '') . ' onchange="syncPaymentCurrency();"></label> ';
+$primary_curr .= '<select name="currency_primary_code" id="currency_primary_code" class="pg-input pg-input--w-md" onchange="syncPaymentCurrency();">';
+foreach ($currency_opts as $code => $info) {
+    $primary_curr .= '<option value="' . adm_ui_h($code) . '"' . ($s['currency_primary_code'] === $code ? ' selected' : '') . '>' . adm_ui_h($info['label']) . '</option>';
+}
+$primary_curr .= '</select>';
+adm_ui_field_row('1차 통화', $primary_curr, false, true);
+
+$secondary_curr = '<label class="pg-check-item"><input type="checkbox" name="currency_secondary_enabled" id="currency_secondary_enabled" value="1"' . ($s['currency_secondary_enabled'] !== '0' ? ' checked' : '') . ' onchange="syncPaymentCurrency();"></label> ';
+$secondary_curr .= '<select name="currency_secondary_code" id="currency_secondary_code" class="pg-input pg-input--w-md" onchange="syncPaymentCurrency();">';
+foreach ($currency_opts as $code => $info) {
+    $secondary_curr .= '<option value="' . adm_ui_h($code) . '"' . ($s['currency_secondary_code'] === $code ? ' selected' : '') . '>' . adm_ui_h($info['label']) . '</option>';
+}
+$secondary_curr .= '</select><p class="pg-field-hint">미사용 시 1개 통화만 노출·결제</p>';
+adm_ui_field_row('2차 통화', $secondary_curr, false, true);
+
+$payment_curr = '<select name="currency_payment_code" id="currency_payment_code" class="pg-input pg-input--w-md">';
+foreach ($enabled_codes as $code) {
+    $payment_curr .= '<option value="' . adm_ui_h($code) . '"' . ($s['currency_payment_code'] === $code ? ' selected' : '') . '>' . adm_ui_h($code) . ' (ICOPAY·카드결제)</option>';
+}
+$payment_curr .= '</select><p class="pg-field-hint">노출 통화 중에서만 선택 가능</p>';
+adm_ui_field_row('결제 기준 통화', $payment_curr, false, true);
+
+$example_html = '<div class="pg-field-stack"><div>예시 (USD 430 기준): <strong>' . adm_ui_h(pkshop_format_display_price(430)) . '</strong></div>';
+$example_html .= '<div>결제 금액 예시: <strong>' . adm_ui_h(pkshop_format_currency_amount(pkshop_payment_amount_from_usd(430), pkshop_get_payment_currency())) . '</strong></div></div>';
+adm_ui_field_row('환율 예시', $example_html, false, true);
+?>
+<?php adm_ui_settings_col_close(); ?>
+<?php adm_ui_form_actions('<input type="submit" value="통화 설정 저장" class="pg-btn pg-btn-primary">'); ?>
 								</form>
 								<script>syncPaymentCurrency();</script>
+<?php adm_ui_card_close(); ?>
+
 <? } elseif ($tab === 'payment') { ?>
 								<form method="post" action="pro_site_settings_ok.php">
 								<input type="hidden" name="section" value="payment">
-								<table width="860" border='0' cellspacing='0' cellpadding='0'>
-									<tr><td colspan=2 height=2 bgcolor='#88B7DA'></td></tr>
-									<tr><td colspan=2 style="padding:10px;background:#f9f9f9;">
-										<b>D. 결제연동 (ICOPAY)</b> — 카드결제·통합 인라인 체크아웃 설정입니다. 브로커 시크릿은 <code>lib/icopay_pg_secrets.local.php</code> 에 저장됩니다.
-									</td></tr>
-									<tr>
-										<td width="180" align="center">결제 사용</td>
-										<td style="padding:8px;">
-											<label><input type="checkbox" name="payment_pg_enabled" value="1" <?=$s['payment_pg_enabled']!=='0'?'checked':''?>> ICOPAY 카드결제 활성화</label>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">결제대행사</td>
-										<td style="padding:8px;">
-											<select name="payment_pg_provider" class="adminbttn">
-												<option value="ICOPAY" <?=$s['payment_pg_provider']==='ICOPAY'?'selected':''?>>ICOPAY</option>
-											</select>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">가맹점 명칭</td>
-										<td style="padding:8px;">
-											<input type="text" name="icopay_merchant_name" value="<?=htmlspecialchars($s['icopay_merchant_name'], ENT_QUOTES, 'UTF-8')?>" size="40" class="adminbttn" placeholder="예: TESTING LIVE">
-											<font color="#666">관리용 표시명</font>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">업체코드 (compId)</td>
-										<td style="padding:8px;">
-											<input type="text" name="icopay_comp_id" value="<?=htmlspecialchars($s['icopay_comp_id'], ENT_QUOTES, 'UTF-8')?>" size="30" class="adminbttn" placeholder="6000000017">
-										</td>
-									</tr>
-									<tr>
-										<td align="center">브로커 시크릿</td>
-										<td style="padding:8px;">
-											현재: <span style="font-family:monospace;color:#003366;">
-<? if ($icopay_secret_status['configured']) {
-	echo htmlspecialchars($icopay_secret_status['masked'], ENT_QUOTES, 'UTF-8');
-} else { ?>
-												<font color="#cc0000">미설정</font>
-<? } ?>
-											</span><br><br>
-											<input type="password" name="icopay_broker_secret" size="55" class="adminbttn" placeholder="ic_... (변경 시에만 입력)" autocomplete="off">
-											<font color="#666">비워두면 기존 시크릿 유지</font>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">API Base URL</td>
-										<td style="padding:8px;">
-											<input type="text" name="icopay_api_base_url" value="<?=htmlspecialchars($s['icopay_api_base_url'], ENT_QUOTES, 'UTF-8')?>" size="55" class="adminbttn">
-										</td>
-									</tr>
-									<tr>
-										<td align="center">연동 방식</td>
-										<td style="padding:8px;">
-											<select name="icopay_integration_mode" class="adminbttn">
-<? foreach ($icopay_mode_opts as $mode_key => $mode_label) { ?>
-												<option value="<?=htmlspecialchars($mode_key, ENT_QUOTES, 'UTF-8')?>" <?=$s['icopay_integration_mode']===$mode_key?'selected':''?>><?=htmlspecialchars($mode_label, ENT_QUOTES, 'UTF-8')?></option>
-<? } ?>
-											</select>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">결제 통화</td>
-										<td style="padding:8px;">
-											<select name="icopay_payment_currency" class="adminbttn">
-<? foreach ($currency_opts as $code => $info) { ?>
-												<option value="<?=$code?>" <?=$s['icopay_payment_currency']===$code?'selected':''?>><?=$info['label']?></option>
-<? } ?>
-											</select>
-											<font color="#666">ICOPAY prepare API currency (예: JPY)</font>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">체크아웃 언어</td>
-										<td style="padding:8px;">
-											<select name="icopay_checkout_lang" class="adminbttn">
-<? foreach ($icopay_lang_opts as $lang_key => $lang_label) { ?>
-												<option value="<?=$lang_key?>" <?=$s['icopay_checkout_lang']===$lang_key?'selected':''?>><?=htmlspecialchars($lang_label, ENT_QUOTES, 'UTF-8')?></option>
-<? } ?>
-											</select>
-										</td>
-									</tr>
-									<tr><td colspan=2 style="padding:8px;background:#f9f9f9;font-weight:bold;">JPAY / 레거시 (참고·ChillPay CCD)</td></tr>
-									<tr>
-										<td align="center">JPAY MID</td>
-										<td style="padding:8px;">
-											<input type="text" name="icopay_jpay_mid" value="<?=htmlspecialchars($s['icopay_jpay_mid'], ENT_QUOTES, 'UTF-8')?>" size="20" class="adminbttn" placeholder="10546">
-											<font color="#666">관리 참고용 (통합 인라인은 ICOPAY가 PG 자동 선택)</font>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">ChillPay MID</td>
-										<td style="padding:8px;">
-											<input type="text" name="icopay_ccd_merchant_code" value="<?=htmlspecialchars($s['icopay_ccd_merchant_code'], ENT_QUOTES, 'UTF-8')?>" size="30" class="adminbttn">
-										</td>
-									</tr>
-									<tr>
-										<td align="center">ChillPay API Key</td>
-										<td style="padding:8px;">
-											<input type="text" name="icopay_ccd_api_key" value="<?=htmlspecialchars($s['icopay_ccd_api_key'], ENT_QUOTES, 'UTF-8')?>" size="55" class="adminbttn">
-										</td>
-									</tr>
-									<tr>
-										<td align="center">ChillPay CCD 언어</td>
-										<td style="padding:8px;">
-											<input type="text" name="icopay_ccd_lang" value="<?=htmlspecialchars($s['icopay_ccd_lang'], ENT_QUOTES, 'UTF-8')?>" size="10" class="adminbttn" placeholder="en">
-										</td>
-									</tr>
-									<tr><td colspan=2 style="padding:8px;background:#f9f9f9;font-weight:bold;">Webhook (ICOPAY 본사 등록)</td></tr>
-									<tr>
-										<td align="center">Webhook URL</td>
-										<td style="padding:8px;">
-											<input type="text" value="<?=htmlspecialchars($icopay_webhook_url, ENT_QUOTES, 'UTF-8')?>" size="65" class="adminbttn" readonly onclick="this.select();">
-											<font color="#666">ICOPAY 업체관리 merchantNotifyUrls 에 등록</font>
-										</td>
-									</tr>
-									<tr><td colspan=2 style="padding:10px;">
-										상태:
-<? if ($icopay_secret_status['configured'] && $s['icopay_comp_id'] !== '') { ?>
-										<font color="#006600"><b>연동 준비됨</b></font> (compId <?=htmlspecialchars($s['icopay_comp_id'], ENT_QUOTES, 'UTF-8')?>, <?=htmlspecialchars($s['icopay_integration_mode'], ENT_QUOTES, 'UTF-8')?>)
-<? } else { ?>
-										<font color="#cc0000"><b>업체코드·브로커 시크릿을 입력 후 저장하세요.</b></font>
-<? } ?>
-									</td></tr>
-									<tr><td colspan=2 align="center" style="padding:15px;">
-										<input type="submit" value="결제연동 설정 저장" class="adminbttn" style="padding:8px 20px;">
-									</td></tr>
-								</table>
+<?php adm_ui_notice('ICOPAY 카드결제·통합 인라인 체크아웃 설정입니다. 브로커 시크릿은 <code>lib/icopay_pg_secrets.local.php</code> 에 저장됩니다.', 'info'); ?>
+<?php require dirname(__FILE__) . '/inc/pro_site_settings_payment_ui.php'; ?>
 								</form>
+
 <? } elseif ($tab === 'promo') { ?>
 								<form method="post" action="pro_site_settings_ok.php">
 								<input type="hidden" name="section" value="promo">
-								<table width="860" border='0' cellspacing='0' cellpadding='0'>
-									<tr><td colspan=2 height=2 bgcolor='#88B7DA'></td></tr>
-									<tr><td colspan=2 style="padding:10px;background:#f9f9f9;font-weight:bold;">E. 홍보설정 (메인 순환 노출)</td></tr>
-									<tr><td colspan=2 style="padding:8px 10px;color:#666;">
-										메인 첫 화면의 <b>BEST</b>(4개), <b>RECOMMENDED</b>(8개), <b>All PRODUCTS</b> 영역이<br>
-										등록된 상품·카테고리 풀에서 정해진 시간마다 순차적으로 교체되도록 설정합니다.
-									</td></tr>
-									<tr>
-										<td width="220" align="center">BEST 순환 간격</td>
-										<td style="padding:8px;">
-											<select name="promo_rotate_best" class="adminbttn">
-<? foreach ($interval_opts as $sec => $label) { ?>
-												<option value="<?=$sec?>" <?=(string)$promo_best_sec===(string)$sec?'selected':''?>><?=htmlspecialchars($label, ENT_QUOTES, 'UTF-8')?> (화면 4개)</option>
-<? } ?>
-											</select>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">RECOMMENDED 순환 간격</td>
-										<td style="padding:8px;">
-											<select name="promo_rotate_recommended" class="adminbttn">
-<? foreach ($interval_opts as $sec => $label) { ?>
-												<option value="<?=$sec?>" <?=(string)$promo_recommended_sec===(string)$sec?'selected':''?>><?=htmlspecialchars($label, ENT_QUOTES, 'UTF-8')?> (화면 8개)</option>
-<? } ?>
-											</select>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">All PRODUCTS 순환 간격</td>
-										<td style="padding:8px;">
-											<select name="promo_rotate_all" class="adminbttn">
-<? foreach ($interval_opts as $sec => $label) { ?>
-												<option value="<?=$sec?>" <?=(string)$promo_all_sec===(string)$sec?'selected':''?>><?=htmlspecialchars($label, ENT_QUOTES, 'UTF-8')?> (카테고리별 4개)</option>
-<? } ?>
-											</select>
-										</td>
-									</tr>
-									<tr><td colspan=2 style="padding:10px;color:#666;">
-										※ BEST·RECOMMENDED는 테마 등록 상품이 지정 개수보다 많을 때 자동 순환합니다.<br>
-										※ All PRODUCTS는 <a href="pro_all.php">ALL상품</a>에 등록한 카테고리별 4개씩 순환합니다.
-									</td></tr>
-									<tr><td colspan=2 align="center" style="padding:15px;">
-										<input type="submit" value="홍보설정 저장" class="adminbttn" style="padding:8px 24px;">
-									</td></tr>
-								</table>
+<?php adm_ui_card_open('홍보설정'); ?>
+<?php adm_ui_notice('메인 첫 화면의 <strong>BEST</strong>(4개), <strong>RECOMMENDED</strong>(8개), <strong>All PRODUCTS</strong> 영역이 등록된 상품·카테고리 풀에서 정해진 시간마다 순차적으로 교체됩니다.', 'info'); ?>
+<?php adm_ui_settings_col_open(); ?>
+<?php
+$best_opts = '<select name="promo_rotate_best" class="pg-input pg-input--w-md">';
+foreach ($interval_opts as $sec => $label) {
+    $best_opts .= '<option value="' . adm_ui_h($sec) . '"' . ((string)$promo_best_sec === (string)$sec ? ' selected' : '') . '>' . adm_ui_h($label) . ' (화면 4개)</option>';
+}
+$best_opts .= '</select>';
+adm_ui_field_row('BEST 순환 간격', $best_opts, false, true);
+
+$rec_opts = '<select name="promo_rotate_recommended" class="pg-input pg-input--w-md">';
+foreach ($interval_opts as $sec => $label) {
+    $rec_opts .= '<option value="' . adm_ui_h($sec) . '"' . ((string)$promo_recommended_sec === (string)$sec ? ' selected' : '') . '>' . adm_ui_h($label) . ' (화면 8개)</option>';
+}
+$rec_opts .= '</select>';
+adm_ui_field_row('RECOMMENDED 순환 간격', $rec_opts, false, true);
+
+$all_opts = '<select name="promo_rotate_all" class="pg-input pg-input--w-md">';
+foreach ($interval_opts as $sec => $label) {
+    $all_opts .= '<option value="' . adm_ui_h($sec) . '"' . ((string)$promo_all_sec === (string)$sec ? ' selected' : '') . '>' . adm_ui_h($label) . ' (카테고리별 4개)</option>';
+}
+$all_opts .= '</select>';
+adm_ui_field_row('All PRODUCTS 순환 간격', $all_opts, false, true);
+
+adm_ui_field_row('안내', '<div class="pg-field-stack"><p class="pg-field-hint">※ BEST·RECOMMENDED는 테마 등록 상품이 지정 개수보다 많을 때 자동 순환합니다.</p><p class="pg-field-hint">※ All PRODUCTS는 <a href="pro_all.php">All 상품</a>에 등록한 카테고리별 4개씩 순환합니다.</p></div>', false, true);
+?>
+<?php adm_ui_settings_col_close(); ?>
+adm_ui_form_actions('<input type="submit" value="홍보설정 저장" class="pg-btn pg-btn-primary">');
+?>
 								</form>
+<?php adm_ui_card_close(); ?>
+
 <? } ?>
-							</td>
-						</tr>
-						<tr><td height=40></td></tr>
-					</table>
+<?php adm_ui_page_close(); ?>
 <? include "../inc/down_menu.php"; ?>

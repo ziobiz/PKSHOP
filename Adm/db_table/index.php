@@ -1,9 +1,7 @@
 <? 
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
-pkshop_admin_auto_shell_begin();
-
-
+include "../inc/top_menu.php";
+include "../inc/left_menu_db_table.php";
 
 <table class="pg-table pg-table-form" width="100%" border=0 cellpadding=0 cellspacing=0>
 	<tr><td height=30 colspan="2"></td></tr>
@@ -143,5 +141,4 @@ $tts = mysql_list_tables ($dbname);
 
 
 ?>
-<?php pkshop_admin_shell_end(); ?>
-
+<? include "../inc/down_menu.php"; ?>

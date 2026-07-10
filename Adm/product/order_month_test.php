@@ -1,7 +1,9 @@
 <?
 ########## 입력값에 대한 타당성 검사를 수행한다. ####################
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_sell.php";
+
 include "../common/user_function.php";
 
 ########## 데이터베이스에 연결한다. #################################
@@ -9,7 +11,6 @@ if($tyear == "") {	$year_e = date("Y"); }
 
 #####################################################################
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 <script language="javascript">
 <!--
 function go() {
@@ -158,4 +159,4 @@ function move() {
 							</center>
 							</form>
 							<br><br>
-<?php pkshop_admin_shell_end(); ?>
+<? include "../inc/down_menu.php"; ?>

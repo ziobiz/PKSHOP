@@ -2,8 +2,6 @@
 #####################################################################
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
-pkshop_admin_auto_shell_begin();
 #####################################################################
 ?>
 <html>

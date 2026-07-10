@@ -3,9 +3,10 @@
 
 include "../common/user_function.php";
 include "../common/dbconn.php";
-include_once "../inc/admin_shell_lib.php";
+include "../inc/top_menu.php";
+include "../inc/left_menu_member.php";
+
 ?>
-<?php pkshop_admin_auto_shell_begin(); ?>
 				<table class="pg-table pg-table-form" width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr><td height=30></td></tr>
 					<tr><td height=3></td></tr>
@@ -155,6 +156,5 @@ if($page!=$total_page){
 					<input type="hidden" name="chk_num" value="<?echo($chk_num)?>">  
 					</form>  
 				</table>
-							<BR><BR> 
-
-<?php pkshop_admin_shell_end(); ?>
+							<BR><BR>
+<? include "../inc/down_menu.php"; ?>

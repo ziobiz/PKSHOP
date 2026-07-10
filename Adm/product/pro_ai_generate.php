@@ -1,224 +1,191 @@
 <?
 include "../common/dbconn.php";
 include "../inc/top_menu.php";
-include "../inc/left_menu_product.php";
+include "../inc/left_menu_ai.php";
 include "pro_import_lib.php";
 include "gemini_client.php";
 
 $gender_opts = gemini_gender_options();
+$model_ethnicity_opts = gemini_model_ethnicity_main_options();
+$east_asian_detail_opts = gemini_east_asian_detail_options();
 $season_opts = gemini_season_options();
 $country_opts = gemini_country_options();
 $type_opts = gemini_product_type_options();
 $api_key_status = gemini_api_key_status();
-?>
-					<table width=900 border=0 cellpadding=0 cellspacing=0>
-						<tr><td height=30></td></tr>
-						<tr><td>
-							<table border=0 cellpadding=0 cellspacing=0>
-								<tr>
-									<td width=60 align=center><img src="../image/icon2.gif" width=45 height=35 border=0></td>
-									<td class='td14'><b>AI 상품 생성 (제미나이)</b></td>
-								</tr>
-							</table>
-						</td></tr>
-						<tr><td height=10></td></tr>
-						<tr>
-							<td valign=top style="padding:10px;">
-								<font color="#003366">
-									키워드(성별·계절·국가·종목 등)를 입력하면 제미나이 API가 상품명·가격·설명·이미지(4~8장/상품)를 자동 생성하여 등록합니다.
-								</font>
-								<br><br>
-								<table width="860" border='0' cellspacing='0' cellpadding='0'>
-									<tr><td colspan=2 height=2 bgcolor='#88B7DA'></td></tr>
 
-									<tr>
-										<td width="140" height="35" align="center">API 키</td>
-										<td align="left" style="padding-left:10px;">
-											<font color="#003366">API 키 설정은 <a href="pro_site_settings.php?tab=ai"><b>환경설정 → A. AI 설정</b></a> 에서 관리합니다.</font>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
-
-									<tr>
-										<td width="140" height="35" align="center">1. 성별</td>
-										<td align="left" style="padding-left:10px;">
-<?
+$gender_html = '<div class="pg-radio-group">';
 foreach ($gender_opts as $val => $label) {
-	$chk = ($val === 'all') ? 'checked' : '';
-?>
-											<label><input type="radio" name="gender" value="<?=$val?>" <?=$chk?>> <?=$label?></label>&nbsp;&nbsp;
-<?
+	$chk = ($val === 'all') ? ' checked' : '';
+	$gender_html .= '<label class="pg-radio-item"><input type="radio" name="gender" value="' . adm_ui_h($val) . '"' . $chk . '> ' . adm_ui_h($label) . '</label>';
 }
-?>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
+$gender_html .= '</div>';
 
-									<tr>
-										<td height="35" align="center">2. 계절</td>
-										<td align="left" style="padding-left:10px;">
-											<select id="season" class="adminbttn">
-<?
+$ethnicity_html = '<div class="pg-ai-model-select-inline">';
+$ethnicity_html .= '<select id="model_ethnicity" class="pg-select pg-select--w-md" onchange="toggleEastAsianDetail();">';
+foreach ($model_ethnicity_opts as $val => $label) {
+	$ethnicity_html .= '<option value="' . adm_ui_h($val) . '">' . adm_ui_h($label) . '</option>';
+}
+$ethnicity_html .= '</select>';
+$ethnicity_html .= '<span id="east_asian_detail_wrap" class="pg-ai-model-detail" style="display:none;">';
+$ethnicity_html .= '<span class="pg-ai-model-detail-label">동양(개별)</span>';
+$ethnicity_html .= '<select id="east_asian_detail" class="pg-select pg-select--w-md">';
+foreach ($east_asian_detail_opts as $val => $label) {
+	$ethnicity_html .= '<option value="' . adm_ui_h($val) . '">' . adm_ui_h($label) . '</option>';
+}
+$ethnicity_html .= '</select></span></div>';
+
+$season_html = '<select id="season" class="pg-select pg-select--w-md">';
 foreach ($season_opts as $val => $label) {
-	$sel = ($val === 'all_season') ? 'selected' : '';
-?>
-												<option value="<?=$val?>" <?=$sel?>><?=$label?></option>
-<?
+	$sel = ($val === 'all_season') ? ' selected' : '';
+	$season_html .= '<option value="' . adm_ui_h($val) . '"' . $sel . '>' . adm_ui_h($label) . '</option>';
 }
-?>
-											</select>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
+$season_html .= '</select>';
 
-									<tr>
-										<td height="35" align="center">3. 국가</td>
-										<td align="left" style="padding-left:10px;">
-											<select id="country" class="adminbttn">
-<?
+$country_html = '<select id="country" class="pg-select pg-select--w-country">';
 foreach ($country_opts as $code => $info) {
-	$sel = ($code === '1') ? 'selected' : '';
-?>
-												<option value="<?=$code?>" <?=$sel?>><?=$info['name']?> (<?=$info['label']?>)</option>
-<?
+	$sel = ((string)$code === '1') ? ' selected' : '';
+	$country_html .= '<option value="' . adm_ui_h($code) . '"' . $sel . '>' . adm_ui_h($info['name']) . ' (' . adm_ui_h($info['label']) . ')</option>';
 }
-?>
-											</select>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
+$country_html .= '</select>';
 
-									<tr>
-										<td valign="top" align="center" style="padding-top:8px;">4. 상품 종목</td>
-										<td align="left" style="padding:8px 10px;">
-											<table width="700" border="0" cellpadding="2" cellspacing="0" style="font-size:12px;">
-												<tr>
-<?
-$i = 0;
+$types_html = '<div class="pg-check-grid pg-check-grid--4col">';
 foreach ($type_opts as $val => $label) {
-	if ($i > 0 && $i % 4 === 0) echo '</tr><tr>';
-	$chk = ($val === 'clothing') ? 'checked' : '';
-?>
-													<td width="175"><label><input type="checkbox" name="product_types" value="<?=$val?>" <?=$chk?>> <?=$label?></label></td>
-<?
-	$i++;
+	$chk = ($val === 'clothing') ? ' checked' : '';
+	$types_html .= '<label class="pg-check-item"><input type="checkbox" name="product_types" value="' . adm_ui_h($val) . '"' . $chk . '> ' . adm_ui_h($label) . '</label>';
 }
-?>
-												</tr>
-											</table>
-											기타 종목: <input type="text" id="product_type_custom" size="40" class="adminbttn" placeholder="예: 골프용품, 캠핑장비 등">
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
+$types_html .= '</div>';
+$types_html .= '<div class="pg-ai-custom-type"><span class="pg-ai-custom-type-label">기타 종목</span>';
+$types_html .= '<input type="text" id="product_type_custom" class="pg-input pg-input--w-lg" placeholder="예: 골프용품, 캠핑장비 등"></div>';
 
-									<tr>
-										<td height="35" align="center">5. 생성 가격</td>
-										<td align="left" style="padding-left:10px;">
-											최저 <input type="number" id="gen_price_min" value="110" min="10" step="10" size="8" class="adminbttn"> USD
-											~ 최대 <input type="number" id="gen_price_max" value="190" min="10" step="10" size="8" class="adminbttn"> USD
-											<font color="#666">(마지막 자리 0 — 예: 110~190, 1100~1900)</font>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
+$price_html = '<div class="pg-input-unit pg-input-unit--inline-hint pg-input-unit--price-range">';
+$price_html .= '<span>최저</span>';
+$price_html .= '<input type="number" id="gen_price_min" value="110" min="10" step="10" class="pg-input pg-input--w-sm">';
+$price_html .= '<span>USD ~ 최대</span>';
+$price_html .= '<input type="number" id="gen_price_max" value="190" min="10" step="10" class="pg-input pg-input--w-sm">';
+$price_html .= '<span>USD</span>';
+$price_html .= '<span class="pg-field-hint-inline">(마지막 자리 0 — 예: 110~190, 1100~1900)</span>';
+$price_html .= '</div>';
 
-									<tr>
-										<td valign="top" align="center" style="padding-top:8px;">6. 참고 내용</td>
-										<td align="left" style="padding:8px 10px;">
-											<textarea id="memo" rows="3" cols="70" class="adminbttn" placeholder="예: 프리미엄 라인, 20~30대 타겟, 캐주얼 스타일"></textarea>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
-
-									<tr>
-										<td height="35" align="center">7. 생성 이미지</td>
-										<td align="left" style="padding-left:10px;">
-											<select id="gen_image_count" class="adminbttn">
-												<option value="4" selected>4장 (기본)</option>
-												<option value="5">5장</option>
-												<option value="6">6장</option>
-												<option value="7">7장</option>
-												<option value="8">8장</option>
-											</select>
-											<font color="#666">(앞 4장: 목록/상세 썸네일, 5장 이상: Product Details에 추가 노출)</font>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
-
-									<tr>
-										<td height="35" align="center">8. 생성 수량</td>
-										<td align="left" style="padding-left:10px;">
-											<input type="number" id="gen_count" value="3" min="1" max="100" size="5" class="adminbttn"> 개
-											<font color="#666">(1~100, 많을수록 API 비용·시간 증가)</font>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
-
-									<tr>
-										<td valign="top" align="center" style="padding-top:8px;">9. 카테고리</td>
-										<td align="left" style="padding:8px 10px;">
-											<label><input type="radio" name="cate_mode" value="existing" checked onclick="toggleCateMode();"> 기존 카테고리</label>
-											&nbsp;&nbsp;
-											<label><input type="radio" name="cate_mode" value="new" onclick="toggleCateMode();"> 신규 카테고리 생성</label>
-											<br><br>
-											<div id="cate_existing">
-												<select id="code1" class="adminbttn">
-													<option value="">대분류 선택</option>
-<?
+$cate_html = '<div class="pg-ai-cate-inline">';
+$cate_html .= '<select id="cate_mode" class="pg-select pg-select--w-cate-mode" onchange="toggleCateMode();">';
+$cate_html .= '<option value="existing" selected>기존 카테고리</option>';
+$cate_html .= '<option value="new">신규 카테고리 생성</option>';
+$cate_html .= '</select>';
+$cate_html .= '<span id="cate_existing" class="pg-ai-cate-extra">';
+$cate_html .= '<select id="code1" class="pg-select pg-select--w-md"><option value="">대분류 선택</option>';
 $query = "SELECT cate1,code1 FROM $shop_cate WHERE code2='00' AND code3='00' AND code4='00' ORDER BY order_rank";
 $DB->get($query, $rs, $rn);
 for ($i = 0; $i < $rn; $i++) {
-	$cate = htmlspecialchars(stripslashes($rs[$i]['cate1']));
-	$g_code = $rs[$i]['code1'];
-?>
-													<option value="<?=$g_code?>"><?=$cate?> (<?=$g_code?>)</option>
-<?
+	$cate = adm_ui_h(stripslashes($rs[$i]['cate1']));
+	$g_code = adm_ui_h($rs[$i]['code1']);
+	$cate_html .= '<option value="' . $g_code . '">' . $cate . ' (' . $g_code . ')</option>';
 }
+$cate_html .= '</select></span>';
+$cate_html .= '<span id="cate_new" class="pg-ai-cate-extra" style="display:none;">';
+$cate_html .= '<input type="text" id="new_cate_name" class="pg-input pg-input--w-md" placeholder="신규 카테고리명 (예: AI 가전, AI 여행상품)">';
+$cate_html .= '<span class="pg-field-hint-inline">(대분류 자동 생성)</span>';
+$cate_html .= '</span></div>';
+
+$image_html = '<div class="pg-input-unit pg-input-unit--inline-hint">';
+$image_html .= '<select id="gen_image_count" class="pg-select pg-select--w-sm">';
+$image_html .= '<option value="4" selected>4장 (기본)</option>';
+$image_html .= '<option value="5">5장</option><option value="6">6장</option>';
+$image_html .= '<option value="7">7장</option><option value="8">8장</option>';
+$image_html .= '</select>';
+$image_html .= '<span class="pg-field-hint-inline">(앞 4장: 목록/상세 썸네일, 5장 이상: Product Details에 추가 노출)</span>';
+$image_html .= '</div>';
+
+$count_html = '<div class="pg-input-unit pg-input-unit--inline-hint">';
+$count_html .= '<input type="number" id="gen_count" value="3" min="1" max="100" class="pg-input pg-input--w-xs">';
+$count_html .= '<span>개</span>';
+$count_html .= '<span class="pg-field-hint-inline">(1~100, 많을수록 API 비용·시간 증가)</span>';
+$count_html .= '</div>';
 ?>
-												</select>
-											</div>
-											<div id="cate_new" style="display:none;">
-												신규 카테고리명: <input type="text" id="new_cate_name" size="30" class="adminbttn" placeholder="예: AI 가전, AI 여행상품">
-												<font color="#666">(대분류가 자동 생성됩니다)</font>
-											</div>
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#D2DEE8'></td></tr>
+<?php adm_ui_page_open('pg-ai-generate-screen'); ?>
+<?php adm_ui_notice('키워드(성별·인종·계절·국가·종목 등)를 입력하면 제미나이 API가 상품명·가격·설명·이미지(4~8장/상품)를 자동 생성하여 등록합니다. 또한 의류·뷰티·주얼리·스포츠 등 모델 촬영 상품에 적용됩니다. 미선택 시 전체(제한 없음)입니다.', 'info'); ?>
 
-									<tr>
-										<td height="35" align="center">실행</td>
-										<td align="left" style="padding-left:10px;">
-											<input type="button" id="btn_start" value="AI 상품 생성 시작" class="adminbttn" onclick="startGeneration();">
-											&nbsp;
-											<input type="button" value="전체상품관리" class="adminbttn" onclick="location.href='products.php';">
-										</td>
-									</tr>
-									<tr><td colspan=2 height=1 bgcolor='#88B7DA'></td></tr>
-								</table>
+<?php adm_ui_card_open('기본 조건'); ?>
+<?php
+adm_ui_field_row('성별', $gender_html, true, true);
+adm_ui_field_row('모델선정', $ethnicity_html, false, true);
+adm_ui_field_row('계절', $season_html, false, true);
+adm_ui_field_row('국가', $country_html, false, true);
+?>
+<?php adm_ui_card_close(); ?>
 
-								<br>
-								<div id="progress_area" style="display:none;">
-									<b>진행 상황</b><br>
-									<div style="width:840px;height:20px;border:1px solid #ccc;background:#f5f5f5;margin:8px 0;">
-										<div id="progress_bar" style="width:0%;height:100%;background:#88B7DA;"></div>
-									</div>
-									<div id="progress_text">대기 중...</div>
-									<br>
-									<div id="log_area" style="width:840px;height:320px;overflow-y:auto;border:1px solid #D2DEE8;padding:8px;font-size:12px;background:#fafafa;"></div>
-								</div>
-							</td>
-						</tr>
-						<tr><td height=40></td></tr>
-					</table>
+<?php adm_ui_card_open('상품 종목 · 가격'); ?>
+<?php
+adm_ui_field_row('상품 종목', $types_html, true, true);
+adm_ui_field_row('생성 가격', $price_html, true, true);
+adm_ui_field_row('참고 내용', '<textarea id="memo" rows="12" class="pg-input pg-input--ai-memo" placeholder="예: 프리미엄 라인, 20~30대 타겟, 캐주얼 스타일"></textarea>', false, true);
+?>
+<?php adm_ui_card_close(); ?>
+
+<?php adm_ui_card_open('생성 옵션'); ?>
+<?php
+adm_ui_field_row('생성 이미지', $image_html, false, true);
+adm_ui_field_row('생성 수량', $count_html, true, true);
+adm_ui_field_row('카테고리', $cate_html, true, true);
+?>
+<?php adm_ui_card_close(); ?>
+
+<?php adm_ui_card_open('실행'); ?>
+<?php adm_ui_form_actions(
+	'<button type="button" id="btn_start" class="pg-btn pg-btn-primary" onclick="startGeneration();">AI 상품 생성 시작</button>'
+	. '<button type="button" class="pg-btn" onclick="location.href=\'products.php\';">전체상품관리</button>'
+); ?>
+<?php adm_ui_card_close(); ?>
+
+<?php adm_ui_card_open('생성 진행'); ?>
+<div id="progress_idle" class="pg-screen-notice pg-screen-notice--info">AI 상품 생성을 시작하면 여기에 진행 상황이 표시됩니다.</div>
+<div id="progress_area" class="pg-ai-progress" style="display:none;">
+	<div class="pg-ai-progress-label">진행 상황</div>
+	<div class="pg-ai-progress-track">
+		<div id="progress_bar" class="pg-ai-progress-bar"></div>
+	</div>
+	<div id="progress_text" class="pg-ai-progress-text">대기 중...</div>
+	<div id="log_area" class="pg-ai-log"></div>
+</div>
+<?php adm_ui_card_close(); ?>
+<?php adm_ui_page_close(); ?>
 
 <script>
 var currentJobId = '';
 var totalProducts = 0;
 var isRunning = false;
 
+function toggleEastAsianDetail() {
+	var main = document.getElementById('model_ethnicity').value;
+	var wrap = document.getElementById('east_asian_detail_wrap');
+	wrap.style.display = (main === 'east_asian') ? '' : 'none';
+	if (main !== 'east_asian') {
+		document.getElementById('east_asian_detail').value = '';
+	}
+}
+
+function resolveEthnicitiesForSubmit() {
+	var main = document.getElementById('model_ethnicity').value;
+	var detail = document.getElementById('east_asian_detail').value;
+	var list = [];
+	if (!main) {
+		return list;
+	}
+	if (main === 'east_asian') {
+		if (detail === 'mix') {
+			list.push('mix_east_asian');
+		} else if (detail) {
+			list.push(detail);
+		}
+	} else {
+		list.push(main);
+	}
+	return list;
+}
+
 function toggleCateMode() {
-	var mode = document.querySelector('input[name=cate_mode]:checked').value;
-	document.getElementById('cate_existing').style.display = (mode === 'existing') ? 'block' : 'none';
-	document.getElementById('cate_new').style.display = (mode === 'new') ? 'block' : 'none';
+	var mode = document.getElementById('cate_mode').value;
+	document.getElementById('cate_existing').style.display = (mode === 'existing') ? '' : 'none';
+	document.getElementById('cate_new').style.display = (mode === 'new') ? '' : 'none';
 }
 
 function log(msg, color) {
@@ -258,7 +225,7 @@ function collectFormData() {
 	params.append('gen_price_max', document.getElementById('gen_price_max').value);
 	params.append('image_count', document.getElementById('gen_image_count').value);
 	params.append('product_type_custom', document.getElementById('product_type_custom').value);
-	params.append('cate_mode', document.querySelector('input[name=cate_mode]:checked').value);
+	params.append('cate_mode', document.getElementById('cate_mode').value);
 	params.append('code1', document.getElementById('code1').value);
 	params.append('new_cate_name', document.getElementById('new_cate_name').value);
 	params.append('code2', '00');
@@ -267,6 +234,13 @@ function collectFormData() {
 
 	document.querySelectorAll('input[name=product_types]:checked').forEach(function(el) {
 		params.append('product_types[]', el.value);
+	});
+
+	params.append('model_ethnicity', document.getElementById('model_ethnicity').value);
+	params.append('east_asian_detail', document.getElementById('east_asian_detail').value);
+
+	resolveEthnicitiesForSubmit().forEach(function(val) {
+		params.append('ethnicities[]', val);
 	});
 
 	return params;
@@ -298,7 +272,7 @@ async function startGeneration() {
 		return;
 	}
 
-	var cateMode = document.querySelector('input[name=cate_mode]:checked').value;
+	var cateMode = document.getElementById('cate_mode').value;
 	if (cateMode === 'existing' && !document.getElementById('code1').value) {
 		alert('기존 카테고리(대분류)를 선택하세요.');
 		return;
@@ -324,6 +298,7 @@ async function startGeneration() {
 
 	isRunning = true;
 	document.getElementById('btn_start').disabled = true;
+	document.getElementById('progress_idle').style.display = 'none';
 	document.getElementById('progress_area').style.display = 'block';
 	document.getElementById('log_area').innerHTML = '';
 	log('작업 시작 — 키워드 기반 상품 기획 생성 중...', '#0066cc');
