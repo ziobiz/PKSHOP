@@ -108,6 +108,14 @@ adm_ui_field_row('원산지', '<input type="text" name="home" value="' . adm_ui_
 <?php adm_ui_card_open('노출 설정'); ?>
 <?php adm_ui_field_row('상품홍보', pro_form_theme_checkboxes_html($theme_g, $theme_n, $theme_r, $theme_f), false, true); ?>
 <p class="pg-field-hint">체크한 항목은 쇼핑몰 메인·테마 영역에 노출됩니다.</p>
+<?php
+require_once dirname(__FILE__) . '/../../include/pkshop_adglobal_lib.php';
+pkshop_adglobal_ensure_schema($DB, $shop_goods);
+if (!isset($expose_ag) || $expose_ag === '') {
+	$expose_ag = 'N';
+}
+adm_ui_field_row('AdGloball 연동', pkshop_adglobal_expose_checkbox_html($expose_ag), false, true);
+?>
 <?php adm_ui_card_close(); ?>
 
 <?php adm_ui_card_open('가격 · RV'); ?>

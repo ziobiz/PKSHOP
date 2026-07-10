@@ -7,6 +7,7 @@ $api_get_bank			= "http://pentakleva.shop/api/shopApi/api_get_bank.php";
 $api_test			= "http://pentakleva.shop/api/shopApi/api_test.php";
 
 $api_history			= "http://pentakleva.shop/api/shopApi/api_history.php";
+$api_adglobal			= "http://pentakleva.shop/api/shopApi/api_adglobal.php";
 $api_category			= "http://pentakleva.shop/api/shopApi/api_category.php";
 $api_cart			= "http://pentakleva.shop/api/shopApi/api_cart.php";
 

@@ -41,7 +41,7 @@ function pkshop_reload_post_fields() {
 	global $No, $page, $keyfield, $key, $sel_code1, $sel_code2, $sel_code3, $sel_code4, $sel_code;
 	global $chk_order, $sel_cate, $old_imgl, $old_imgm, $old_imgb1, $old_imgb2, $old_imgb3, $old_imgb4, $old_imgb5;
 	global $onlypoint, $c_pv, $dis, $country, $F_l, $F_m, $F_b1, $F_b2, $F_b3, $F_b4, $F_b5;
-	global $code1_tmp, $code2_tmp, $code3_tmp, $code4_tmp, $old_code;
+	global $code1_tmp, $code2_tmp, $code3_tmp, $code4_tmp, $old_code, $expose_ag;
 
 	$title      = pkshop_post('title');
 	$info       = pkshop_post('info');
@@ -222,6 +222,9 @@ $savedir = "$shop_img";
 
 include "../common/dbconn.php";
 pkshop_reload_post_fields();
+require_once dirname(__FILE__) . '/../../include/pkshop_adglobal_lib.php';
+pkshop_adglobal_ensure_schema($DB, $shop_goods);
+$expose_ag = pkshop_adglobal_expose_from_post();
 $imgl = pkshop_file_tmp('imgl');
 $imgl_name = pkshop_file_name('imgl');
 
@@ -884,6 +887,7 @@ $query = "code1=".pkshop_sql_q($code1)
 	.",code4=".pkshop_sql_q($code4)
 	.",order4=".pkshop_sql_q($order4)
 	.",p_id=".pkshop_sql_q($p_id)
+	.",expose_ag=".pkshop_sql_q($expose_ag)
 	.",esigndate=".pkshop_sql_q($esigndate)
 	.",c_dis=".pkshop_sql_q($dis)
 	." where No=".intval($No);
