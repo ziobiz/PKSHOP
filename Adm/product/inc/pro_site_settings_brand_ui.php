@@ -92,6 +92,30 @@ adm_ui_field_row('관리자 파비콘', $admin_favicon_note, false, true);
 adm_ui_settings_col_close();
 adm_ui_card_close();
 
+$agree_terms_edit = function_exists('pkshop_agree_terms_text') ? pkshop_agree_terms_text(true) : (isset($s['agree_terms_text']) ? $s['agree_terms_text'] : '');
+$agree_privacy_edit = function_exists('pkshop_agree_privacy_text') ? pkshop_agree_privacy_text(true) : (isset($s['agree_privacy_text']) ? $s['agree_privacy_text'] : '');
+adm_ui_card_open('이용 약관 / 개인정보 정책');
+adm_ui_notice('아래에서 수정·저장하면 <a href="/member/agree.php" target="_blank" rel="noopener">회원 약관 페이지</a>에 바로 반영됩니다. 회사명·주소는 About company의 「약관 회사명/주소」 값으로도 치환됩니다.', 'info');
+adm_ui_settings_col_open();
+adm_ui_field_row(
+    '이용 약관/환불 정책',
+    '<textarea name="agree_terms_text" rows="18" class="pg-input pg-input--w-memo" style="min-height:280px;font-family:Consolas,monospace;font-size:12px;line-height:1.45;">'
+    . adm_ui_h($agree_terms_edit)
+    . '</textarea><p class="pg-field-hint">member/agree.php 첫 번째 약관 영역</p>',
+    false,
+    true
+);
+adm_ui_field_row(
+    '개인 정보 보호 정책',
+    '<textarea name="agree_privacy_text" rows="14" class="pg-input pg-input--w-memo" style="min-height:220px;font-family:Consolas,monospace;font-size:12px;line-height:1.45;">'
+    . adm_ui_h($agree_privacy_edit)
+    . '</textarea><p class="pg-field-hint">member/agree.php 두 번째 프라이버시 영역</p>',
+    false,
+    true
+);
+adm_ui_settings_col_close();
+adm_ui_card_close();
+
 adm_ui_card_open('상단 로고');
 echo '<div class="pg-settings-logo-grid">' . "\n";
 adm_ui_settings_row_open();
@@ -171,30 +195,6 @@ pkshop_settings_file_row('MY INFO 아이콘', $s['footer_icon_myinfo'], 'upload_
 pkshop_settings_file_row('CART 아이콘', $s['footer_icon_cart'], 'upload_footer_icon_cart');
 pkshop_settings_file_row('하단 이미지', $s['footer_bottom_image'], 'upload_footer_bottom_image', '', 'delete_footer_bottom_image');
 adm_ui_field_row('하단 이미지 사이즈', pkshop_settings_size_pair('footer_bottom_image_width', 'footer_bottom_image_height', $s['footer_bottom_image_width'], $s['footer_bottom_image_height'], '가로 기본 1200px (0=자동높이)'), false, true);
-adm_ui_settings_col_close();
-adm_ui_card_close();
-
-$agree_terms_edit = function_exists('pkshop_agree_terms_text') ? pkshop_agree_terms_text(true) : (isset($s['agree_terms_text']) ? $s['agree_terms_text'] : '');
-$agree_privacy_edit = function_exists('pkshop_agree_privacy_text') ? pkshop_agree_privacy_text(true) : (isset($s['agree_privacy_text']) ? $s['agree_privacy_text'] : '');
-adm_ui_card_open('이용 약관 / 개인정보 정책');
-adm_ui_notice('아래에서 수정·저장하면 <a href="/member/agree.php" target="_blank" rel="noopener">회원 약관 페이지</a>에 바로 반영됩니다. 회사명·주소는 위 「약관 회사명/주소」 값으로도 치환됩니다.', 'info');
-adm_ui_settings_col_open();
-adm_ui_field_row(
-    '이용 약관/환불 정책',
-    '<textarea name="agree_terms_text" rows="18" class="pg-input pg-input--w-memo" style="min-height:280px;font-family:Consolas,monospace;font-size:12px;line-height:1.45;">'
-    . adm_ui_h($agree_terms_edit)
-    . '</textarea><p class="pg-field-hint">member/agree.php 첫 번째 약관 영역</p>',
-    false,
-    true
-);
-adm_ui_field_row(
-    '개인 정보 보호 정책',
-    '<textarea name="agree_privacy_text" rows="14" class="pg-input pg-input--w-memo" style="min-height:220px;font-family:Consolas,monospace;font-size:12px;line-height:1.45;">'
-    . adm_ui_h($agree_privacy_edit)
-    . '</textarea><p class="pg-field-hint">member/agree.php 두 번째 프라이버시 영역</p>',
-    false,
-    true
-);
 adm_ui_settings_col_close();
 adm_ui_card_close();
 
