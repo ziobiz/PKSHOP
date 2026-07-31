@@ -1,5 +1,5 @@
 <?
-	include "../include/com.php";
+	include "../include/get_balance.php";
 ?>
 <!doctype html>
 <html lang="en">
@@ -303,8 +303,7 @@ Pentakleva Concept ショッピング モールでは、当社の Web サイト�
 
 Ontheline Japan Co., Ltd.
 
-東京都中央区日本橋茅場町1-2-18 ニッポンビルディングアネックス9階
-9th Floor, Nippon Building Annex, 1-2-18 Nihonbashi Kayabacho, Chuo-ku, Tokyo 
+9th Floor, Nippon Building Annex, 1-2-18 Nihonbashi Kayabacho, Chuo-ku, Tokyo
 
 http://www.pentakleva.shop
 
