@@ -11,6 +11,62 @@ if (!isset($_SESSION["idok"]) || $_SESSION["idok"] !== "yes") {
 
 $section = isset($_POST['section']) ? $_POST['section'] : '';
 
+if ($section === 'brand_auto') {
+	$type = isset($_POST['brand_auto_type']) ? strtoupper(trim((string)$_POST['brand_auto_type'])) : 'A';
+	if (!in_array($type, pkshop_brand_preset_types(), true)) {
+		$type = 'A';
+	}
+	$action = isset($_POST['brand_auto_action']) ? trim((string)$_POST['brand_auto_action']) : 'save';
+	$redir = "pro_site_settings.php?tab=brand_auto&type=" . rawurlencode($type);
+
+	if ($action === 'capture') {
+		if (!pkshop_brand_preset_capture_live_to_type($type)) {
+			echo "<script>alert('현재 사이트 설정을 타입에 저장하지 못했습니다.');location.href='{$redir}';</script>";
+			exit;
+		}
+		echo "<script>alert('현재 사이트 설정을 {$type}형에 저장했습니다.');location.href='{$redir}';</script>";
+		exit;
+	}
+
+	if ($action === 'apply') {
+		$result = pkshop_brand_preset_apply_to_live($type);
+		if (empty($result['ok'])) {
+			$err = isset($result['error']) ? $result['error'] : '일괄적용에 실패했습니다.';
+			echo "<script>alert('" . addslashes($err) . "');location.href='{$redir}';</script>";
+			exit;
+		}
+		$label = isset($result['label']) ? $result['label'] : ($type . '형');
+		echo "<script>alert('" . addslashes($type . '형(' . $label . ')을 사이트에 일괄적용했습니다.') . "');location.href='{$redir}';</script>";
+		exit;
+	}
+
+	// save: merge with existing preset so hidden/label-only fields are kept
+	$existing = pkshop_brand_preset_get($type, true);
+	$merged = isset($existing['data']) && is_array($existing['data']) ? $existing['data'] : array();
+	foreach (pkshop_brand_preset_keys() as $key) {
+		if (isset($_POST[$key])) {
+			$merged[$key] = (string)$_POST[$key];
+		}
+	}
+	// keep bank display in sync inside preset
+	if (isset($merged['footer_bank_line1'])) {
+		$merged['payment_bank_line1'] = $merged['footer_bank_line1'];
+	}
+	if (isset($merged['footer_bank_line2'])) {
+		$merged['payment_bank_line2'] = $merged['footer_bank_line2'];
+	}
+	$label = isset($_POST['preset_label']) ? trim((string)$_POST['preset_label']) : '';
+	if ($label === '' && isset($merged['footer_company_name'])) {
+		$label = trim((string)$merged['footer_company_name']);
+	}
+	if (!pkshop_brand_preset_save_type($type, $merged, $label)) {
+		echo "<script>alert('타입 저장에 실패했습니다.');location.href='{$redir}';</script>";
+		exit;
+	}
+	echo "<script>alert('{$type}형이 저장되었습니다.');location.href='{$redir}';</script>";
+	exit;
+}
+
 if ($section === 'promo') {
 	require_once dirname(__FILE__) . '/../../include/pkshop_promo_lib.php';
 	$opts = pkshop_promo_rotate_interval_options();

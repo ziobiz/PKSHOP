@@ -1071,3 +1071,305 @@ if (!function_exists('pkshop_agree_privacy_text')) {
         return pkshop_brand_replace_text($text);
     }
 }
+
+if (!function_exists('pkshop_brand_preset_path')) {
+    function pkshop_brand_preset_path() {
+        return dirname(__FILE__) . '/.brand_presets.json';
+    }
+}
+
+if (!function_exists('pkshop_brand_preset_keys')) {
+    /** 브랜드자동화 일괄적용 대상 필드 */
+    function pkshop_brand_preset_keys() {
+        return array(
+            'footer_cs_title',
+            'footer_cs_line1',
+            'footer_cs_line2',
+            'footer_bank_title',
+            'footer_bank_line1',
+            'footer_bank_line2',
+            'footer_history_title',
+            'footer_delivery_title',
+            'footer_delivery_line1',
+            'footer_link_home',
+            'footer_link_terms',
+            'footer_link_policy',
+            'footer_about_title',
+            'footer_company_label',
+            'footer_company_name',
+            'footer_ceo_label',
+            'footer_ceo',
+            'footer_address_label',
+            'footer_address',
+            'footer_tel_label',
+            'footer_tel',
+            'footer_fax_label',
+            'footer_fax',
+            'footer_biz_label',
+            'footer_biz_no',
+            'footer_mail_order_label',
+            'footer_mail_order',
+            'footer_copyright',
+            'agree_company_name',
+            'agree_company_address',
+            'agree_terms_text',
+            'agree_privacy_text',
+            'payment_bank_line1',
+            'payment_bank_line2',
+            'payment_bank_line3',
+        );
+    }
+}
+
+if (!function_exists('pkshop_brand_preset_types')) {
+    function pkshop_brand_preset_types() {
+        return array('A', 'B', 'C');
+    }
+}
+
+if (!function_exists('pkshop_brand_preset_empty')) {
+    function pkshop_brand_preset_empty($type, $label = '') {
+        $type = strtoupper((string)$type);
+        if ($label === '') {
+            $label = $type . '형';
+        }
+        return array(
+            'label' => $label,
+            'data' => array(),
+        );
+    }
+}
+
+if (!function_exists('pkshop_brand_preset_snapshot_from_live')) {
+    /** 현재 사이트 브랜드 설정에서 프리셋 스냅샷 생성 */
+    function pkshop_brand_preset_snapshot_from_live() {
+        $settings = pkshop_site_settings(true);
+        $data = array();
+        foreach (pkshop_brand_preset_keys() as $key) {
+            if ($key === 'agree_terms_text') {
+                $data[$key] = function_exists('pkshop_agree_terms_text')
+                    ? pkshop_agree_terms_text(true)
+                    : (isset($settings[$key]) ? (string)$settings[$key] : '');
+                continue;
+            }
+            if ($key === 'agree_privacy_text') {
+                $data[$key] = function_exists('pkshop_agree_privacy_text')
+                    ? pkshop_agree_privacy_text(true)
+                    : (isset($settings[$key]) ? (string)$settings[$key] : '');
+                continue;
+            }
+            $data[$key] = isset($settings[$key]) ? (string)$settings[$key] : '';
+        }
+        $label = isset($data['footer_company_name']) ? trim($data['footer_company_name']) : '';
+        if ($label === '') {
+            $label = isset($data['agree_company_name']) ? trim($data['agree_company_name']) : 'A형';
+        }
+        if ($label === '') {
+            $label = 'A형';
+        }
+        return array(
+            'label' => $label,
+            'data' => $data,
+        );
+    }
+}
+
+if (!function_exists('pkshop_brand_presets_defaults')) {
+    function pkshop_brand_presets_defaults() {
+        return array(
+            'active' => 'A',
+            'presets' => array(
+                'A' => pkshop_brand_preset_empty('A', 'A형'),
+                'B' => pkshop_brand_preset_empty('B', 'B형'),
+                'C' => pkshop_brand_preset_empty('C', 'C형'),
+            ),
+        );
+    }
+}
+
+if (!function_exists('pkshop_brand_presets_normalize')) {
+    function pkshop_brand_presets_normalize($raw) {
+        $out = pkshop_brand_presets_defaults();
+        if (!is_array($raw)) {
+            return $out;
+        }
+        if (isset($raw['active']) && in_array(strtoupper((string)$raw['active']), pkshop_brand_preset_types(), true)) {
+            $out['active'] = strtoupper((string)$raw['active']);
+        }
+        if (!isset($raw['presets']) || !is_array($raw['presets'])) {
+            return $out;
+        }
+        foreach (pkshop_brand_preset_types() as $type) {
+            if (!isset($raw['presets'][$type]) || !is_array($raw['presets'][$type])) {
+                continue;
+            }
+            $item = $raw['presets'][$type];
+            $label = isset($item['label']) ? trim((string)$item['label']) : ($type . '형');
+            if ($label === '') {
+                $label = $type . '형';
+            }
+            $data = array();
+            $src = (isset($item['data']) && is_array($item['data'])) ? $item['data'] : array();
+            foreach (pkshop_brand_preset_keys() as $key) {
+                $data[$key] = isset($src[$key]) ? (string)$src[$key] : '';
+            }
+            $out['presets'][$type] = array(
+                'label' => $label,
+                'data' => $data,
+            );
+        }
+        return $out;
+    }
+}
+
+if (!function_exists('pkshop_brand_presets_save_file')) {
+    function pkshop_brand_presets_save_file($store) {
+        $store = pkshop_brand_presets_normalize($store);
+        $path = pkshop_brand_preset_path();
+        $json = json_encode($store, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        if ($json === false) {
+            return false;
+        }
+        $ok = @file_put_contents($path, $json, LOCK_EX);
+        return $ok !== false;
+    }
+}
+
+if (!function_exists('pkshop_brand_presets')) {
+    /**
+     * 브랜드 A/B/C 프리셋 로드.
+     * A형 data가 비어 있으면 현재 라이브 설정으로 시드한다.
+     */
+    function pkshop_brand_presets($refresh = false) {
+        static $cache = null;
+        if ($cache !== null && !$refresh) {
+            return $cache;
+        }
+
+        $store = pkshop_brand_presets_defaults();
+        $path = pkshop_brand_preset_path();
+        if (is_file($path)) {
+            $raw = @file_get_contents($path);
+            $json = json_decode((string)$raw, true);
+            $store = pkshop_brand_presets_normalize($json);
+        }
+
+        $a_data = isset($store['presets']['A']['data']) && is_array($store['presets']['A']['data'])
+            ? $store['presets']['A']['data']
+            : array();
+        $a_empty = true;
+        foreach (pkshop_brand_preset_keys() as $key) {
+            if (isset($a_data[$key]) && trim((string)$a_data[$key]) !== '') {
+                $a_empty = false;
+                break;
+            }
+        }
+        if ($a_empty) {
+            $store['presets']['A'] = pkshop_brand_preset_snapshot_from_live();
+            pkshop_brand_presets_save_file($store);
+        }
+
+        $cache = $store;
+        return $cache;
+    }
+}
+
+if (!function_exists('pkshop_brand_preset_get')) {
+    function pkshop_brand_preset_get($type, $refresh = false) {
+        $type = strtoupper((string)$type);
+        $store = pkshop_brand_presets($refresh);
+        if (!isset($store['presets'][$type])) {
+            return pkshop_brand_preset_empty($type);
+        }
+        return $store['presets'][$type];
+    }
+}
+
+if (!function_exists('pkshop_brand_preset_sanitize_data')) {
+    function pkshop_brand_preset_sanitize_data($input) {
+        $data = array();
+        if (!is_array($input)) {
+            $input = array();
+        }
+        foreach (pkshop_brand_preset_keys() as $key) {
+            $data[$key] = isset($input[$key]) ? (string)$input[$key] : '';
+        }
+        return $data;
+    }
+}
+
+if (!function_exists('pkshop_brand_preset_save_type')) {
+    /** 특정 타입 프리셋 저장 (편집 내용) */
+    function pkshop_brand_preset_save_type($type, $data, $label = null) {
+        $type = strtoupper((string)$type);
+        if (!in_array($type, pkshop_brand_preset_types(), true)) {
+            return false;
+        }
+        $store = pkshop_brand_presets(true);
+        $clean = pkshop_brand_preset_sanitize_data($data);
+        if ($label === null || trim((string)$label) === '') {
+            $label = isset($clean['footer_company_name']) ? trim($clean['footer_company_name']) : '';
+            if ($label === '') {
+                $label = isset($clean['agree_company_name']) ? trim($clean['agree_company_name']) : '';
+            }
+            if ($label === '') {
+                $label = $type . '형';
+            }
+        }
+        $store['presets'][$type] = array(
+            'label' => trim((string)$label),
+            'data' => $clean,
+        );
+        $store['active'] = $type;
+        return pkshop_brand_presets_save_file($store);
+    }
+}
+
+if (!function_exists('pkshop_brand_preset_capture_live_to_type')) {
+    /** 현재 사이트 설정을 선택한 타입에 덮어쓰기 */
+    function pkshop_brand_preset_capture_live_to_type($type) {
+        $type = strtoupper((string)$type);
+        if (!in_array($type, pkshop_brand_preset_types(), true)) {
+            return false;
+        }
+        $snap = pkshop_brand_preset_snapshot_from_live();
+        return pkshop_brand_preset_save_type($type, $snap['data'], $snap['label']);
+    }
+}
+
+if (!function_exists('pkshop_brand_preset_apply_to_live')) {
+    /** 선택한 타입을 라이브 브랜드 설정에 일괄적용 */
+    function pkshop_brand_preset_apply_to_live($type) {
+        $type = strtoupper((string)$type);
+        if (!in_array($type, pkshop_brand_preset_types(), true)) {
+            return array('ok' => false, 'error' => '지원하지 않는 타입입니다.');
+        }
+        $preset = pkshop_brand_preset_get($type, true);
+        $data = isset($preset['data']) && is_array($preset['data']) ? $preset['data'] : array();
+        $has = false;
+        foreach ($data as $v) {
+            if (trim((string)$v) !== '') {
+                $has = true;
+                break;
+            }
+        }
+        if (!$has) {
+            return array('ok' => false, 'error' => $type . '형에 저장된 내용이 없습니다. 먼저 타입을 저장하세요.');
+        }
+        $clean = pkshop_brand_preset_sanitize_data($data);
+        // 은행 표시 연동
+        if (isset($clean['footer_bank_line1'])) {
+            $clean['payment_bank_line1'] = $clean['footer_bank_line1'];
+        }
+        if (isset($clean['footer_bank_line2'])) {
+            $clean['payment_bank_line2'] = $clean['footer_bank_line2'];
+        }
+        if (!pkshop_site_settings_save($clean)) {
+            return array('ok' => false, 'error' => '사이트 설정 저장에 실패했습니다.');
+        }
+        $store = pkshop_brand_presets(true);
+        $store['active'] = $type;
+        pkshop_brand_presets_save_file($store);
+        return array('ok' => true, 'label' => isset($preset['label']) ? $preset['label'] : ($type . '형'));
+    }
+}

@@ -8,7 +8,7 @@ require_once dirname(__FILE__) . '/../../include/pkshop_promo_lib.php';
 include "gemini_client.php";
 
 $tab = isset($_GET['tab']) ? $_GET['tab'] : 'ai';
-if (!in_array($tab, array('ai', 'brand', 'currency', 'payment', 'promo'), true)) {
+if (!in_array($tab, array('ai', 'brand', 'brand_auto', 'currency', 'payment', 'promo'), true)) {
 	$tab = 'ai';
 }
 $s = pkshop_site_settings();
@@ -231,6 +231,9 @@ adm_ui_field_row('버튼 문구', '<input type="text" name="login_admin_btn" val
 <?php adm_ui_card_close(); ?>
 <?php require dirname(__FILE__) . '/inc/pro_site_settings_brand_ui.php'; ?>
 								</form>
+
+<? } elseif ($tab === 'brand_auto') { ?>
+<?php require dirname(__FILE__) . '/inc/pro_site_settings_brand_auto_ui.php'; ?>
 
 <? } elseif ($tab === 'currency') { ?>
 								<form method="post" action="pro_site_settings_ok.php" onsubmit="syncPaymentCurrency();">
