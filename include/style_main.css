@@ -569,15 +569,60 @@ body {
 	overflow:hidden;
 }
 
-.best_box01{
-	width:calc(94%/4);
-	float:left;
-	margin-right:2%;
-	margin-bottom:10px;
+.product_inner > div {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	width: 100%;
+	overflow: hidden;
+	gap: 16px 2%;
 }
-
-.best_box01:nth-child(4n+0){
-	margin-right:0px;
+/* BEST/RECOMMENDED 순환 컨테이너 — 내부 상품을 4열 그리드로 유지 */
+.product_inner > div > .pkshop-promo-rotate,
+.new_box > .pkshop-promo-rotate {
+	flex: 1 1 100%;
+	min-width: 0;
+}
+.pkshop-promo-rotate {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	width: 100%;
+	gap: 16px 2%;
+	box-sizing: border-box;
+}
+.pkshop-promo-rotate > .best_box01,
+.pkshop-promo-rotate > .new_product01,
+.pkshop-promo-rotate > .all_box01 {
+	width: calc((100% - 6%) / 4);
+	float: none;
+	margin-right: 0;
+	margin-bottom: 0;
+	box-sizing: border-box;
+}
+.best_box01{
+	width:calc((100% - 6%) / 4);
+	float: none;
+	margin-right: 0;
+	margin-bottom: 0;
+	box-sizing: border-box;
+}
+.best_box01:nth-child(4n){
+	margin-right:0;
+}
+.best_box01 .best_img a {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+}
+.best_box01 .best_img img {
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	max-height: 100%;
+	object-fit: contain;
 }
 
 .best_box02{
@@ -667,17 +712,39 @@ body {
 	width:1200px;
 	float:left;
 	padding:0 20px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	gap: 16px 2%;
+	box-sizing: border-box;
 }
 
 .new_product01{
-	width: calc(94%/4);
-    float: left;
-    margin-right: 2%;
-    margin-bottom: 10px;
+	width: calc((100% - 6%) / 4);
+	float: none;
+	margin-right: 0;
+	margin-bottom: 0;
+	box-sizing: border-box;
 }
 
 .new_product01:nth-child(4n+0){
-	margin-right:0px;
+	margin-right:0;
+}
+
+.new_img a {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+}
+
+.new_img img{
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	max-height: 100%;
+	object-fit: contain;
 }
 
 .new_product02{
@@ -695,11 +762,6 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-}
-
-.new_img img{
-	width: 80%;
-    height: auto;
 }
 
 .new_textbar{
@@ -770,14 +832,31 @@ body {
 }
 
 .all_box01 {
-    float: left;
-    margin-right: 2%;
-    margin-bottom: 10px;
-    width: calc(94%/4);
+	float: none;
+	margin-right: 0;
+	margin-bottom: 0;
+	width: calc((100% - 6%) / 4);
+	box-sizing: border-box;
 }
 
 .all_box01:nth-child(4n+0){
-	margin-right:0px;
+	margin-right:0;
+}
+
+.all_img a {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+}
+
+.all_img img{
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	max-height: 100%;
+	object-fit: contain;
 }
 
 .all_box02{
@@ -794,11 +873,6 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-}
-
-.all_img img{
-    width: 80%;
-    height: auto;
 }
 
 .all_text {

@@ -2667,13 +2667,44 @@ font-size:0.8em;
 	overflow:hidden;
 	margin-top:10px;
 }
-.best_box01 {
-    width: 48%;
-    margin: 0 auto;
-    padding-bottom: 50px;
-    float: left;
+.product_inner > div {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px 4%;
+	width: 100%;
 }
-.best_box01:nth-child(2n-1) {margin-right:4%;}
+/* BEST/RECOMMENDED 순환 컨테이너 — 모바일 2열 유지 */
+.product_inner > div > .pkshop-promo-rotate,
+.new_box > .pkshop-promo-rotate {
+	flex: 1 1 100%;
+	min-width: 0;
+}
+.pkshop-promo-rotate {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	width: 100%;
+	gap: 12px 4%;
+	box-sizing: border-box;
+}
+.pkshop-promo-rotate > .best_box01,
+.pkshop-promo-rotate > .new_product01,
+.pkshop-promo-rotate > .all_box01 {
+	width: 48%;
+	margin: 0;
+	padding-bottom: 20px;
+	float: none;
+	box-sizing: border-box;
+}
+.best_box01 {
+	width: 48%;
+	margin: 0;
+	padding-bottom: 20px;
+	float: none;
+	box-sizing: border-box;
+}
+.best_box01:nth-child(2n-1) {margin-right:0;}
 .best_box02{
 	width:200px;
 	float:left;
@@ -2681,16 +2712,28 @@ font-size:0.8em;
 
 .best_img{
 	width: 100%;
-    height: 150px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	height: 220px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid #e4e4e4;
+}
+
+.best_img a {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
 }
 
 .best_img img {
-    width: 100%;
-    height: 100%;
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	max-height: 100%;
+	object-fit: contain;
 }
 
 .best_text {
@@ -2759,15 +2802,21 @@ font-size:0.8em;
 }
 
 .new_box{
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px 4%;
 }
 
 .new_product01 {
-    width:48%;
-    float: left;
-    margin-bottom: 10px;
+	width:48%;
+	float: none;
+	margin-bottom: 0;
+	margin-right: 0;
+	box-sizing: border-box;
 }
 .new_product01:nth-child(2n-1) {
-    margin-right: 4%;
+	margin-right: 0;
 }
 .new_product02{
 	width:260px;
@@ -2776,17 +2825,29 @@ font-size:0.8em;
 }
 
 .new_img {
-    width: 100%;
-    height: 150px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	width: 100%;
+	height: 220px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid #e4e4e4;
+}
+
+.new_img a {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
 }
 
 .new_img img {
-    width: 100%;
-    height: 100%;
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	max-height: 100%;
+	object-fit: contain;
 }
 
 .new_textbar{
@@ -2853,11 +2914,12 @@ font-size:0.8em;
 
 .nav_logo img {width:125px;}
 .all_box01{
-    width: 48%;
-    margin: 0 auto;
-    float: left;
+	width: 48%;
+	margin: 0;
+	float: none;
+	box-sizing: border-box;
 }
-.all_box01:nth-child(2n-1) {margin-right:4%;}
+.all_box01:nth-child(2n-1) {margin-right:0;}
 .all_box02{
 	width:1;
 	float:left;
@@ -2865,16 +2927,28 @@ font-size:0.8em;
 
 .all_img{
 	width: 100%;
-    height: 150px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	height: 220px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid #e4e4e4;
+}
+
+.all_img a {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
 }
 
 .all_img img{
-	width: 100%;
-    height: 100%;
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	max-height: 100%;
+	object-fit: contain;
 }
 
 .all_text{

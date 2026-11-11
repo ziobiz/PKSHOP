@@ -23,7 +23,7 @@
 	$nc = 6;
 	$a='0123456789';
      $l=strlen($a)-1; $rr='';
-     while($nc-->0) $rr.=$a{mt_rand(0,$l)};
+     while($nc-->0) $rr.=$a[mt_rand(0,$l)];
  
 		if ($_POST['userid'] != "")
 		{

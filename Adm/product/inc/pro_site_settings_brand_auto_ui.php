@@ -25,11 +25,11 @@ function pkshopBrandAutoSwitch(type) {
 }
 function pkshopBrandAutoConfirmApply() {
 	var type = document.getElementById('brand_auto_type').value;
-	return confirm(type + '형 내용으로 하단정보 / About company / 이용약관·개인정보를 일괄 적용할까요?\n\n현재 사이트 값이 덮어씌워집니다.');
+	return confirm(type + '형 내용으로 라이브 사이트(하단정보 / About company / 이용약관·개인정보)에 일괄적용할까요?\n\n현재 라이브 값이 덮어씌워집니다.');
 }
 </script>
 
-<?php adm_ui_notice('A/B/C 타입에 회사·푸터·약관 정보를 저장해 두고, 선택 타입으로 <strong>일괄적용</strong>하면 사이트에 바로 반영됩니다. 로고·배너·결제연동은 포함되지 않습니다.', 'info'); ?>
+<?php adm_ui_notice('A/B/C 타입에 회사·푸터·약관 정보를 저장해 두고, <strong>이 타입으로 라이브 일괄적용</strong>을 누르면 라이브 사이트에 바로 반영됩니다. 로고·배너·결제연동은 포함되지 않습니다.', 'info'); ?>
 
 <form method="post" action="pro_site_settings_ok.php" id="brand_auto_form">
 <input type="hidden" name="section" value="brand_auto">
@@ -117,9 +117,9 @@ adm_ui_field_row(
 <?php adm_ui_settings_col_close(); ?>
 <?php
 $actions = '';
-$actions .= '<button type="submit" name="brand_auto_action" value="save" class="pg-btn pg-btn-primary">이 타입 저장</button> ';
-$actions .= '<button type="submit" name="brand_auto_action" value="capture" class="pg-btn pg-btn-outline">현재 사이트 설정을 이 타입에 저장</button> ';
-$actions .= '<button type="submit" name="brand_auto_action" value="apply" class="pg-btn pg-btn-primary" onclick="return pkshopBrandAutoConfirmApply();">이 타입으로 일괄적용</button>';
+$actions .= '<button type="submit" name="brand_auto_action" value="save" class="pg-btn pg-btn-pastel-blue">이 타입 저장</button> ';
+$actions .= '<button type="submit" name="brand_auto_action" value="capture" class="pg-btn pg-btn-pastel-yellow">현재 사이트 설정을 이 타입에 저장</button> ';
+$actions .= '<button type="submit" name="brand_auto_action" value="apply" class="pg-btn pg-btn-pastel-red" onclick="return pkshopBrandAutoConfirmApply();">이 타입으로 라이브 일괄적용</button>';
 adm_ui_form_actions($actions);
 ?>
 <?php adm_ui_card_close(); ?>

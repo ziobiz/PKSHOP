@@ -1,7 +1,7 @@
 <?
 @session_start();
 
-
+include_once( $_SERVER["DOCUMENT_ROOT"]."/include/php_compat.php");
 include_once( $_SERVER["DOCUMENT_ROOT"]."/Adm/lib/config.php"); 
 include_once( $_SERVER["DOCUMENT_ROOT"]."/Adm/lib/basic_class.php");
 include_once( $_SERVER["DOCUMENT_ROOT"]."/Adm/lib/common_db.php");
@@ -34,6 +34,11 @@ $member_p="member_p";				//이벤트데이타
 $coin_goods="coin_goods";
 
 $shop_key		= "459sdfwodlfjsx342255";
+/* PHP 8.4: prefill missing request keys to avoid undefined-array-key noise */
+foreach (array('B_Title','Cid','Cnt','Cont','Cont_type','Edit','Email','Homepage','Ip','Name','No','Old_file','Old_size','P_Fname','P_Fsize','P_Link','P_Location','P_Name','P_Size','P_Target','P_Up','Pass','PassWord','Point','Secret','Secret_ok','Sub_No','Title','Wdate','add_opt1','add_opt2','add_opt3','add_opt4','add_opt5','addr1','address','address1','amount','bank','best','button','buyername','buytype','cate','cate1','cate2','cate3','cate4','catenum1','catenum2','catenum3','catenum4','cateuid1','cateuid2','cateuid3','cateuid4','center','char_day','char_month','char_num','char_year','chk_num','chk_order','cmenu','code','code1','code2','code3','code4','coin','color','color_opt','com_no','company','currnum','cut','ddate1','ddate2','del_num','detail','dis','email','event','event_str','feature','file_name','globaltop_id','handphone','handphone1','handphone2','handphone3','home','htel','id','imgl','imgm','in_day','in_name','info','k_name','k_ordernum1','k_ordernum2','k_ordernum3','key','keyfield','keynum','kkid','kkid1','kkpoint1','left_code','level_l','mdate1','mdate2','member_count','mode','name','new','no','old_img','old_imgb1','old_imgb2','old_imgb3','old_imgb4','old_imgb5','old_imgm','opt_num','opt_num_str','option_k1','option_k2','option_k3','option_k4','option_k5','option_n1','option_n2','option_n3','option_n4','option_n5','option_p1','option_p2','option_p3','option_p4','option_p5','option_t1','option_t2','option_t3','option_t4','option_t5','order1','order2','order3','order4','order_kk','ordernum','ordnum','ostatus','ostatus_tmp','p_id','page','passwd','passwd2','pay_email','pay_name','paymentkind','point','point_dis','post','pr_kind','price_dis','pricec','priced','prices','query_dis','raddr1','rank','rank_f','rank_g','rank_n','rank_r','rank_s','rank_x','rank_y','rank_z','rcontent','recommend','recommend2','recvname','relation','rhtel','rpost','sel_cate','sel_code1','sel_code2','sel_code3','sel_code4','sel_goods','sel_kind','sel_status','sel_theme','select','shelf','signdate','size','size_opt','soldout','sword','theme','theme_f','theme_g','theme_n','theme_r','theme_s','theme_str','theme_x','theme_y','theme_z','title','title_cate1','total_coin1','total_money_num','total_price123','tyear','type','usepoint','warnnum','word','ydate1','ydate2','zipcorde') as $_pk_req_k) {
+	if (!isset($_REQUEST[$_pk_req_k])) { $_REQUEST[$_pk_req_k] = ''; }
+}
+
 
 $globaltop_id = $_REQUEST['globaltop_id'];
 $sel_cate = $_REQUEST['sel_cate'];

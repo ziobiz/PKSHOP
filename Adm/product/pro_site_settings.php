@@ -16,7 +16,13 @@ if ($tab === 'payment') {
 	$s = pkshop_icopay_admin_form_values();
 }
 $currency_opts = pkshop_currency_options();
+$currency_round_modes = pkshop_currency_round_mode_options();
+$currency_round_units = pkshop_currency_round_unit_options();
 $api_key_status = gemini_api_key_status();
+$ai_settings = gemini_load_settings();
+$ai_model_catalog = gemini_model_catalog();
+$ai_text_map = gemini_model_option_map('text');
+$ai_image_map = gemini_model_option_map('image');
 $enabled_codes = pkshop_currency_enabled_codes();
 $icopay_secret_status = pkshop_icopay_broker_secret_status();
 $icopay_mode_opts = pkshop_icopay_integration_mode_options();
@@ -45,6 +51,28 @@ async function saveApiKey() {
 	document.getElementById('api_key_masked').textContent = res.masked;
 	document.getElementById('api_key_input').value = '';
 	alert(res.message || 'API 키가 저장되었습니다.');
+}
+function syncAiModelPriceHint(selectId, hintId) {
+	var sel = document.getElementById(selectId);
+	var hint = document.getElementById(hintId);
+	if (!sel || !hint) return;
+	var opt = sel.options[sel.selectedIndex];
+	if (!opt) { hint.textContent = ''; return; }
+	var price = opt.getAttribute('data-price') || '';
+	var badge = opt.getAttribute('data-badge') || '';
+	hint.textContent = (badge ? '[' + badge + '] ' : '') + price + '  ·  유료 Standard 기준 (Google AI Studio)';
+}
+async function saveAiModels() {
+	var textModel = document.getElementById('ai_text_model').value;
+	var imageModel = document.getElementById('ai_image_model').value;
+	if (!textModel || !imageModel) { alert('텍스트/이미지 모델을 선택하세요.'); return; }
+	var res = await postRun({ action: 'save_ai_models', text_model: textModel, image_model: imageModel });
+	if (res.error) { alert(res.error); return; }
+	var curText = document.getElementById('ai_text_model_current');
+	var curImage = document.getElementById('ai_image_model_current');
+	if (curText) curText.textContent = res.text_label || textModel;
+	if (curImage) curImage.textContent = res.image_label || imageModel;
+	alert(res.message || 'AI 모델 설정이 저장되었습니다.');
 }
 function syncPaymentCurrency() {
 	var primaryOn = document.getElementById('currency_primary_enabled').value === '1';
@@ -177,12 +205,50 @@ adm_ui_page_open($page_screen_class); ?>
 	$api_input_html .= '</div>';
 	$api_input_html .= '<p class="pg-field-hint">lib/gemini_secrets.local.php 에 저장됩니다.</p>';
 	$api_input_html .= '</div>';
+
+	$text_select = '<div class="pg-ai-model-field">';
+	$text_select .= '<div class="pg-field-hint" style="margin-bottom:8px;">현재: <span id="ai_text_model_current">' . adm_ui_h(gemini_model_select_label($ai_text_map[$ai_settings['text_model']])) . '</span></div>';
+	$text_select .= '<select id="ai_text_model" class="pg-select pg-select--w-full" onchange="syncAiModelPriceHint(\'ai_text_model\',\'ai_text_model_hint\');">';
+	foreach ($ai_model_catalog['text'] as $row) {
+		$sel = ($row['id'] === $ai_settings['text_model']) ? ' selected' : '';
+		$text_select .= '<option value="' . adm_ui_h($row['id']) . '" data-price="' . adm_ui_h($row['price']) . '" data-badge="' . adm_ui_h($row['badge']) . '"' . $sel . '>'
+			. adm_ui_h(gemini_model_select_label($row)) . '</option>';
+	}
+	$text_select .= '</select>';
+	$text_select .= '<p id="ai_text_model_hint" class="pg-field-hint" style="margin-top:8px;"></p>';
+	$text_select .= '<p class="pg-field-hint">상품명·가격·설명 등 기획(텍스트) 생성에 사용합니다. 1M 토큰 단가입니다.</p>';
+	$text_select .= '</div>';
+
+	$image_select = '<div class="pg-ai-model-field">';
+	$image_select .= '<div class="pg-field-hint" style="margin-bottom:8px;">현재: <span id="ai_image_model_current">' . adm_ui_h(gemini_model_select_label($ai_image_map[$ai_settings['image_model']])) . '</span></div>';
+	$image_select .= '<select id="ai_image_model" class="pg-select pg-select--w-full" onchange="syncAiModelPriceHint(\'ai_image_model\',\'ai_image_model_hint\');">';
+	foreach ($ai_model_catalog['image'] as $row) {
+		$sel = ($row['id'] === $ai_settings['image_model']) ? ' selected' : '';
+		$image_select .= '<option value="' . adm_ui_h($row['id']) . '" data-price="' . adm_ui_h($row['price']) . '" data-badge="' . adm_ui_h($row['badge']) . '"' . $sel . '>'
+			. adm_ui_h(gemini_model_select_label($row)) . '</option>';
+	}
+	$image_select .= '</select>';
+	$image_select .= '<p id="ai_image_model_hint" class="pg-field-hint" style="margin-top:8px;"></p>';
+	$image_select .= '<p class="pg-field-hint">상품 이미지 생성에 사용합니다. 장당 예상 단가(해상도에 따라 달라질 수 있음)입니다.</p>';
+	$image_select .= '</div>';
+
+	$model_actions = '<div class="pg-input-unit pg-input-unit--inline-hint">';
+	$model_actions .= '<button type="button" class="pg-btn pg-btn-primary" onclick="saveAiModels();">모델 설정 저장</button>';
+	$model_actions .= '<span class="pg-field-hint-inline">선택한 모델이 AI 상품생성에 바로 적용됩니다. 실패 시 다음 후보 모델로 자동 재시도합니다.</span>';
+	$model_actions .= '</div>';
 ?>
 <?php adm_ui_card_open('AI 설정'); ?>
-<?php adm_ui_notice('AI 상품생성은 <a href="pro_ai_generate.php">AI 상품생성</a> 메뉴에서 진행합니다.', 'info'); ?>
+<?php adm_ui_notice('AI 상품생성은 <a href="pro_ai_generate.php">AI 상품생성</a> 메뉴에서 진행합니다. 아래 모델은 직접 선택·저장할 수 있으며, 옵션에 단가가 함께 표시됩니다.', 'info'); ?>
 <?php adm_ui_settings_col_open(); ?>
 <?php adm_ui_field_row('API 키', $api_input_html, true, true); ?>
+<?php adm_ui_field_row('텍스트 모델', $text_select, true, true); ?>
+<?php adm_ui_field_row('이미지 모델', $image_select, true, true); ?>
+<?php adm_ui_field_row('저장', $model_actions, false, true); ?>
 <?php adm_ui_settings_col_close(); ?>
+<script>
+syncAiModelPriceHint('ai_text_model', 'ai_text_model_hint');
+syncAiModelPriceHint('ai_image_model', 'ai_image_model_hint');
+</script>
 <?php adm_ui_card_close(); ?>
 
 <? } elseif ($tab === 'brand') { ?>
@@ -239,11 +305,16 @@ adm_ui_field_row('버튼 문구', '<input type="text" name="login_admin_btn" val
 								<form method="post" action="pro_site_settings_ok.php" onsubmit="syncPaymentCurrency();">
 								<input type="hidden" name="section" value="currency">
 <?php adm_ui_card_open('통화 설정'); ?>
-<?php adm_ui_notice('상품 DB 가격은 USD 기준입니다. Yahoo Finance 환율로 변환·표시합니다.', 'info'); ?>
+<?php adm_ui_notice('상품 DB 가격은 USD 기준입니다. Yahoo Finance 환율로 변환한 뒤, 아래 자리수·처리 방식으로 표시합니다. 기본값은 <strong>10 단위 절사(버림)</strong>입니다.', 'info'); ?>
 <?php adm_ui_settings_col_open(); ?>
 <?php
 $primary_enabled = ($s['currency_primary_enabled'] !== '0');
 $secondary_enabled = ($s['currency_secondary_enabled'] !== '0');
+$round_mode_cur = isset($s['currency_round_mode']) ? $s['currency_round_mode'] : 'floor';
+$round_unit_cur = isset($s['currency_round_unit']) ? $s['currency_round_unit'] : '10';
+if (!isset($currency_round_modes[$round_mode_cur])) $round_mode_cur = 'floor';
+if (!isset($currency_round_units[$round_unit_cur])) $round_unit_cur = '10';
+
 $primary_curr = '<div class="pg-currency-field-row">';
 $primary_curr .= '<select name="currency_primary_enabled" id="currency_primary_enabled" class="pg-input pg-input--w-sm" onchange="syncPaymentCurrency();">';
 $primary_curr .= '<option value="1"' . ($primary_enabled ? ' selected' : '') . '>사용</option>';
@@ -277,8 +348,25 @@ $payment_curr .= '</select>';
 $payment_curr .= '<p class="pg-field-hint" id="currency_payment_hint">노출 통화 중에서만 선택 가능</p>';
 adm_ui_field_row('결제 기준 통화', $payment_curr, false, true);
 
+$round_mode_html = '<select name="currency_round_mode" id="currency_round_mode" class="pg-select pg-select--w-md">';
+foreach ($currency_round_modes as $val => $label) {
+    $round_mode_html .= '<option value="' . adm_ui_h($val) . '"' . ($round_mode_cur === $val ? ' selected' : '') . '>' . adm_ui_h($label) . '</option>';
+}
+$round_mode_html .= '</select>';
+$round_mode_html .= '<p class="pg-field-hint">반올림 / 절상 / 절사(버림) / 오사오입 중 선택</p>';
+adm_ui_field_row('금액 처리 방식', $round_mode_html, true, true);
+
+$round_unit_html = '<select name="currency_round_unit" id="currency_round_unit" class="pg-select pg-select--w-md">';
+foreach ($currency_round_units as $val => $label) {
+    $round_unit_html .= '<option value="' . adm_ui_h($val) . '"' . ((string)$round_unit_cur === (string)$val ? ' selected' : '') . '>' . adm_ui_h($label) . '</option>';
+}
+$round_unit_html .= '</select>';
+$round_unit_html .= '<p class="pg-field-hint">예: 단위 10 + 절사 → 12,345 → 12,340</p>';
+adm_ui_field_row('금액 자리수', $round_unit_html, true, true);
+
 $example_html = '<div class="pg-field-stack"><div>예시 (USD 430 기준): <strong>' . adm_ui_h(pkshop_format_display_price(430)) . '</strong></div>';
-$example_html .= '<div>결제 금액 예시: <strong>' . adm_ui_h(pkshop_format_currency_amount(pkshop_payment_amount_from_usd(430), pkshop_get_payment_currency())) . '</strong></div></div>';
+$example_html .= '<div>결제 금액 예시: <strong>' . adm_ui_h(pkshop_format_currency_amount(pkshop_payment_amount_from_usd(430), pkshop_get_payment_currency())) . '</strong></div>';
+$example_html .= '<div class="pg-field-hint">현재 규칙: ' . adm_ui_h($currency_round_modes[$round_mode_cur]) . ' / 단위 ' . adm_ui_h($currency_round_units[$round_unit_cur]) . '</div></div>';
 adm_ui_field_row('환율 예시', $example_html, false, true);
 ?>
 <?php adm_ui_settings_col_close(); ?>
@@ -298,12 +386,12 @@ adm_ui_field_row('환율 예시', $example_html, false, true);
 								<form method="post" action="pro_site_settings_ok.php">
 								<input type="hidden" name="section" value="promo">
 <?php adm_ui_card_open('홍보설정'); ?>
-<?php adm_ui_notice('메인 첫 화면의 <strong>BEST</strong>(4개), <strong>RECOMMENDED</strong>(8개), <strong>All PRODUCTS</strong> 영역이 등록된 상품·카테고리 풀에서 정해진 시간마다 순차적으로 교체됩니다.', 'info'); ?>
+<?php adm_ui_notice('메인 첫 화면의 <strong>BEST</strong>(최대 8개), <strong>RECOMMENDED</strong>(최대 8개), <strong>All PRODUCTS</strong> 영역이 등록된 상품·카테고리 풀에서 정해진 시간마다 순차적으로 교체됩니다. BEST·RECOMMENDED는 상품이 8개를 초과하면 기본 30분 간격으로 로테이션됩니다.', 'info'); ?>
 <?php adm_ui_settings_col_open(); ?>
 <?php
 $best_opts = '<select name="promo_rotate_best" class="pg-input pg-input--w-md">';
 foreach ($interval_opts as $sec => $label) {
-    $best_opts .= '<option value="' . adm_ui_h($sec) . '"' . ((string)$promo_best_sec === (string)$sec ? ' selected' : '') . '>' . adm_ui_h($label) . ' (화면 4개)</option>';
+    $best_opts .= '<option value="' . adm_ui_h($sec) . '"' . ((string)$promo_best_sec === (string)$sec ? ' selected' : '') . '>' . adm_ui_h($label) . ' (화면 8개)</option>';
 }
 $best_opts .= '</select>';
 adm_ui_field_row('BEST 순환 간격', $best_opts, false, true);

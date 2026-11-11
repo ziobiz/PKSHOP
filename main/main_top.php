@@ -43,8 +43,8 @@
 <meta property="og:description" content="Pentakleva">
 <title>Pentakleva</title>
 <link rel="stylesheet" href="../include/reset.css">
-<link rel="stylesheet" type="text/css" href="../include/style_main.css" media="screen and (min-width:1024px)"/>
-<link rel="stylesheet" type="text/css" href="../include/responsive.css" media="screen and (max-width:1023px)"/>
+<link rel="stylesheet" type="text/css" href="../include/style_main.css?v=20261112promoGrid" media="screen and (min-width:1024px)"/>
+<link rel="stylesheet" type="text/css" href="../include/responsive.css?v=20261112promoGrid" media="screen and (max-width:1023px)"/>
 <link rel="stylesheet" href="../include/swiper.min.css">
 
  </head>
@@ -126,6 +126,7 @@
 						$tops = curl_exec ($ch);
 						curl_close ($ch);
 						$tops = json_decode($tops,true);
+						if (!is_array($tops)) { $tops = array(); }
 						$count = count($tops);
 
 
@@ -177,8 +178,8 @@
 		// echo $result;
 		// exit;
 		
-		$json_o = json_decode($result,true);
-
+		$json_o = json_decode($result, true);
+		if (!is_array($tops)) { $tops = array(); }
 		$count = count($json_o);
 									
 		

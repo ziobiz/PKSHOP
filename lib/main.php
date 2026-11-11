@@ -123,8 +123,8 @@ if($theme_str!=""){
 		
 		
 		
-		$json_o = json_decode($result,true);
-
+		$json_o = json_decode($result, true);
+		if (!is_array($json_o)) { $json_o = array(); }
 		$count = count($json_o);
 
 		$total_record = $count;
@@ -364,8 +364,8 @@ $data = "deId=e7bb77ca2517821473681d3e9fe132e54c21bdff0ef170596f0414032aac3dbc&T
 		
 		//echo $result;
 		
-		$json_o = json_decode($result,true);
-
+		$json_o = json_decode($result, true);
+		if (!is_array($json_o)) { $json_o = array(); }
 		$count = count($json_o);
 
 		$total_record = $count;
@@ -556,10 +556,8 @@ if($i==$last){
 	$result = curl_exec ($ch);
 	curl_close ($ch);
 	
-	$json_o = json_decode($result,true);
-	
-	
-
+	$json_o = json_decode($result, true);
+	if (!is_array($json_o)) { $json_o = array(); }
 	$count = count($json_o);
 	$total_record_tt = $count;
 	
@@ -589,8 +587,8 @@ if($i==$last){
 
 		if ($result != '')
 		{
-		$json_o = json_decode($result,true);
-		
+		$json_o = json_decode($result, true);
+		if (!is_array($json_o)) { $json_o = array(); }
 		$count = count($json_o);
 
 		for ($j = 0;$j<$count ; $j++)
@@ -679,9 +677,8 @@ if($theme_str!=""){
 	curl_close ($ch);
 	
 	//echo $result;
-	$json_o = json_decode($result,true);
-	
-
+	$json_o = json_decode($result, true);
+	if (!is_array($json_o)) { $json_o = array(); }
 	$count = count($json_o);
 
 	

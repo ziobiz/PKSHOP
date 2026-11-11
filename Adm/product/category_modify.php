@@ -75,6 +75,18 @@ $cate2 = addslashes($cate2);
 $cate3 = addslashes($cate3);
 $cate4 = addslashes($cate4);
 
+// 1차 카테고리명 변경 시 다른 대분류와 이름 중복 금지
+if ($cate == '1') {
+	$DB->get(
+		"SELECT uid, cate1, code1 FROM $shop_cate WHERE code2='00' AND code3='00' AND code4='00' AND LOWER(TRIM(cate1))=LOWER(TRIM('$cate1')) AND uid<>'$uid' LIMIT 1",
+		$name_rs,
+		$name_rn
+	);
+	if ($name_rn > 0) {
+		popup_msg("이미 \"" . stripslashes($name_rs[0]['cate1']) . "\" 카테고리명이 있습니다. 동일 이름으로는 변경할 수 없습니다.");
+		exit;
+	}
+}
 
 $query = "cate1='$cate1',cate2='$cate2',cate3='$cate3',cate4='$cate4' WHERE uid = '$uid'";
 $DB->update($shop_cate,$query);

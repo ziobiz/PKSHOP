@@ -36,7 +36,7 @@ if ($section === 'brand_auto') {
 			exit;
 		}
 		$label = isset($result['label']) ? $result['label'] : ($type . '형');
-		echo "<script>alert('" . addslashes($type . '형(' . $label . ')을 사이트에 일괄적용했습니다.') . "');location.href='{$redir}';</script>";
+		echo "<script>alert('" . addslashes($type . '형(' . $label . ')을 라이브 사이트에 일괄적용했습니다.') . "');location.href='{$redir}';</script>";
 		exit;
 	}
 
@@ -200,6 +200,21 @@ if ($section === 'currency') {
 		}
 		$data['currency_payment_code'] = $payment;
 	}
+
+	$round_modes = pkshop_currency_round_mode_options();
+	$round_units = pkshop_currency_round_unit_options();
+	$round_mode = isset($_POST['currency_round_mode']) ? strtolower(trim((string)$_POST['currency_round_mode'])) : (isset($existing['currency_round_mode']) ? $existing['currency_round_mode'] : 'floor');
+	$round_unit = isset($_POST['currency_round_unit']) ? trim((string)$_POST['currency_round_unit']) : (isset($existing['currency_round_unit']) ? $existing['currency_round_unit'] : '10');
+	if (!isset($round_modes[$round_mode])) {
+		echo "<script>alert('금액 처리 방식(반올림/절상/절사/오사오입)을 선택하세요.');history.back();</script>";
+		exit;
+	}
+	if (!isset($round_units[$round_unit])) {
+		echo "<script>alert('금액 자리수 단위를 선택하세요.');history.back();</script>";
+		exit;
+	}
+	$data['currency_round_mode'] = $round_mode;
+	$data['currency_round_unit'] = $round_unit;
 }
 
 if ($section === 'payment') {

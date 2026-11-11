@@ -57,7 +57,7 @@
 				<a href="../cart/cart.php">Shopping Cart</a>
 				</div>
 				<div class="header_top_box02">
-					<?if($_SESSION['member_id']==""){ ?>
+					<?if(!isset($_SESSION['member_id']) || $_SESSION['member_id']==""){ ?>
 					<a href="../member/login.php">LOGIN or Membership</a>
 					<!-- <a href="../member/agree.php">JOIN US</a> -->
 					<?}else{?>
@@ -107,7 +107,7 @@
 					</select>
 					
 					<div class="header_input">
-					<input type="text" name="word" style="border:none;" value="<?=$_REQUEST['word']?>">
+					<input type="text" name="word" style="border:none;" value="<?=isset($_REQUEST['word']) ? htmlspecialchars((string)$_REQUEST['word'], ENT_QUOTES, 'UTF-8') : ''?>">
 					<a onclick="javascript:sgo2();" style="cursor:pointer;"><img src="../images/icon01.png"></a>
 					</div>
 				</form>
@@ -128,6 +128,7 @@
 						$tops = curl_exec ($ch);
 						curl_close ($ch);
 						$tops = json_decode($tops,true);
+						if (!is_array($tops)) { $tops = array(); }
 						$count = count($tops);
 
 
@@ -204,6 +205,7 @@
 
 		
 		$json_o = json_decode($result,true);
+		if (!is_array($json_o)) { $json_o = array(); }
 
 		$count = count($json_o);
 
@@ -249,7 +251,7 @@
 		
 				<div class="header_top_box02">
 					
-				<?if($_SESSION['member_id']==""){ ?>
+				<?if(!isset($_SESSION['member_id']) || $_SESSION['member_id']==""){ ?>
 					<a href="../member/login.php">LOGIN or Membership<br>(로그인 및 회원가입)</a>
 					<!-- <a href="../member/agree.php">JOIN US</a> -->
 					<?}else{?>

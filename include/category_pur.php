@@ -41,6 +41,7 @@
 
 		$json_o = json_decode($result,true);
 
+		if (!is_array($json_o)) { $json_o = array(); }
 		$count = count($json_o);
 
 		
@@ -85,7 +86,8 @@
 				
 				$json_o = json_decode($result,true);
 
-				$count = count($json_o);
+				if (!is_array($json_o)) { $json_o = array(); }
+		$count = count($json_o);
 				
 				$total_record_tm = $count;
 				?>
@@ -127,6 +129,7 @@
 				// echo $result_tt;
 				
 				$json_o_tt = json_decode($result_tt,true);
+				if (!is_array($json_o_tt)) { $json_o_tt = array(); }
 
 				$count_tt = count($json_o_tt);
 				

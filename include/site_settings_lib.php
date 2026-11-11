@@ -38,8 +38,8 @@ if (!function_exists('pkshop_site_settings_defaults')) {
             'main_all_code4' => '',
             'main_all_sel_cate' => '',
             'main_all_categories' => '',
-            'promo_rotate_best' => '30',
-            'promo_rotate_recommended' => '30',
+            'promo_rotate_best' => '1800',
+            'promo_rotate_recommended' => '1800',
             'promo_rotate_all' => '30',
             'footer_cs_title' => '顧客センター',
             'footer_cs_line1' => 'OPEN: 09:00 ~ 18:00 / 土日祝休業',
@@ -91,6 +91,9 @@ if (!function_exists('pkshop_site_settings_defaults')) {
             'currency_secondary_code' => 'JPY',
             'currency_secondary_enabled' => '1',
             'currency_payment_code' => 'USD',
+            /* 환율 변환 후 표시 금액 자리수·처리 방식 (기본: 10 단위 절사) */
+            'currency_round_mode' => 'floor',
+            'currency_round_unit' => '10',
             'payment_pg_provider' => 'ICOPAY',
             'payment_pg_enabled' => '1',
             'icopay_merchant_name' => '',
@@ -144,12 +147,126 @@ if (!function_exists('pkshop_currency_options')) {
     function pkshop_currency_options() {
         return array(
             'USD' => array('label' => 'USD (미국 달러)', 'symbol' => 'USD', 'decimals' => 0),
-            'JPY' => array('label' => 'JPY (일본 엔)', 'symbol' => 'JPY', 'decimals' => 0, 'ceil_unit' => 100),
-            'KRW' => array('label' => 'KRW (한국 원)', 'symbol' => 'KRW', 'decimals' => 0, 'ceil_unit' => 100),
+            'JPY' => array('label' => 'JPY (일본 엔)', 'symbol' => 'JPY', 'decimals' => 0),
+            'KRW' => array('label' => 'KRW (한국 원)', 'symbol' => 'KRW', 'decimals' => 0),
             'EUR' => array('label' => 'EUR (유로)', 'symbol' => 'EUR', 'decimals' => 0),
             'THB' => array('label' => 'THB (태국 바트)', 'symbol' => 'THB', 'decimals' => 0),
             'CNY' => array('label' => 'CNY (중국 위안)', 'symbol' => 'CNY', 'decimals' => 0),
         );
+    }
+}
+
+if (!function_exists('pkshop_currency_round_mode_options')) {
+    function pkshop_currency_round_mode_options() {
+        return array(
+            'round'  => '반올림',
+            'ceil'   => '절상',
+            'floor'  => '절사(버림)',
+            'banker' => '오사오입',
+        );
+    }
+}
+
+if (!function_exists('pkshop_currency_round_unit_options')) {
+    /** value => 화면 라벨 (자리 단위) */
+    function pkshop_currency_round_unit_options() {
+        return array(
+            '100'   => '100',
+            '10'    => '10',
+            '1'     => '0 (1의 자리)',
+            '0.1'   => '.0 (소수 1자리)',
+            '0.01'  => '.01 (소수 2자리)',
+            '0.001' => '.001 (소수 3자리)',
+        );
+    }
+}
+
+if (!function_exists('pkshop_currency_round_unit_value')) {
+    function pkshop_currency_round_unit_value($unit = null) {
+        if ($unit === null) {
+            $s = pkshop_site_settings();
+            $unit = isset($s['currency_round_unit']) ? $s['currency_round_unit'] : '10';
+        }
+        $unit = trim((string)$unit);
+        $opts = pkshop_currency_round_unit_options();
+        if (!isset($opts[$unit])) {
+            $unit = '10';
+        }
+        $val = floatval($unit);
+        return ($val > 0) ? $val : 10.0;
+    }
+}
+
+if (!function_exists('pkshop_currency_round_mode_value')) {
+    function pkshop_currency_round_mode_value($mode = null) {
+        if ($mode === null) {
+            $s = pkshop_site_settings();
+            $mode = isset($s['currency_round_mode']) ? $s['currency_round_mode'] : 'floor';
+        }
+        $mode = strtolower(trim((string)$mode));
+        $opts = pkshop_currency_round_mode_options();
+        if (!isset($opts[$mode])) {
+            $mode = 'floor';
+        }
+        return $mode;
+    }
+}
+
+if (!function_exists('pkshop_currency_round_decimals')) {
+    function pkshop_currency_round_decimals($unit = null) {
+        $u = pkshop_currency_round_unit_value($unit);
+        if ($u >= 1) {
+            return 0;
+        }
+        if (abs($u - 0.1) < 1e-12) return 1;
+        if (abs($u - 0.01) < 1e-12) return 2;
+        if (abs($u - 0.001) < 1e-12) return 3;
+        $s = rtrim(rtrim(sprintf('%.10F', $u), '0'), '.');
+        $pos = strpos($s, '.');
+        return ($pos === false) ? 0 : (strlen($s) - $pos - 1);
+    }
+}
+
+if (!function_exists('pkshop_apply_currency_rounding')) {
+    /**
+     * 환율 변환 후 금액에 자리수·반올림 규칙 적용
+     * - round: 반올림 (사사오입, HALF_UP)
+     * - ceil: 절상
+     * - floor: 절사(버림)
+     * - banker: 오사오입 (HALF_EVEN)
+     */
+    function pkshop_apply_currency_rounding($amount, $mode = null, $unit = null) {
+        $amount = floatval($amount);
+        if ($amount == 0.0) {
+            return 0.0;
+        }
+        $mode = pkshop_currency_round_mode_value($mode);
+        $unit = pkshop_currency_round_unit_value($unit);
+        $scaled = $amount / $unit;
+        $eps = 1e-10;
+
+        switch ($mode) {
+            case 'ceil':
+                $adj = ($amount > 0) ? ceil($scaled - $eps) : floor($scaled + $eps);
+                break;
+            case 'floor':
+                $adj = ($amount > 0) ? floor($scaled + $eps) : ceil($scaled - $eps);
+                break;
+            case 'banker':
+                $adj = round($scaled, 0, PHP_ROUND_HALF_EVEN);
+                break;
+            case 'round':
+            default:
+                $adj = round($scaled, 0, PHP_ROUND_HALF_UP);
+                break;
+        }
+
+        $result = $adj * $unit;
+        $decimals = pkshop_currency_round_decimals($unit);
+        if ($decimals <= 0) {
+            return (float)round($result);
+        }
+        return round($result, $decimals);
     }
 }
 
@@ -916,17 +1033,8 @@ if (!function_exists('pkshop_convert_usd_amount')) {
             return 0;
         }
         $to_currency = strtoupper($to_currency);
-        $opts = pkshop_currency_options();
         $amount = $usd * pkshop_get_fx_rate('USD', $to_currency);
-        if (isset($opts[$to_currency]['ceil_unit'])) {
-            $unit = intval($opts[$to_currency]['ceil_unit']);
-            if ($unit > 0) {
-                $amount = ceil($amount / $unit) * $unit;
-            }
-        } else {
-            $amount = round($amount);
-        }
-        return (int)$amount;
+        return pkshop_apply_currency_rounding($amount);
     }
 }
 
@@ -935,7 +1043,11 @@ if (!function_exists('pkshop_format_currency_amount')) {
         $currency_code = strtoupper($currency_code);
         $opts = pkshop_currency_options();
         $symbol = isset($opts[$currency_code]['symbol']) ? $opts[$currency_code]['symbol'] : $currency_code;
-        return $symbol . ' ' . number_format((int)$amount);
+        $decimals = pkshop_currency_round_decimals();
+        if ($decimals <= 0) {
+            return $symbol . ' ' . number_format((float)$amount, 0, '.', ',');
+        }
+        return $symbol . ' ' . number_format((float)$amount, $decimals, '.', ',');
     }
 }
 
@@ -977,14 +1089,10 @@ if (!function_exists('pkshop_currency_js_config')) {
         $enabled = pkshop_currency_enabled_codes();
         $payment = pkshop_get_payment_currency();
         $rates = array();
-        $ceil_units = array();
         $symbols = array();
         foreach ($enabled as $code) {
             $rates[$code] = pkshop_get_fx_rate('USD', $code);
             $symbols[$code] = isset($opts[$code]['symbol']) ? $opts[$code]['symbol'] : $code;
-            if (isset($opts[$code]['ceil_unit'])) {
-                $ceil_units[$code] = intval($opts[$code]['ceil_unit']);
-            }
         }
         $ordered = array($payment);
         foreach ($enabled as $code) {
@@ -992,13 +1100,18 @@ if (!function_exists('pkshop_currency_js_config')) {
                 $ordered[] = $code;
             }
         }
+        $unit = pkshop_currency_round_unit_value();
         return array(
             'enabled' => $enabled,
             'payment' => $payment,
             'display_order' => $ordered,
             'rates' => $rates,
-            'ceil_units' => $ceil_units,
             'symbols' => $symbols,
+            'round_mode' => pkshop_currency_round_mode_value(),
+            'round_unit' => $unit,
+            'round_decimals' => pkshop_currency_round_decimals($unit),
+            /* 하위 호환: 예전 ceil_units 키는 비움 (새 round_* 사용) */
+            'ceil_units' => array(),
         );
     }
 }

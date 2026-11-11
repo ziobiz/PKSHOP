@@ -77,7 +77,7 @@ if (!defined('ADM_SHELL_MENU_LOADED')) {
                 array('id' => 'M0503', 'label' => '통화설정',   'url' => '/Adm/product/pro_site_settings.php?tab=currency'),
                 array('id' => 'M0504', 'label' => '결제연동',   'url' => '/Adm/product/pro_site_settings.php?tab=payment'),
                 array('id' => 'M0505', 'label' => '홍보설정',   'url' => '/Adm/product/pro_site_settings.php?tab=promo'),
-                array('id' => 'M0506', 'label' => '계좌변경',   'url' => '/Adm/admin_pass/bank_change.php'),
+                array('id' => 'M0507', 'label' => '계좌변경',   'url' => '/Adm/admin_pass/bank_change.php'),
             ),
         ),
     );

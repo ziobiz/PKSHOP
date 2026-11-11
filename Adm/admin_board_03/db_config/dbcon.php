@@ -1,6 +1,5 @@
 <?
-
-
+include_once($_SERVER["DOCUMENT_ROOT"]."/include/php_compat.php");
 $DBurl="localhost";
 $dbname="ngtmall";     
 $DBid="ngtmall"; 

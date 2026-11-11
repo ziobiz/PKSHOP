@@ -10,6 +10,8 @@
 //   ini_set( "display_errors", 1 );
 
 include "../include/get_balance.php";
+require_once dirname(__FILE__) . "/../include/pkshop_main_products.php";
+require_once dirname(__FILE__) . "/../include/pkshop_promo_lib.php";
 
 $shop_jpy_rate = shop_usd_jpy_rate($json_balance);
 
@@ -27,6 +29,7 @@ $shop_jpy_rate = shop_usd_jpy_rate($json_balance);
 		// echo "Asd";exit;
 
 		?>
+		<script type="text/javascript" src="../include/pkshop_main_rotate.js?v=20261112"></script>
 		<!-- 상단(Top) -->
 
 		<div class="visual_slide">
@@ -65,264 +68,20 @@ $shop_jpy_rate = shop_usd_jpy_rate($json_balance);
 
 					<div class="product_inner">
 						<div>
-							<?
-							/*
-// 정렬 방식
-if($query_dis==""){
-	if($type=='1'){
-		$kk_query="ORDER BY order2";
-	}else if($type=='2'){
-		$kk_query="ORDER BY order3";
-	}else if($type=='3'){
-		$kk_query="ORDER BY order4";
-	}else{
-		$kk_query="ORDER BY order1,signdate desc";
-	}
-}else{
-	if($query_dis=="k_new"){
-		$kk_query="ORDER BY signdate desc";
-	}else if($query_dis=="k_price1"){
-		$kk_query="ORDER BY pricec ";
-	}else if($query_dis=="k_price2"){
-		$kk_query="ORDER BY pricec desc";
-	}else if($query_dis=="k_ga1"){
-		$kk_query="ORDER BY title";
-	}else if($query_dis=="k_ga2"){
-		$kk_query="ORDER BY title desc";
-	}else{
-		$kk_query="ORDER BY signdate desc";
-	}
-}
-
-if($theme_str!=""){
-	if($theme_str == "n") $theme_tmp = "where theme_n='n'";
-	if($theme_str == "r") $theme_tmp = "where theme_r='r'";
-	if($theme_str == "f") $theme_tmp = "where theme_f='f'";
-	if($theme_str == "x") $theme_tmp = "where theme_x='x'";
-	if($theme_str == "y") $theme_tmp = "where theme_y='y'";
-	if($theme_str == "z") $theme_tmp = "where theme_z='z'";
-	if($theme_str == "s") $theme_tmp = "where theme_s='s'";
-
-    $query = "SELECT code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4 ,opt_num,imgb1,imgb2 FROM $shop_goods $theme_tmp $kk_query";
-
-
-
-}else{
-
-
-#####################################################################
-
-  $query = "SELECT code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4 ,opt_num,imgb1,imgb2 FROM $shop_goods where theme_r = 'r' and soldout='N' $kk_query";
-
- }
- */
-
-
-							$data = "deId=e7bb77ca2517821473681d3e9fe132e54c21bdff0ef170596f0414032aac3dbc&Type=best";
-//  echo $api_history;
-							$ch = curl_init();
-							curl_setopt($ch, CURLOPT_URL, $api_history);
-							curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
-							curl_setopt($ch, CURLOPT_POST, 1);
-							curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-							curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-							curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-							$result = curl_exec($ch);
-							curl_close($ch);
-							// echo "Asd";
-							// echo $result;
- 							// exit;
-
-
-							$json_o = json_decode($result, true);
-
-							$count = count($json_o);
-
-							$total_record = $count;
-
-
-
-							$num_per_page = 40;
-							$page_per_block = 12;
-							if ($page == "") $page = 1;
-							if ($keyfield == "") $key = "";
-							if (!$total_record) {
-								$first = 1;
-								$last = 0;
-							} else {
-								$first = $num_per_page * ($page - 1);
-								$last = $num_per_page * $page;
-								$IsNext = $total_record - $last;
-								if ($IsNext > 0) {
-									$last -= 1;
-								} else {
-									$last = $total_record - 1;
-								}
-							}
-							$total_page = ceil($total_record / $num_per_page);
-							if ($total_record == 0) {
-							?>
-							<?
-							} else {
-							?>
-
-								<?
-								$article_num = $total_record - $num_per_page * ($page - 1);
-
-								for ($i = $first; $i <= $last; $i++) {
-									$code2 = $json_o[$i]['code2'];
-									$code3 = $json_o[$i]['code3'];
-									$code = $json_o[$i]['code'];
-									$title = $json_o[$i]['title'];
-									$pricec = $json_o[$i]['pricec'];
-									$prices = $json_o[$i]['prices'];
-									$priced = $json_o[$i]['priced'];
-									$company = $json_o[$i]['company'];
-									$new = $json_o[$i]['new'];
-									$soldout = $json_o[$i]['soldout'];
-									$best = $json_o[$i]['best'];
-									$cut = $json_o[$i]['cut'];
-									$recommend = $json_o[$i]['recommend'];
-									$price_dis = $json_o[$i]['price_dis'];
-									$size = $json_o[$i]['size'];	/*사이즈*/
-									$color = $json_o[$i]['color'];	/*색상*/
-									$imgl = $json_o[$i]['imgl'];	/*색상*/
-									$code4 = $json_o[$i]['code4'];	/*색상*/
-									$opt_num = $json_o[$i]['opt_num'];	/*색상*/
-									$imgb1 = $json_o[$i]['imgb1'];
-									$imgb2 = $json_o[$i]['imgb2'];
-									$country = $json_o[$i]['country'];
-									$c_pv = $json_o[$i]['c_pv'];
-									$onlypoint = $json_o[$i]['onlypoint'];
-									if ($onlypoint == 1) {
-										$onlyP = $onlyP + 1;
-										$title=$title."<span style='color:#ff0000;'> [InT Only]</span>";
-									}
-									if ($shop_country != $country) {
-										continue;
-									}
-
-
-
-									$asize = explode(",", $size);				/*사이즈 분리*/
-									$acolor = explode(",", $color);					/*색상 분리*/
-
-
-									//echo $pricec."222";
-
-
-									if ($size != "") {
-										$size = $asize[0];
-									}
-									if ($color != "") {
-										$color = $acolor[0];
-									}
-
-									$pricec_code = $pricec;
-									$prices_code = $prices;
-									$priced_code = $priced;
-
-
-
-									if ($priced == "0") {
-										//	$price_s = "<font class='sbest_text02'>".number_format($pricec)."</font> ";	//가격표시변환
-									} else {
-										//	$price_s = "<font class='sbest_text02'>".number_format($priced)."</font> "."<font style='text-decoration: line-through;'>(".number_format($pricec).")</font>"."";
-									}
-									$price_s = "<font style=''>(" . number_format($pricec) . ")</font>" . "";
-
-
-									if ($_SESSION['valid_user'] == "") $price_s = "";
-									### 이미지 파일 저장 디렉토리 ###
-									$savedir = "//pentakleva.shop/upload/";
-
-									$img_name = $savedir . $imgb1;
-
-
-									$img_info = getImageSize($savedir . '/' . $imgb1); //원본이미지의 정보를 얻어옵니다
-									$img_width = $img_info[0];
-									$img_height = $img_info[1];
-
-									if ($img_width > $img_height) {
-										$img_size = "width='242'";
-									} else {
-										$img_size = "height='200'";
-									}
-
-
-
-									$price_code = $prices;
-									$prices_code = $prices1;
-									$priced_code = $priced;
-
-									if ($cook_dis == "1" && $cook_dis1 == "승인") {
-										$price_tmp = $priced;
-									} else	if ($cook_dis == "2" && $cook_dis1 == "승인") {
-										$price_tmp = $pricec;
-									} else if ($cook_dis == "3" && $cook_dis1 == "승인") {
-										$price_tmp = $prices;
-									} else {
-										if ($priced > 0) {
-											$price_tmp = $priced;
-										} else {
-											$price_tmp = $pricec;
-										}
-									}
-
-
-
-									if ($opt_num != "") {
-										$opt_num_arr = explode(",", $opt_num);
-										$kk_amount = $opt_num_arr[0];
-									} else {
-										$kk_amount = '1';
-									}
-									if ($i > $first && ($i % 4) == 0) {
-										#####################################################################
-								?>
-
-
-									<?
-									}
-									?>
-
-
-									<div class="best_box01">
-										<div class="best_img">
-											<a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&theme=f&type=<?= $type ?>">
-												<? if ($imgl != "") { ?><img src="<?= $savedir . $imgl ?>" border="0" align="absmiddle">
-												<? } else { ?><img src="<?= $savedir ?><?= $imgb1 ?>" border="0" align="absmiddle">
-												<? } ?>
-										</div>
-										<p class="best_text" style="padding-bottom:5px;text-align:center;"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&theme=f&type=<?= $type ?>" class="a_3"><?= $title ?></a></p>
-										<?if($_SESSION["member_id"] != ""){?>
-										<p class="best_price" style="text-align:center; font-weight:bold;font-size:16px;color:#c3070b"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&type=<?= $type ?>" class="c_red"><?= shop_format_usd_jpy_dual($price_tmp, $shop_jpy_rate) ?></a></p>
-
-										<?}?>
-									</div>
-
-
-									<? if (($i + 1) % 4 != 0) { ?>
-									<? } ?>
-
-
-
-								<?
-									if ($i == $last) {
-										if (($last + 1) % 4 == "1") {
-											echo "";
-										} else if (($last + 1) % 4 == "2") {
-											echo "";
-										} else if (($last + 1) % 4 == "3") {
-											echo "";
-										}
-										echo "";
-									}
-								}
-								?>
-							<?
-								$article_num--;
-							}
+							<?php
+							$pkshop_savedir = function_exists('pkshop_main_upload_base') ? pkshop_main_upload_base() : '//pentakleva.shop/upload/';
+							$best_frames = pkshop_promo_build_rotate_frames(
+								pkshop_promo_fetch_theme_rows($api_history, 'best'),
+								8
+							);
+							pkshop_promo_render_rotating_section(array(
+								'container_id' => 'pkshop-rotate-best',
+								'frames' => $best_frames,
+								'layout' => 'best',
+								'interval_sec' => pkshop_promo_rotate_seconds('best'),
+								'savedir' => $pkshop_savedir,
+								'type' => isset($type) ? $type : '',
+							));
 							?>
 						</div>
 
@@ -339,262 +98,23 @@ if($theme_str!=""){
 				<div class="new_inner">
 					<!-- 				<a class="new_arrow01" href="#"><img src="../main/images/arrow_left.png"></a> -->
 					<div class="new_box">
-						<?
-
-						/*
-// 정렬 방식
-if($query_dis==""){
-	if($type=='1'){
-		$kk_query="ORDER BY order2";
-	}else if($type=='2'){
-		$kk_query="ORDER BY order3";
-	}else if($type=='3'){
-		$kk_query="ORDER BY order4";
-	}else{
-		$kk_query="ORDER BY order1,signdate desc";
-	}
-}else{
-	if($query_dis=="k_new"){
-		$kk_query="ORDER BY signdate desc";
-	}else if($query_dis=="k_price1"){
-		$kk_query="ORDER BY pricec ";
-	}else if($query_dis=="k_price2"){
-		$kk_query="ORDER BY pricec desc";
-	}else if($query_dis=="k_ga1"){
-		$kk_query="ORDER BY title";
-	}else if($query_dis=="k_ga2"){
-		$kk_query="ORDER BY title desc";
-	}else{
-		$kk_query="ORDER BY signdate desc";
-	}
-}
-
-if($theme_str!=""){
-	if($theme_str == "n") $theme_tmp = "where theme_n='n'";
-	if($theme_str == "r") $theme_tmp = "where theme_r='r'";
-	if($theme_str == "f") $theme_tmp = "where theme_f='f'";
-	if($theme_str == "x") $theme_tmp = "where theme_x='x'";
-	if($theme_str == "y") $theme_tmp = "where theme_y='y'";
-	if($theme_str == "z") $theme_tmp = "where theme_z='z'";
-	if($theme_str == "s") $theme_tmp = "where theme_s='s'";
-
-    $query = "SELECT code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4 ,opt_num,imgb1,imgb2 FROM $shop_goods $theme_tmp $kk_query";
-
-}else{
-
-
-#####################################################################
-
-  $query = "SELECT code2, code3, code, title, pricec, prices, priced, company, new, soldout,best,cut,recommend,price_dis,size,color,imgl, code4 ,opt_num,imgb1,imgb2 FROM $shop_goods where theme_r = 'r' and soldout='N' ORDER BY signdate desc limit 4 ";
-
- }
-
- echo $query;
-
-*/
-
-
-						$data = "deId=e7bb77ca2517821473681d3e9fe132e54c21bdff0ef170596f0414032aac3dbc&Type=new";
-
-						$ch = curl_init();
-						curl_setopt($ch, CURLOPT_URL, $api_history);
-						curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
-						curl_setopt($ch, CURLOPT_POST, 1);
-						curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-						curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-						curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-						$result = curl_exec($ch);
-						curl_close($ch);
-
-						//echo $result;
-
-						$json_o = json_decode($result, true);
-
-						$count = count($json_o);
-
-						$total_record = $count;
-
-
-						$num_per_page = 40;
-						$page_per_block = 12;
-						if ($page == "") $page = 1;
-						if ($keyfield == "") $key = "";
-						if (!$total_record) {
-							$first = 1;
-							$last = 0;
-						} else {
-							$first = $num_per_page * ($page - 1);
-							$last = $num_per_page * $page;
-							$IsNext = $total_record - $last;
-							if ($IsNext > 0) {
-								$last -= 1;
-							} else {
-								$last = $total_record - 1;
-							}
+						<?php
+						if (!isset($pkshop_savedir)) {
+							$pkshop_savedir = function_exists('pkshop_main_upload_base') ? pkshop_main_upload_base() : '//pentakleva.shop/upload/';
 						}
-						$total_page = ceil($total_record / $num_per_page);
-						if ($total_record == 0) {
+						$recommended_frames = pkshop_promo_build_rotate_frames(
+							pkshop_promo_fetch_theme_rows($api_history, 'new'),
+							8
+						);
+						pkshop_promo_render_rotating_section(array(
+							'container_id' => 'pkshop-rotate-recommended',
+							'frames' => $recommended_frames,
+							'layout' => 'recommended',
+							'interval_sec' => pkshop_promo_rotate_seconds('recommended'),
+							'savedir' => $pkshop_savedir,
+							'type' => isset($type) ? $type : '',
+						));
 						?>
-						<?
-						} else {
-						?>
-
-							<?
-							$article_num = $total_record - $num_per_page * ($page - 1);
-
-							for ($i = $first; $i <= $last; $i++) {
-
-
-								$code2 = $json_o[$i]['code2'];
-								$code3 = $json_o[$i]['code3'];
-								$code = $json_o[$i]['code'];
-								$title = $json_o[$i]['title'];
-								$pricec = $json_o[$i]['pricec'];
-								$prices = $json_o[$i]['prices'];
-								$priced = $json_o[$i]['priced'];
-								$company = $json_o[$i]['company'];
-								$new = $json_o[$i]['new'];
-								$soldout = $json_o[$i]['soldout'];
-								$best = $json_o[$i]['best'];
-								$cut = $json_o[$i]['cut'];
-								$recommend = $json_o[$i]['recommend'];
-								$price_dis = $json_o[$i]['price_dis'];
-								$size = $json_o[$i]['size'];	/*사이즈*/
-								$color = $json_o[$i]['color'];	/*색상*/
-								$imgl = $json_o[$i]['imgl'];	/*색상*/
-								$code4 = $json_o[$i]['code4'];	/*색상*/
-								$opt_num = $json_o[$i]['opt_num'];	/*색상*/
-								$imgb1 = $json_o[$i]['imgb1'];
-								$imgb2 = $json_o[$i]['imgb2'];
-								$country = $json_o[$i]['country'];
-								$c_pv = $json_o[$i]['c_pv'];
-								$onlypoint = $json_o[$i]['onlypoint'];
-								if ($onlypoint == 1) {
-									$onlyP = $onlyP + 1;
-									$title=$title."<span style='color:#ff0000;'> [InT Only]</span>";
-								}
-								if ($shop_country != $country) {
-									continue;
-								}
-								$asize = explode(",", $size);				/*사이즈 분리*/
-								$acolor = explode(",", $color);					/*색상 분리*/
-
-								if ($size != "") {
-									$size = $asize[0];
-								}
-								if ($color != "") {
-									$color = $acolor[0];
-								}
-
-								$pricec_code = $pricec;
-								$prices_code = $prices;
-								$priced_code = $priced;
-
-								if ($priced == "0") {
-									//		$price_s = "<font class='sbest_text02'>".number_format($pricec)."원</font> ";	//가격표시변환
-								} else {
-									if ($priced == "0") {
-										//		$price_s = "<font class='sbest_text02'>".number_format($pricec)."</font>";	//가격표시변환
-									} else {
-										//		$price_s = "<font class='sbest_text02'>".number_format($priced)."</font> "."<font style='text-decoration: line-through;'>(".number_format($pricec).")</font>"."";
-									}
-								}
-								$price_s = "<font class='sbest_text02'>$ " . number_format($pricec) . "</font> ";
-								### 이미지 파일 저장 디렉토리 ###
-								$savedir = "//pentakleva.shop/upload/";
-
-								$img_name = $savedir . $imgb1;
-								if ($_SESSION['valid_user'] == "") $price_s = "";
-
-								$img_info = getImageSize($savedir . '/' . $imgb1); //원본이미지의 정보를 얻어옵니다
-								$img_width = $img_info[0];
-								$img_height = $img_info[1];
-
-								if ($img_width > $img_height) {
-									$img_size = "width='242'";
-								} else {
-									$img_size = "height='200'";
-								}
-
-
-
-								$price_code = $prices;
-								$prices_code = $prices1;
-								$priced_code = $priced;
-
-								if ($opt_num != "") {
-									$opt_num_arr = explode(",", $opt_num);
-									$kk_amount = $opt_num_arr[0];
-								} else {
-									$kk_amount = '1';
-								}
-								if ($cook_dis == "1" && $cook_dis1 == "승인") {
-									$price_tmp = $priced;
-								} else	if ($cook_dis == "2" && $cook_dis1 == "승인") {
-									$price_tmp = $pricec;
-								} else if ($cook_dis == "3" && $cook_dis1 == "승인") {
-									$price_tmp = $prices;
-								} else {
-									if ($priced > 0) {
-										$price_tmp = $priced;
-									} else {
-										$price_tmp = $pricec;
-									}
-								}
-
-
-								if ($i > $first && ($i % 4) == 0) {
-									#####################################################################
-							?>
-
-
-								<?
-								}
-								?>
-								<div class="new_product01">
-									<div class="sp15"></div>
-									<div class="new_img">
-										<a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&theme=f&type=<?= $type ?>">
-											<? if ($imgl != "") { ?><img src="<?= $savedir . $imgl ?>" border="0" align="absmiddle" width="200" height="174">
-											<? } else { ?><img src="<?= $savedir ?><?= $imgb1 ?>" width="200" height="174" border="0" align="absmiddle" style="border:1px solid #dedede;">
-											<? } ?>
-									</div>
-									<div class="sp15"></div>
-									<p class="best_text" style="text-align:center;"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&theme=f&type=<?= $type ?>" class="a_3"><?= $title ?></a></p>
-
-									<?if($_SESSION["member_id"] != ""){?>
-									<p class="best_price" style="text-align:center; font-weight:bold;font-size:16px;color:#c3070b"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&type=<?= $type ?>" class="c_red"><?= shop_format_usd_jpy_dual($price_tmp, $shop_jpy_rate) ?></a></p>
-
-									<?}?>
-									<div class="sp25"></div>
-								</div>
-
-
-
-
-								<? if (($i + 1) % 4 != 0) { ?>
-								<? } ?>
-
-
-
-							<?
-								if ($i == $last) {
-									if (($last + 1) % 4 == "1") {
-										echo "";
-									} else if (($last + 1) % 4 == "2") {
-										echo "";
-									} else if (($last + 1) % 4 == "3") {
-										echo "";
-									}
-									echo "";
-								}
-							}
-							?>
-						<?
-							$article_num--;
-						}
-						?>
-
 					</div>
 					<!-- 				<a class="new_arrow02" href="#"><img src="../main/images/arrow_right.png"></a> -->
 				</div>
@@ -625,9 +145,9 @@ if($theme_str!=""){
 							curl_close($ch);
 
 							$json_o = json_decode($result, true);
-
-
-
+							if (!is_array($json_o)) { $json_o = array(); }
+							$json_o = pkshop_main_filter_products($json_o, isset($shop_country) ? $shop_country : '1');
+							$json_o = array_values($json_o);
 							$count = count($json_o);
 							$total_record_tt = $count;
 
@@ -656,8 +176,10 @@ if($theme_str!=""){
 
 								if ($result != '') {
 									$json_o = json_decode($result, true);
-
-									$count = count($json_o);
+									if (!is_array($json_o)) { $json_o = array(); }
+									$json_o = pkshop_main_filter_products($json_o, isset($shop_country) ? $shop_country : '1');
+							$json_o = array_values($json_o);
+							$count = count($json_o);
 
 									for ($j = 0; $j < $count; $j++) {
 
@@ -744,8 +266,9 @@ if($theme_str!=""){
 							$result = curl_exec($ch);
 							curl_close($ch);
 							$json_o = json_decode($result, true);
-
-
+							if (!is_array($json_o)) { $json_o = array(); }
+							$json_o = pkshop_main_filter_products($json_o, isset($shop_country) ? $shop_country : '1');
+							$json_o = array_values($json_o);
 							$count = count($json_o);
 
 
@@ -779,6 +302,7 @@ if($theme_str!=""){
 								$article_num = $total_record - $num_per_page * ($page - 1);
 
 								for ($i = $first; $i <= $last; $i++) {
+									$code1	 = isset($json_o[$i]['code1']) ? $json_o[$i]['code1'] : '';
 									$code2	 = $json_o[$i]['code2'];
 									$code3	 = $json_o[$i]['code3'];
 									$code	 = $json_o[$i]['code'];
@@ -800,14 +324,19 @@ if($theme_str!=""){
 									$opt_num	= $json_o[$i]['opt_num'];	/*색상*/
 									$imgb1		= $json_o[$i]['imgb1'];
 									$imgb2		= $json_o[$i]['imgb2'];
-									$country = $json_o[$i]['country'];
+									$country = isset($json_o[$i]['country']) ? $json_o[$i]['country'] : '';
 									$c_pv = $json_o[$i]['c_pv'];
 									$onlypoint = $json_o[$i]['onlypoint'];
 									if ($onlypoint == 1) {
 										$onlyP = $onlyP + 1;
 										$title=$title."<span style='color:#ff0000;'> [InT Only]</span>";
 									}
-									if ($shop_country != $country) {
+									$imgl = is_string($imgl) ? trim($imgl) : '';
+									$imgb1 = is_string($imgb1) ? trim($imgb1) : '';
+									if ($imgl === '' && $imgb1 === '') {
+										continue;
+									}
+									if ($country !== '' && isset($shop_country) && $shop_country != $country) {
 										continue;
 									}
 
@@ -836,20 +365,12 @@ if($theme_str!=""){
 									}
 									$price_s = "<font class='sbest_text02'>" . number_format($pricec) . "</font> ";	//가격표시변환
 									### 이미지 파일 저장 디렉토리 ###
-									$savedir = "//pentakleva.shop/upload/";
+									$savedir = function_exists("pkshop_main_upload_base") ? pkshop_main_upload_base() : ("http://" . (isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : "pentakleva.shop") . "/upload/");
 
 									$img_name = $savedir . $imgb1;
 
 									if ($_SESSION['valid_user'] == "") $price_s = "";
-									$img_info = getImageSize($savedir . '/' . $imgb1); //원본이미지의 정보를 얻어옵니다
-									$img_width = $img_info[0];
-									$img_height = $img_info[1];
-
-									if ($img_width > $img_height) {
-										$img_size = "width='200'";
-									} else {
-										$img_size = "height='174'";
-									}
+									$img_size = "width='200'";
 
 									if ($cook_dis == "1" && $cook_dis1 == "승인") {
 										$price_tmp = $priced;
@@ -888,9 +409,10 @@ if($theme_str!=""){
 									<div class="all_box01">
 										<div class="all_img">
 											<a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&theme=f&type=<?= $type ?>">
-												<? if ($imgl != "") { ?><img src="<?= $savedir . $imgl ?>" border="0" align="absmiddle" width="200" height="174">
-												<? } else { ?><img src="<?= $savedir ?><?= $imgb1 ?>" width="200" height="174" border="0" align="absmiddle">
+												<? if ($imgl != "") { ?><img src="<?= $savedir . $imgl ?>" border="0" align="absmiddle">
+												<? } else { ?><img src="<?= $savedir ?><?= $imgb1 ?>" border="0" align="absmiddle">
 												<? } ?>
+											</a>
 										</div>
 										<p class="all_text" style="padding-bottom:5px;height: auto;"><a href="../sub04/view.php?left_code=<?= $code ?>&code1=<?= $code1 ?>&code2=<?= $code2 ?>&code3=<?= $code3 ?>&code4=<?= $code4 ?>&theme=f&type=<?= $type ?>" class="a_3"><?= $title ?></a>
 

@@ -18,9 +18,12 @@ function shop_usd_jpy_rate(array $json_balance = array()): float
 	return 162.0;
 }
 
-/** USD → JPY, 10엔 단위 올림 (895 → 900). */
+/** USD → JPY (환경설정 통화 반올림 규칙 적용, 기본 10엔 절사). */
 function shop_usd_to_jpy_ceiling($usd, $rate = null): int
 {
+	if (function_exists('pkshop_convert_usd_amount')) {
+		return (int)pkshop_convert_usd_amount($usd, 'JPY');
+	}
 	$usd = (float)str_replace(',', '', (string)$usd);
 	if ($usd <= 0) {
 		return 0;
@@ -30,7 +33,8 @@ function shop_usd_to_jpy_ceiling($usd, $rate = null): int
 		$rate = shop_usd_jpy_rate(is_array($json_balance ?? null) ? $json_balance : array());
 	}
 	$jpy = $usd * (float)$rate;
-	return (int)(ceil($jpy / 10) * 10);
+	// 레거시 폴백: 10엔 절사
+	return (int)(floor($jpy / 10) * 10);
 }
 
 function shop_format_usd($usd): string

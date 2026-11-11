@@ -68,6 +68,17 @@ include "../common/dbconn.php";
 	$theme_r=$_POST["theme_r"]; $theme_f=$_POST["theme_f"]; $theme_x=$_POST["theme_x"]; $theme_y=$_POST["theme_y"]; $theme_z=$_POST["theme_z"]; $rank_g=$_POST["rank_g"]; $rank_n=$_POST["rank_n"]; $rank_r=$_POST["rank_r"]; $rank_f=$_POST["rank_f"]; $rank_x=$_POST["rank_x"]; $rank_y=$_POST["rank_y"]; $rank_z=$_POST["rank_z"]; $opt_num=$_POST["opt_num"]; $opt_num_str=$_POST["opt_num_str"]; $theme_s=$_POST["theme_s"]; $rank_s=$_POST["rank_s"]; $code4=$_POST["code4"];$order4=$_POST["order4"]; $p_id=$_POST["p_id"];
 #################################
 
+// MySQL 정수 컬럼에 빈 문자열이 들어가면 오류(Incorrect integer value) — 빈값은 0으로 보정
+$__int_fields = array('pricec','prices','priced','coin','point','point_dis','currnum','warnnum','dis','fee','c_pv','onlypoint','rank','order1','order2','order3','order4','price_dis','rank_g','rank_n','rank_r','rank_f','rank_x','rank_y','rank_z','rank_s','opt_num');
+foreach ($__int_fields as $__f) {
+	if (!isset($$__f) || $$__f === '' || $$__f === null || !is_numeric($$__f)) {
+		$$__f = '0';
+	}
+}
+if ($country === '' || $country === null) {
+	$country = '1';
+}
+
 $title = trim($title);
 $title = addslashes($title);
 $info = addslashes($info);

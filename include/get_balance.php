@@ -1,8 +1,10 @@
 <? 	include "../include/com.php";
+	include_once dirname(__FILE__) . '/shop_public_config.php';
 	
-	$data = "deId=e7bb77ca2517821473681d3e9fe132e54c21bdff0ef170596f0414032aac3dbc&user_id=".$_SESSION['member_id'];
+	$mid = isset($_SESSION['member_id']) ? $_SESSION['member_id'] : '';
+	$data = "deId=e7bb77ca2517821473681d3e9fe132e54c21bdff0ef170596f0414032aac3dbc&user_id=".$mid;
 
-	$valid_user = $_SESSION['member_id'];
+	$valid_user = $mid;
 
 	
 		$ch = curl_init();
@@ -30,8 +32,8 @@
 		$json_balance['su_bankname'] = SHOP_BANK_HOLDER;
 	}
 	require_once dirname(__FILE__) . '/../lib/shop_currency.php';
-	$session_cart = $_SESSION["session_cart"];
-	$shop_country = $json_balance["shop_country"];
+	$session_cart = isset($_SESSION["session_cart"]) ? $_SESSION["session_cart"] : null;
+	$shop_country = isset($json_balance["shop_country"]) ? $json_balance["shop_country"] : "";
 	if($shop_country == ""){
 		$shop_country="1";
 	}

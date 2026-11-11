@@ -1,5 +1,6 @@
-<? @session_start(); 
-	
+<? @session_start();
+
+	include_once( $_SERVER["DOCUMENT_ROOT"]."/include/php_compat.php");
 	include_once( $_SERVER["DOCUMENT_ROOT"]."/lib/config.php"); 
 	include_once( $_SERVER["DOCUMENT_ROOT"]."/lib/basic_class.php");
 	include_once( $_SERVER["DOCUMENT_ROOT"]."/lib/common_db.php");
@@ -18,7 +19,7 @@
 	 }
 
 
-	if ($_SESSION['member_id'] == "")
+	if (!isset($_SESSION['member_id']) || $_SESSION['member_id'] == "")
 	{
 		//$tools->alertJavaGo('try again',"../login.php");		
 	}

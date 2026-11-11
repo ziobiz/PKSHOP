@@ -1,4 +1,5 @@
 <?
+include_once($_SERVER["DOCUMENT_ROOT"]."/include/php_compat.php");
 //$DBurl="localhost";
 //$dbname="jt5012_";     
 //$DBid="jt5012_"; 

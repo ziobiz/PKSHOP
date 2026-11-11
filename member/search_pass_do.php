@@ -42,7 +42,7 @@ if($email!="$real_email") {
 $nc = 6;
 $a='0123456789';
 $l=strlen($a)-1; $r='';
-while($nc-->0) $r.=$a{mt_rand(0,$l)};
+while($nc-->0) $r.=$a[mt_rand(0,$l)];
 
 $rand =  $r;
 
