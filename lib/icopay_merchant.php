@@ -182,10 +182,10 @@ function icopay_map_lang_to_api_code(string $lang): string
 }
 
 /**
- * 통합 prepare buyer(email·phone·countryIso2).
+ * 통합 prepare buyer(email·phone·countryIso2·name/firstName/lastName).
  *
  * @param array<string,mixed> $in
- * @return array{email:string,phone:string,countryIso2:string}
+ * @return array{email:string,phone:string,countryIso2:string,name?:string,firstName?:string,lastName?:string}
  */
 function icopay_resolve_buyer(array $in = array()): array
 {
@@ -222,11 +222,58 @@ function icopay_resolve_buyer(array $in = array()): array
 		$phone = '';
 	}
 
-	return array(
+	$buyer = array(
 		'email' => $email,
 		'phone' => $phone,
 		'countryIso2' => $country !== '' ? $country : 'JP',
 	);
+
+	$nameSource = $in;
+	if (empty($nameSource['buyername']) && empty($nameSource['buyername_l']) && empty($nameSource['firstName']) && empty($nameSource['lastName']) && empty($nameSource['name'])) {
+		$nameSource = array_merge($nameSource, $_POST);
+	}
+	if (function_exists('icopay_unified_split_name_parts')) {
+		$names = icopay_unified_split_name_parts($nameSource);
+	} else {
+		$first = isset($nameSource['buyername']) ? trim((string)$nameSource['buyername']) : '';
+		if ($first === '' && !empty($nameSource['firstName'])) {
+			$first = trim((string)$nameSource['firstName']);
+		}
+		if ($first === '' && isset($nameSource['buyer']['firstName'])) {
+			$first = trim((string)$nameSource['buyer']['firstName']);
+		}
+		$last = isset($nameSource['buyername_l']) ? trim((string)$nameSource['buyername_l']) : '';
+		if ($last === '' && !empty($nameSource['lastName'])) {
+			$last = trim((string)$nameSource['lastName']);
+		}
+		if ($last === '' && isset($nameSource['buyer']['lastName'])) {
+			$last = trim((string)$nameSource['buyer']['lastName']);
+		}
+		if ($first !== '' && $last === '') {
+			$last = $first;
+		} elseif ($last !== '' && $first === '') {
+			$first = $last;
+		}
+		$name = isset($nameSource['buyer']['name']) ? trim((string)$nameSource['buyer']['name']) : '';
+		if ($name === '' && !empty($nameSource['name'])) {
+			$name = trim((string)$nameSource['name']);
+		}
+		if ($name === '') {
+			$name = trim($last . ' ' . $first);
+		}
+		$names = array('firstName' => $first, 'lastName' => $last, 'name' => $name);
+	}
+	if ($names['name'] !== '') {
+		$buyer['name'] = $names['name'];
+	}
+	if ($names['firstName'] !== '') {
+		$buyer['firstName'] = $names['firstName'];
+	}
+	if ($names['lastName'] !== '') {
+		$buyer['lastName'] = $names['lastName'];
+	}
+
+	return $buyer;
 }
 
 function icopay_validate_buyer(array $buyer): ?string
@@ -239,6 +286,12 @@ function icopay_validate_buyer(array $buyer): ?string
 	}
 	if (trim((string)($buyer['countryIso2'] ?? '')) === '') {
 		return 'Buyer country (countryIso2) is required for ICOPAY checkout.';
+	}
+	$name = trim((string)($buyer['name'] ?? ''));
+	$first = trim((string)($buyer['firstName'] ?? ''));
+	$last = trim((string)($buyer['lastName'] ?? ''));
+	if ($name === '' && ($first === '' || $last === '')) {
+		return 'Buyer name (buyer.name or firstName+lastName) is required.';
 	}
 	return null;
 }

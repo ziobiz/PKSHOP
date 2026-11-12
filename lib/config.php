@@ -45,7 +45,7 @@ $pv_array = array("0","50","150","300","600","1200","2400","3600","5000","10000"
 
 /*
  * ICOPAY (통합 인라인 / JPAY) — $GLOBALS['ICOPAY_COMP_ID'], ICOPAY_BROKER_SECRET 등 채우기.
- * lib/icopay_pg_secrets.local.php 예시 참고: compId 6000000017, ICOPAY_INTEGRATION_MODE=unified, JPY.
+ * lib/icopay_pg_secrets.local.php 예시 참고: compId 6000000067, ICOPAY_INTEGRATION_MODE=unified, JPY.
  * 인라인 결제(공식 샘플): ICOPAY_INLINE_CHECKOUT=true(기본), 브로커 시크릿만 있으면 동작.
  * 카드용 KSNET(KSPay) 스크립트는 기본 OFF. 구 KSPay 쓰려면 ICOPAY_USE_KSPAY_CARD=true.
  */

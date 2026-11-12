@@ -11,7 +11,7 @@ include "../include/get_balance.php";
 include "../include/login_check.php";
 include "../cart/cartfunc.php";
 include_once dirname(__FILE__) . '/../lib/icopay_pg_config.php';
-include_once dirname(__FILE__) . '/../lib/icopay_merchant.php';
+include_once dirname(__FILE__) . '/lib_icopay_unified.php';
 
 $session_cart = $_SESSION['session_cart'];
 
@@ -279,8 +279,6 @@ for($i=0;$i<$tot;$i++) {
                 else $charge=3;
                 $total_settle = $total_price + $charge-$usepoint;
                 $total_settle_num=$total_settle;
-                $total_settle_num_usd = $total_settle_num;
-                $total_settle_jpy_num = shop_usd_to_jpy_ceiling($total_settle_num);
                 $total_pv = $total_pv +floor($total_price*($c_pv/100));
 				$charge_num = $charge;
                 $chargeT =  number_format($charge)."&nbsp;";
@@ -317,7 +315,6 @@ for($i=0;$i<$tot;$i++) {
                     }else{
                         $state="주문접수";
                     }
-                    $GLOBALS['icopay_order_state'] = $state;
                     // $state="결제완료";
                     // echo $buyername;
     
@@ -632,15 +629,196 @@ for($i=0;$i<$tot;$i++) {
                     $connect_check="ok";
                     //session_register("connect_check");
                     $_SESSION['connect_check'] = $connect_check;
-                    if (icopay_should_return_card_json()) {
-                        icopay_order_save_json_exit(
-                            $ediDate,
-                            $ordNo,
-                            $new_num,
-                            $total_settle_jpy_num,
-                            isset($title_11111) ? (string)$title_11111 : '',
-                            array('amountUsd' => $total_settle_num_usd)
+                    if (defined('ICOPAY_UNIFIED_ENABLED') && ICOPAY_UNIFIED_ENABLED
+                        && isset($_POST['paymentkind']) && (string)$_POST['paymentkind'] === '1'
+                        && isset($state) && $state !== "결제완료") {
+                        $currency = icopay_unified_payment_currency();
+                        $icopay_amount = icopay_unified_amount_from_usd($total_settle_num);
+                        $buyer = icopay_unified_buyer_from_post($_POST);
+                        if ($buyer['email'] === '') {
+                            while (ob_get_level() > 0) {
+                                ob_end_clean();
+                            }
+                            header('Content-Type: application/json; charset=utf-8');
+                            echo json_encode(array('result' => '0', 'msg' => 'Buyer email is required for card payment.'));
+                            exit;
+                        }
+                        $buyerNameOk = (!empty($buyer['name']))
+                            || (!empty($buyer['firstName']) && !empty($buyer['lastName']));
+                        if (!$buyerNameOk) {
+                            while (ob_get_level() > 0) {
+                                ob_end_clean();
+                            }
+                            header('Content-Type: application/json; charset=utf-8');
+                            echo json_encode(array('result' => '0', 'msg' => 'Buyer name (firstName/lastName) is required for card payment.'));
+                            exit;
+                        }
+                        if ((int)$icopay_amount <= 0) {
+                            while (ob_get_level() > 0) {
+                                ob_end_clean();
+                            }
+                            header('Content-Type: application/json; charset=utf-8');
+                            echo json_encode(array('result' => '0', 'msg' => 'Payment amount is invalid.'));
+                            exit;
+                        }
+                        $_SESSION['icopay_pending_checkout'] = array(
+                            'orderNo' => (string)$new_num,
+                            'ediDate' => $ediDate,
+                            'amount' => (string)$icopay_amount,
+                            'currency' => $currency,
+                            'ordNo' => $ordNo,
+                            'new_num' => $new_num,
+                            'description' => isset($title_11111) ? $title_11111 : '',
+                            'ts' => time(),
                         );
+                        $api = icopay_unified_api_client();
+                        $productName = isset($title_11111) ? mb_substr((string)$title_11111, 0, 100) : 'Order';
+                        $prep = $api->prepareUnifiedCheckout(
+                            (string)$new_num,
+                            $icopay_amount,
+                            $buyer,
+                            $currency,
+                            $productName,
+                            icopay_unified_checkout_lang()
+                        );
+                        if (empty($prep['success']) || empty($prep['data']['sessionToken'])) {
+                            while (ob_get_level() > 0) {
+                                ob_end_clean();
+                            }
+                            header('Content-Type: application/json; charset=utf-8');
+                            echo json_encode(array(
+                                'result' => '0',
+                                'msg' => isset($prep['message']) ? $prep['message'] : 'ICOPAY prepare failed.',
+                            ));
+                            exit;
+                        }
+                        $sessionToken = (string)$prep['data']['sessionToken'];
+                        $checkoutLang = icopay_unified_checkout_lang();
+                        if (!empty($prep['data']['langCode'])) {
+                            $checkoutLang = strtoupper(trim((string)$prep['data']['langCode']));
+                        }
+                        $embedTarget = 'icopayUnifiedHost';
+                        $embedSrc = !empty($prep['data']['embedScriptUrl'])
+                            ? (string)$prep['data']['embedScriptUrl']
+                            : (rtrim(ICOPAY_PUBLIC_BASE, '/') . '/v1/embed-checkout/' . rawurlencode(ICOPAY_COMP_ID));
+                        $embedConfig = array(
+                            'src' => $embedSrc,
+                            'sessionToken' => $sessionToken,
+                            'target' => $embedTarget,
+                            'lang' => $checkoutLang,
+                        );
+                        if (method_exists($api, 'getUnifiedEmbedConfig')) {
+                            $embedConfig = $api->getUnifiedEmbedConfig($sessionToken, $embedTarget, $checkoutLang);
+                            if (!empty($prep['data']['embedScriptUrl'])) {
+                                $embedConfig['src'] = (string)$prep['data']['embedScriptUrl'];
+                            }
+                        }
+                        $embedHtml = $api->buildUnifiedEmbedScript($sessionToken, $embedTarget, $checkoutLang);
+                        // Always prefer prepare payUrl so amount/buyerPrefill session stays attached.
+                        $payUrlRaw = !empty($prep['data']['payUrl']) ? (string)$prep['data']['payUrl'] : '';
+                        if ($payUrlRaw !== '') {
+                            $iframeUrl = $payUrlRaw;
+                        } elseif (method_exists($api, 'buildUnifiedIframeUrl')) {
+                            $iframeUrl = $api->buildUnifiedIframeUrl($sessionToken, $checkoutLang);
+                        } else {
+                            $iframeUrl = '';
+                        }
+                        if ($payUrlRaw !== '' && method_exists($api, 'rewriteUnifiedPayUrl')) {
+                            $iframeUrl = $api->rewriteUnifiedPayUrl($payUrlRaw, $sessionToken, $checkoutLang);
+                        }
+
+                        // ICOPAY hosted UI does not map buyerPrefill first/last name into payFirstname/payLastname.
+                        // Serve a same-origin bridge that injects those fields.
+                        $bridgePayUrl = $iframeUrl !== '' ? $iframeUrl : $payUrlRaw;
+                        $_SESSION['icopay_checkout_bridge'] = array(
+                            'payUrl' => $bridgePayUrl,
+                            'compId' => defined('ICOPAY_COMP_ID') ? (string)ICOPAY_COMP_ID : '',
+                            'firstName' => isset($buyer['firstName']) ? (string)$buyer['firstName'] : '',
+                            'lastName' => isset($buyer['lastName']) ? (string)$buyer['lastName'] : '',
+                            'email' => isset($buyer['email']) ? (string)$buyer['email'] : '',
+                            'phone' => isset($buyer['phone']) ? (string)$buyer['phone'] : '',
+                            'countryIso2' => isset($buyer['countryIso2']) ? (string)$buyer['countryIso2'] : '',
+                            'amount' => (string)$icopay_amount,
+                            'productName' => (string)$productName,
+                            'orderNo' => (string)$new_num,
+                            'ts' => time(),
+                        );
+                        $bridgeQuery = array('t' => (string)time());
+                        $payParams = array();
+                        $payQs = parse_url($bridgePayUrl, PHP_URL_QUERY);
+                        if (is_string($payQs) && $payQs !== '') {
+                            parse_str($payQs, $payParams);
+                        }
+                        if (!is_array($payParams)) {
+                            $payParams = array();
+                        }
+                        foreach (array('m', 'compId', 'session', 'entry', 'embed', 'lang') as $qk) {
+                            if (!empty($payParams[$qk])) {
+                                $bridgeQuery[$qk] = $payParams[$qk];
+                            }
+                        }
+                        if (empty($bridgeQuery['m']) && defined('ICOPAY_COMP_ID') && ICOPAY_COMP_ID !== '') {
+                            $bridgeQuery['m'] = ICOPAY_COMP_ID;
+                        }
+                        $iframeUrl = './icopay_checkout_bridge.php?' . http_build_query($bridgeQuery);
+                        while (ob_get_level() > 0) {
+                            ob_end_clean();
+                        }
+                        header('Content-Type: application/json; charset=utf-8');
+                        echo json_encode(array(
+                            'result' => '1',
+                            'icopayUnified' => true,
+                            'orderNo' => (string)$new_num,
+                            'ediDate' => $ediDate,
+                            'ordNo' => $ordNo,
+                            'new_num' => $new_num,
+                            'amount' => $icopay_amount,
+                            'currency' => $currency,
+                            'sessionToken' => $sessionToken,
+                            'payUrl' => $iframeUrl,
+                            'iframeUrl' => $iframeUrl,
+                            'embed' => $embedConfig,
+                            'embedSrc' => $embedConfig['src'],
+                            'embedSessionToken' => $sessionToken,
+                            'embedTarget' => $embedTarget,
+                            'embedLang' => isset($embedConfig['lang']) ? $embedConfig['lang'] : '',
+                            'embedHtml' => $embedHtml,
+                            'pgVendor' => isset($prep['data']['pgVendor']) ? (string)$prep['data']['pgVendor'] : '',
+                            'description' => isset($title_11111) ? $title_11111 : '',
+                        ));
+                        exit;
+                    }
+
+                    if (defined('ICOPAY_CHILLPAY_LEGACY_ENABLED') && ICOPAY_CHILLPAY_LEGACY_ENABLED
+                        && defined('ICOPAY_CHILLPAY_ENABLED') && ICOPAY_CHILLPAY_ENABLED
+                        && isset($_POST['paymentkind']) && (string)$_POST['paymentkind'] === '1'
+                        && isset($state) && $state !== "결제완료") {
+                        $icopay_amount = function_exists('pkshop_payment_amount_from_usd')
+                            ? pkshop_payment_amount_from_usd($total_settle_num)
+                            : $total_settle_num;
+                        $_SESSION['icopay_pending_checkout'] = array(
+                            'ediDate' => $ediDate,
+                            'amount' => (string)$icopay_amount,
+                            'currency' => function_exists('pkshop_get_payment_currency') ? pkshop_get_payment_currency() : 'USD',
+                            'ordNo' => $ordNo,
+                            'new_num' => $new_num,
+                            'description' => isset($title_11111) ? $title_11111 : '',
+                            'ts' => time(),
+                        );
+                        while (ob_get_level() > 0) {
+                            ob_end_clean();
+                        }
+                        header('Content-Type: application/json; charset=utf-8');
+                        echo json_encode(array(
+                            'result' => '1',
+                            'icopayChillpay' => true,
+                            'ediDate' => $ediDate,
+                            'ordNo' => $ordNo,
+                            'new_num' => $new_num,
+                            'amount' => $icopay_amount,
+                            'description' => isset($title_11111) ? $title_11111 : '',
+                        ));
+                        exit;
                     }
 
                     // 체크
@@ -656,18 +834,6 @@ for($i=0;$i<$tot;$i++) {
 
 // echo "!";
 //         exit;
-
-if (icopay_should_return_card_json()) {
-	icopay_order_save_json_exit(
-		isset($ediDate) ? $ediDate : (isset($_POST['ediDate']) ? (string)$_POST['ediDate'] : ''),
-		isset($ordNo) ? $ordNo : (isset($_POST['ordNo']) ? (string)$_POST['ordNo'] : ''),
-		isset($new_num) ? $new_num : '',
-		isset($total_settle_jpy_num) ? $total_settle_jpy_num : shop_usd_to_jpy_ceiling(isset($total_settle_num) ? $total_settle_num : 0),
-		isset($title_11111) ? (string)$title_11111 : '',
-		array('amountUsd' => isset($total_settle_num_usd) ? $total_settle_num_usd : (isset($total_settle_num) ? $total_settle_num : 0))
-	);
-}
-
 if($state != "결제완료"){
     
 $md5 = md5("5933757143C1DA395C1AECD1accId=2021121005433420956302&amount=$total_settle_num&currency=USD&merchantTransactionId=$new_num&notificationUrl=https://pentakleva.shop/cart/card_finish.php&shopperResultUrl=https://pentakleva.shop/cart/finish.php&signType=MD5");
