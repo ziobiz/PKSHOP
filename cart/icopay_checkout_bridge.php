@@ -107,14 +107,18 @@ html, body {
   max-height: none !important;
 }
 .pay-shell {
-  padding-top: 8px !important;
-  padding-bottom: 8px !important;
+  padding-top: 6px !important;
+  padding-bottom: 4px !important;
+}
+.pay-card {
+  padding-bottom: 4px !important;
+  margin-bottom: 0 !important;
 }
 #submitBtn, .pay-submit, button[type="submit"] {
   position: static !important;
   bottom: auto !important;
-  margin-top: 10px !important;
-  margin-bottom: 4px !important;
+  margin-top: 8px !important;
+  margin-bottom: 2px !important;
 }
 
 /* Scrollbars off */
@@ -187,12 +191,27 @@ $inject = <<<HTML
     try {
       var body = document.body;
       var html = document.documentElement;
-      var h = Math.max(
-        body ? body.scrollHeight : 0,
-        body ? body.offsetHeight : 0,
-        html ? html.scrollHeight : 0,
-        html ? html.offsetHeight : 0
-      );
+      var h = 0;
+      // Prefer bottom of Pay button so parent Cancel sits right under it.
+      var pay = document.getElementById('submitBtn')
+        || document.querySelector('.pay-submit, button[type="submit"], .btn-pay, #payBtn');
+      if (pay && pay.getBoundingClientRect) {
+        var r = pay.getBoundingClientRect();
+        var top = (window.pageYOffset || html.scrollTop || body.scrollTop || 0);
+        h = Math.ceil(r.bottom + top + 12);
+      }
+      if (!(h > 100)) {
+        var shell = document.querySelector('.pay-card, .pay-shell, .pay-wrap, form');
+        if (shell) {
+          h = Math.max(shell.scrollHeight || 0, shell.offsetHeight || 0) + 8;
+        }
+      }
+      if (!(h > 100)) {
+        h = Math.max(
+          body ? body.scrollHeight : 0,
+          html ? html.scrollHeight : 0
+        );
+      }
       if (!(h > 100)) return;
       if (window.parent && window.parent !== window) {
         window.parent.postMessage({

@@ -304,8 +304,8 @@ include dirname(__FILE__) . '/../include/pkshop_html_head.php';
             }
 
             function icopayUnifiedDefaultIframeHeightPx() {
-                // Compact default for shop UI (brand/shipping/merchant/product hidden).
-                return Math.min(720, icopayUnifiedMaxIframeHeightPx());
+                // Compact default until bridge reports Pay-button height.
+                return Math.min(560, icopayUnifiedMaxIframeHeightPx());
             }
 
             function icopayUnifiedMeasureIframeContentHeight(iframe) {
@@ -314,13 +314,28 @@ include dirname(__FILE__) . '/../include/pkshop_html_head.php';
                     if (!doc) {
                         return 0;
                     }
+                    var pay = doc.getElementById('submitBtn')
+                        || doc.querySelector('.pay-submit, button[type="submit"], .btn-pay, #payBtn');
+                    if (pay && pay.getBoundingClientRect) {
+                        var r = pay.getBoundingClientRect();
+                        var top = (doc.documentElement && doc.documentElement.scrollTop) || (doc.body && doc.body.scrollTop) || 0;
+                        var byPay = Math.ceil(r.bottom + top + 12);
+                        if (byPay > 120) {
+                            return byPay;
+                        }
+                    }
+                    var shell = doc.querySelector('.pay-card, .pay-shell, .pay-wrap, form');
+                    if (shell) {
+                        var sh = Math.max(shell.scrollHeight || 0, shell.offsetHeight || 0);
+                        if (sh > 120) {
+                            return sh + 8;
+                        }
+                    }
                     var body = doc.body;
                     var html = doc.documentElement;
                     var h = Math.max(
                         body ? body.scrollHeight : 0,
-                        body ? body.offsetHeight : 0,
-                        html ? html.scrollHeight : 0,
-                        html ? html.offsetHeight : 0
+                        html ? html.scrollHeight : 0
                     );
                     return h > 0 ? h : 0;
                 } catch (e) {
@@ -334,7 +349,9 @@ include dirname(__FILE__) . '/../include/pkshop_html_head.php';
                 }
                 var measured = reportedHeight > 0 ? reportedHeight : icopayUnifiedMeasureIframeContentHeight(iframe);
                 var h = measured > 120 ? measured : icopayUnifiedDefaultIframeHeightPx();
-                h = Math.min(Math.max(h + 8, 520), icopayUnifiedMaxIframeHeightPx());
+                // Do not force a tall minimum when we already know content height.
+                var floor = measured > 120 ? 360 : 480;
+                h = Math.min(Math.max(h, floor), icopayUnifiedMaxIframeHeightPx());
 
                 var host = document.getElementById('icopayUnifiedHost');
                 var wrap = document.getElementById('icopayUnifiedEmbed');
@@ -349,7 +366,7 @@ include dirname(__FILE__) . '/../include/pkshop_html_head.php';
                 iframe.style.display = 'block';
                 iframe.style.width = '100%';
                 iframe.style.height = h + 'px';
-                iframe.style.minHeight = h + 'px';
+                iframe.style.minHeight = '0';
                 iframe.style.maxHeight = h + 'px';
                 iframe.style.border = '0';
                 iframe.style.background = '#fff';
@@ -2648,12 +2665,12 @@ function pay_result_close(){
         }
         .icopay-unified-modal-card {
             background: #fff;
-            max-width: 480px;
+            max-width: 440px;
             width: 100%;
             height: auto;
             max-height: calc(100vh - 24px);
             margin: 0 auto;
-            padding: 10px 12px 0;
+            padding: 8px 10px 8px;
             border-radius: 10px;
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
             display: flex;
@@ -2707,15 +2724,29 @@ function pay_result_close(){
         }
         .icopay-unified-cancel-wrap {
             flex: 0 0 auto;
-            margin-top: 6px;
-            padding: 4px 0 8px;
+            margin-top: 2px;
+            padding: 0 0 2px;
             text-align: center;
         }
-        .icopay-unified-cancel-wrap .cart_btn01 {
-            width: 140px;
-            height: 40px;
-            margin: 0 auto;
-            font-weight: 700;
+        /* Beat global/mobile .cart_btn01 (often width:90%) */
+        .icopay-unified-cancel-wrap .cart_btn01,
+        #icopayUnifiedCancelBtn.cart_btn01,
+        #icopayUnifiedCancelBtn {
+            display: inline-block !important;
+            width: 110px !important;
+            max-width: 110px !important;
+            min-width: 0 !important;
+            height: 34px !important;
+            line-height: 34px !important;
+            padding: 0 12px !important;
+            margin: 0 auto !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            border-radius: 17px !important;
+            background: #8a8a8a !important;
+            color: #fff !important;
+            border: 0 !important;
+            box-sizing: border-box !important;
         }
     </style>
     <div id="icopayUnifiedModal" style="display:none;position:fixed;z-index:10000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.55);">
