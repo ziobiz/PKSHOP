@@ -32,6 +32,32 @@ if ($section === 'promo') {
 	exit;
 }
 
+if ($section === 'dynamic_menu') {
+	$val = isset($_POST['dynamic_menu_enabled']) ? trim((string)$_POST['dynamic_menu_enabled']) : '0';
+	if ($val !== '0' && $val !== '1') {
+		echo "<script>alert('잘못된 다이나믹 메뉴 값입니다.');location.href='pro_site_settings.php?tab=promo';</script>";
+		exit;
+	}
+	$align = isset($_POST['nav_menu_align']) ? strtolower(trim((string)$_POST['nav_menu_align'])) : 'center';
+	if (!in_array($align, array('left', 'center', 'right'), true)) {
+		echo "<script>alert('잘못된 메뉴 정렬 값입니다.');location.href='pro_site_settings.php?tab=promo';</script>";
+		exit;
+	}
+	if (!pkshop_site_settings_save(array(
+		'dynamic_menu_enabled' => $val,
+		'nav_menu_align' => $align,
+	))) {
+		echo "<script>alert('설정 저장에 실패했습니다.');location.href='pro_site_settings.php?tab=promo';</script>";
+		exit;
+	}
+	$align_label = ($align === 'left') ? '왼쪽' : (($align === 'right') ? '오른쪽' : '가운데');
+	$msg = ($val === '1')
+		? "다이나믹 메뉴가 활성화되었습니다. (정렬: {$align_label})"
+		: "다이나믹 메뉴가 비활성화되었습니다. (정렬: {$align_label})";
+	echo "<script>alert('{$msg}');location.href='pro_site_settings.php?tab=promo';</script>";
+	exit;
+}
+
 $allowed = array('brand', 'currency', 'payment');
 if (!in_array($section, $allowed, true)) {
 	echo "<script>alert('잘못된 요청입니다.');history.back();</script>";

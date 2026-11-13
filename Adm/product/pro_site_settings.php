@@ -26,6 +26,14 @@ $interval_opts = pkshop_promo_rotate_interval_options();
 $promo_best_sec = pkshop_promo_rotate_seconds('best');
 $promo_recommended_sec = pkshop_promo_rotate_seconds('recommended');
 $promo_all_sec = pkshop_promo_rotate_seconds('all');
+$dynamic_menu_enabled = isset($s['dynamic_menu_enabled']) ? trim((string)$s['dynamic_menu_enabled']) : '1';
+if ($dynamic_menu_enabled !== '0' && $dynamic_menu_enabled !== '1') {
+	$dynamic_menu_enabled = '1';
+}
+$nav_menu_align = isset($s['nav_menu_align']) ? strtolower(trim((string)$s['nav_menu_align'])) : 'center';
+if (!in_array($nav_menu_align, array('left', 'center', 'right'), true)) {
+	$nav_menu_align = 'center';
+}
 ?>
 <script>
 function postRun(data) {
@@ -322,10 +330,34 @@ adm_ui_field_row('All PRODUCTS 순환 간격', $all_opts, false, true);
 adm_ui_field_row('안내', '<div class="pg-field-stack"><p class="pg-field-hint">※ BEST·RECOMMENDED는 테마 등록 상품이 지정 개수보다 많을 때 자동 순환합니다.</p><p class="pg-field-hint">※ All PRODUCTS는 <a href="pro_all.php">All 상품</a>에 등록한 카테고리별 4개씩 순환합니다.</p></div>', false, true);
 ?>
 <?php adm_ui_settings_col_close(); ?>
-adm_ui_form_actions('<input type="submit" value="홍보설정 저장" class="pg-btn pg-btn-primary">');
-?>
-								</form>
+<?php adm_ui_form_actions('<input type="submit" value="홍보설정 저장" class="pg-btn pg-btn-primary pg-btn-sm">'); ?>
 <?php adm_ui_card_close(); ?>
+								</form>
+
+								<form method="post" action="pro_site_settings_ok.php">
+								<input type="hidden" name="section" value="dynamic_menu">
+<?php adm_ui_card_open('다이나믹 메뉴'); ?>
+<?php adm_ui_notice('활성화 시 첫화면 외 페이지 상단 메뉴가 <strong>HOME + 카테고리 전체 + Hot Deal</strong>로 바뀝니다. 비활성화 시 기존처럼 <strong>Category / Best / Recommended / Hot Deal</strong>을 유지합니다. 메뉴 정렬은 활성·비활성 모두에 공통 적용됩니다.', 'info'); ?>
+<?php adm_ui_settings_col_open(); ?>
+<?php
+$dyn_opts = '<select name="dynamic_menu_enabled" class="pg-input pg-input--w-md">';
+$dyn_opts .= '<option value="1"' . ($dynamic_menu_enabled === '1' ? ' selected' : '') . '>활성화</option>';
+$dyn_opts .= '<option value="0"' . ($dynamic_menu_enabled === '0' ? ' selected' : '') . '>비활성화</option>';
+$dyn_opts .= '</select>';
+adm_ui_field_row('다이나믹 메뉴', $dyn_opts, false, true);
+
+$align_opts = '<select name="nav_menu_align" class="pg-input pg-input--w-md">';
+$align_labels = array('left' => '왼쪽 정렬', 'center' => '가운데 정렬', 'right' => '오른쪽 정렬');
+foreach ($align_labels as $ak => $alabel) {
+    $align_opts .= '<option value="' . adm_ui_h($ak) . '"' . ($nav_menu_align === $ak ? ' selected' : '') . '>' . adm_ui_h($alabel) . '</option>';
+}
+$align_opts .= '</select>';
+adm_ui_field_row('메뉴 정렬', $align_opts, false, true);
+?>
+<?php adm_ui_settings_col_close(); ?>
+<?php adm_ui_form_actions('<input type="submit" value="다이나믹 메뉴 저장" class="pg-btn pg-btn-primary pg-btn-sm">'); ?>
+<?php adm_ui_card_close(); ?>
+								</form>
 
 <? } ?>
 <?php adm_ui_page_close(); ?>

@@ -162,12 +162,17 @@
 		
 		$json_o = json_decode($result,true);
 
+		if (!is_array($json_o)) { $json_o = array(); }
 		$count = count($json_o);
+		if (!function_exists('pkshop_nav_menu_align_class')) {
+			@require_once dirname(__FILE__) . '/../include/site_settings_lib.php';
+		}
+		$pk_nav_align_class = function_exists('pkshop_nav_menu_align_class') ? pkshop_nav_menu_align_class() : 'nav-align-center';
 									
 		
 									
 ?>
-<div class="main_nav_bar">
+<div class="main_nav_bar <?= htmlspecialchars($pk_nav_align_class, ENT_QUOTES, 'UTF-8') ?>">
 <div class="content">
 				<ul class="all_category">
 					<li><a href="#">Category</a>

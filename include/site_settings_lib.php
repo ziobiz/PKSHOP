@@ -41,6 +41,10 @@ if (!function_exists('pkshop_site_settings_defaults')) {
             'promo_rotate_best' => '30',
             'promo_rotate_recommended' => '30',
             'promo_rotate_all' => '30',
+            /* 1=비메인에서 HOME+카테고리나열+Hot Deal / 0=기존 Category+Best+Recommended+Hot Deal */
+            'dynamic_menu_enabled' => '1',
+            /* 상단 메뉴 정렬: left | center | right (활성/비활성 공통) */
+            'nav_menu_align' => 'center',
             'footer_cs_title' => '顧客センター',
             'footer_cs_line1' => 'OPEN: 09:00 ~ 18:00 / 土日祝休業',
             'footer_cs_line2' => 'ip@onthelinem.com',
@@ -763,6 +767,31 @@ if (!function_exists('pkshop_main_all_get_display_products')) {
             }
         }
         return $display;
+    }
+}
+
+if (!function_exists('pkshop_dynamic_menu_enabled')) {
+    /** 다이나믹 메뉴: 비메인에서 HOME+카테고리 나열+Hot Deal */
+    function pkshop_dynamic_menu_enabled() {
+        $v = trim((string)pkshop_site_setting('dynamic_menu_enabled'));
+        return ($v === '1' || strtolower($v) === 'on' || strtolower($v) === 'true');
+    }
+}
+
+if (!function_exists('pkshop_nav_menu_align')) {
+    /** 상단 메뉴 정렬: left|center|right */
+    function pkshop_nav_menu_align() {
+        $v = strtolower(trim((string)pkshop_site_setting('nav_menu_align')));
+        if (!in_array($v, array('left', 'center', 'right'), true)) {
+            return 'center';
+        }
+        return $v;
+    }
+}
+
+if (!function_exists('pkshop_nav_menu_align_class')) {
+    function pkshop_nav_menu_align_class() {
+        return 'nav-align-' . pkshop_nav_menu_align();
     }
 }
 

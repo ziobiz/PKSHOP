@@ -43,8 +43,8 @@
 <title>Pentakleva</title>
 
 <link rel="stylesheet" href="../include/reset.css">
-<link rel="stylesheet" type="text/css" href="../include/style.css" media="screen and (min-width:1024px)"/>
-<link rel="stylesheet" type="text/css" href="../include/responsive.css" media="screen and (max-width:1023px)"/>
+<link rel="stylesheet" type="text/css" href="../include/style.css?v=20261113dynmenu" media="screen and (min-width:1024px)"/>
+<link rel="stylesheet" type="text/css" href="../include/responsive.css?v=20261113dynmenu" media="screen and (max-width:1023px)"/>
 <link rel="stylesheet" href="../include/swiper.min.css">
 
  </head>
@@ -170,59 +170,54 @@
 
 
 <!--네비-->
-<div class="main_nav_bar">
+<?
+	$pk_is_main = (strpos((string)($_SERVER['SCRIPT_NAME'] ?? ''), '/main/') !== false);
+	if (!function_exists('pkshop_dynamic_menu_enabled')) {
+		@require_once dirname(__FILE__) . '/site_settings_lib.php';
+	}
+	$pk_dynamic_menu = function_exists('pkshop_dynamic_menu_enabled') && pkshop_dynamic_menu_enabled();
+	$pk_use_category_nav = (!$pk_is_main && $pk_dynamic_menu);
+	$pk_nav_align_class = function_exists('pkshop_nav_menu_align_class') ? pkshop_nav_menu_align_class() : 'nav-align-center';
+
+	$data = "deId=e7bb77ca2517821473681d3e9fe132e54c21bdff0ef170596f0414032aac3dbc&Type=cartegory";
+	$ch = curl_init();
+	curl_setopt ($ch, CURLOPT_URL, $api_history);
+	curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 1);
+	curl_setopt ($ch, CURLOPT_POST, 1);
+	curl_setopt ($ch, CURLOPT_POSTFIELDS, $data);
+	curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
+	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+	$result = curl_exec ($ch);
+	curl_close ($ch);
+
+	$json_o = json_decode($result,true);
+	if (!is_array($json_o)) { $json_o = array(); }
+	$total_record_tt = count($json_o);
+?>
+<div class="main_nav_bar<?= $pk_use_category_nav ? ' nav--categories' : '' ?> <?= htmlspecialchars($pk_nav_align_class, ENT_QUOTES, 'UTF-8') ?>">
 <div class="content2">
+<? if ($pk_use_category_nav) { ?>
+				<ul class="nav nav--categories">
+					<li><a href="../main/main.html">HOME</a></li>
+<?
+		for($i_tt  = 0; $i_tt  < $total_record_tt ; $i_tt ++) {
+			$menu_code1 = $json_o[$i_tt]['code'];
+			$menu_title1 = $json_o[$i_tt]['cate'];
+			$menu_code123=$menu_code1;
+?>
+					<li><a href="../sub04/list.php?left_code=<?=$menu_code123?>00000000"><?=$menu_title1?></a></li>
+<?}?>
+					<li><a href="../sub04/list.php?theme_str=f">Hot Deal</a></li>
+				</ul>
+<? } else { ?>
 				<ul class="all_category">
 					<li><a href="#">Category</a>
 						<ul class="dropdown">
 <?
-		//1차분류
-		/*
-		$query_tt = "SELECT code1,cate1 FROM $shop_cate where code2='00' and code3='00' and code4='00' order by order_rank";
-//		echo $query_tt;
-		$result_tt= mysql_query($query_tt);
-		if (!$result_tt) {
-			error("QUERY_ERROR");
-			exit;
-		}
-		*/
-		
-
-		$data = "deId=e7bb77ca2517821473681d3e9fe132e54c21bdff0ef170596f0414032aac3dbc&Type=cartegory";
-		
-
-		$ch = curl_init();
-		curl_setopt ($ch, CURLOPT_URL, $api_history);
-		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 1);
-		curl_setopt ($ch, CURLOPT_POST, 1);
-		curl_setopt ($ch, CURLOPT_POSTFIELDS, $data);
-		curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
-		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-		$result = curl_exec ($ch);
-		curl_close ($ch);
-		
-
-		
-		$json_o = json_decode($result,true);
-
-		$count = count($json_o);
-
-
-	
-		
-		
-
-		$total_record_tt = $count;
-//		echo $total_record_tt;
-		//echo "$total_record_tt";
-		//exit;
-
 		for($i_tt  = 0; $i_tt  < $total_record_tt ; $i_tt ++) {
 			$menu_code1 = $json_o[$i_tt]['code'];
 			$menu_title1 = $json_o[$i_tt]['cate'];
-
 			$menu_code123=$menu_code1;
-
 ?>
 							<li><a href="../sub04/list.php?left_code=<?=$menu_code123?>00000000"><?=$menu_title1?></a></li>
 <?}?>
@@ -235,6 +230,7 @@
 					<li><a href="../sub04/list.php?theme_str=n">Recommended</a></li>
 					<li><a href="../sub04/list.php?theme_str=f">Hot Deal</a></li>
 				</ul>
+<? } ?>
 			</div>
 		</div>
 	</div>
@@ -249,7 +245,7 @@
 		
 				<div class="header_top_box02">
 					
-				<?if($_SESSION['member_id']==""){ ?>
+				<?if(!isset($_SESSION['member_id']) || $_SESSION['member_id']==""){ ?>
 					<a href="../member/login.php">LOGIN or Membership<br>(로그인 및 회원가입)</a>
 					<!-- <a href="../member/agree.php">JOIN US</a> -->
 					<?}else{?>
@@ -259,7 +255,20 @@
 					
 				</div>
 
-				
+<? if ($pk_use_category_nav) { ?>
+				<ul class="m_nav">
+					<li><a href="../main/main.html">HOME</a></li>
+<?
+for($i_tt  = 0; $i_tt  < $total_record_tt ; $i_tt ++) {
+			$menu_code1 = $json_o[$i_tt]['code'];
+			$menu_title1 = $json_o[$i_tt]['cate'];
+			$menu_code123=$menu_code1;
+?>
+					<li><a href="../sub04/list.php?left_code=<?=$menu_code123?>00000000"><?=$menu_title1?></a></li>
+<?}?>
+					<li><a href="../sub04/list.php?theme_str=f">Hot Deal</a></li>
+				</ul>
+<? } else { ?>
 				<ul class="m_nav">
 					<li><a href="../sub04/list.php?theme_str=r">Best</a></li>
 					<li><a href="../sub04/list.php?theme_str=n">Recommended</a></li>
@@ -270,24 +279,12 @@
 for($i_tt  = 0; $i_tt  < $total_record_tt ; $i_tt ++) {
 			$menu_code1 = $json_o[$i_tt]['code'];
 			$menu_title1 = $json_o[$i_tt]['cate'];
-
 			$menu_code123=$menu_code1;
-
 ?>
 					<li><a href="../sub04/list.php?left_code=<?=$menu_code123?>00000000"><?=$menu_title1?></a></li>
 <?}?>
-
-
-
-					<!-- <ul class="sub_dropdown">
-						<li><a href="../sub05/list.php?Sub_No=1">- 공지사항</a></li>
-						<li><a href="../sub05/list.php?Sub_No=2">- 질문과 답변</a></li>
-						<li><a href="../sub05/list.php?Sub_No=3">- 이벤트</a></li>
-					</ul> -->
 				</ul>
-
-				
-
+<? } ?>
 
 	</div>
 </div>
