@@ -43,8 +43,8 @@
 <meta property="og:description" content="Pentakleva">
 <title>Pentakleva</title>
 <link rel="stylesheet" href="../include/reset.css">
-<link rel="stylesheet" type="text/css" href="../include/style_main.css?v=20261112promoGrid" media="screen and (min-width:1024px)"/>
-<link rel="stylesheet" type="text/css" href="../include/responsive.css?v=20261112promoGrid" media="screen and (max-width:1023px)"/>
+<link rel="stylesheet" type="text/css" href="../include/style_main.css?v=202611131900nav" media="screen and (min-width:1024px)"/>
+<link rel="stylesheet" type="text/css" href="../include/responsive.css?v=202611131900nav" media="screen and (max-width:1023px)"/>
 <link rel="stylesheet" href="../include/swiper.min.css">
 
  </head>
@@ -163,39 +163,52 @@
 	</div>
 <!--네비-->
 <?
-		
-		$data = "deId=e7bb77ca2517821473681d3e9fe132e54c21bdff0ef170596f0414032aac3dbc&Type=cartegory";
-		// echo $api_history;
-		$ch = curl_init();
-		curl_setopt ($ch, CURLOPT_URL, $api_history);
-		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 1);
-		curl_setopt ($ch, CURLOPT_POST, 1);
-		curl_setopt ($ch, CURLOPT_POSTFIELDS, $data);
-		curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
-		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-		$result = curl_exec ($ch);
-		curl_close ($ch);
-		// echo $result;
-		// exit;
-		
-		$json_o = json_decode($result, true);
-		if (!is_array($tops)) { $tops = array(); }
-		$count = count($json_o);
-									
-		
-									
+	if (!function_exists('pkshop_dynamic_menu_enabled')) {
+		@require_once dirname(__FILE__) . '/../include/site_settings_lib.php';
+	}
+	$pk_dynamic_menu = function_exists('pkshop_dynamic_menu_enabled') && pkshop_dynamic_menu_enabled();
+	// Home and sub pages share the same centered category menu when enabled.
+	$pk_use_category_nav = $pk_dynamic_menu;
+	$pk_nav_align_class = function_exists('pkshop_nav_menu_align_class') ? pkshop_nav_menu_align_class() : 'nav-align-center';
+
+	$data = "deId=e7bb77ca2517821473681d3e9fe132e54c21bdff0ef170596f0414032aac3dbc&Type=cartegory";
+	$ch = curl_init();
+	curl_setopt ($ch, CURLOPT_URL, $api_history);
+	curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 1);
+	curl_setopt ($ch, CURLOPT_POST, 1);
+	curl_setopt ($ch, CURLOPT_POSTFIELDS, $data);
+	curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
+	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+	$result = curl_exec ($ch);
+	curl_close ($ch);
+
+	$json_o = json_decode($result, true);
+	if (!is_array($json_o)) { $json_o = array(); }
+	$total_record_tt = count($json_o);
+	$count = $total_record_tt;
 ?>
-<div class="main_nav_bar">
-<div class="content">
+<div class="main_nav_bar<?= $pk_use_category_nav ? ' nav--categories' : '' ?> <?= htmlspecialchars($pk_nav_align_class, ENT_QUOTES, 'UTF-8') ?>">
+<div class="content2">
+<? if ($pk_use_category_nav) { ?>
+				<ul class="nav nav--categories">
+					<li><a href="../main/main.html">HOME</a></li>
+<?
+		for($i_tt  = 0; $i_tt  < $total_record_tt ; $i_tt ++) {
+			$menu_code1 = $json_o[$i_tt]['code'];
+			$menu_title1 = $json_o[$i_tt]['cate'];
+			$menu_code123=$menu_code1;
+?>
+					<li><a href="../sub04/list.php?left_code=<?=$menu_code123?>00000000"><?=$menu_title1?></a></li>
+<?}?>
+					<li><a href="../sub04/list.php?theme_str=f">Hot Deal</a></li>
+				</ul>
+<? } else { ?>
 				<ul class="all_category">
 					<li><a href="#">Category</a>
 						<ul class="dropdown">
 <?
-
-
 		for($i=0;$i<$count;$i++)
 		{
-
 ?>
 		<li><a href="../sub04/list.php?left_code=<?=$json_o[$i]['code']?>00000000"><?=$json_o[$i]['cate']?></a></li>
 <?
@@ -209,8 +222,8 @@
 					<li><a href="../sub04/list.php?theme_str=r">Best </a></li>
 					<li><a href="../sub04/list.php?theme_str=n">Recommended</a></li>
 					<li><a href="../sub04/list.php?theme_str=f">Hot deal</a></li>
-					<!-- <li><a href="#none">명품샵</a></li> -->
 				</ul>
+<? } ?>
 			</div>
 		</div>
 	</div>
@@ -235,13 +248,24 @@
 
 				</div>
 
-				
+<? if ($pk_use_category_nav) { ?>
+				<ul class="m_nav">
+					<li><a href="../main/main.html">HOME</a></li>
+<?
+for($i_tt  = 0; $i_tt  < $total_record_tt ; $i_tt ++) {
+			$menu_code1 = $json_o[$i_tt]['code'];
+			$menu_title1 = $json_o[$i_tt]['cate'];
+			$menu_code123=$menu_code1;
+?>
+					<li><a href="../sub04/list.php?left_code=<?=$menu_code123?>00000000"><?=$menu_title1?></a></li>
+<?}?>
+					<li><a href="../sub04/list.php?theme_str=f">Hot Deal</a></li>
+				</ul>
+<? } else { ?>
 				<ul class="m_nav">
 					<li><a href="../sub04/list.php?theme_str=r">Best</a></li>
 					<li><a href="../sub04/list.php?theme_str=n">Recommended</a></li>
 					<li><a href="../sub04/list.php?theme_str=f">Hot deal</a></li>
-					<!-- <li><a href="../sub04/list.php?theme_str=n">추천제품</a></li>
-					<li><a href="../sub04/list.php?theme_str=f">Hot deal제품</a></li> -->
 				</ul>
 
 				<ul class="m_dropdown">
@@ -260,9 +284,7 @@
 						<li><a href="../sub05/list.php?Sub_No=3">- 이벤트</a></li>
 					</ul> -->
 				</ul>
-
-				
-
+<? } ?>
 
 	</div>
 </div>

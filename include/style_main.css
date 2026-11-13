@@ -1056,3 +1056,75 @@ body {
     font-size: 12px;
 	cursor:pointer;
 }
+
+/* pkshop nav align / category menu */
+.main_nav_bar.nav--categories {
+	height: auto;
+	min-height: 50px;
+}
+.main_nav_bar.nav--categories .content2 {
+	overflow: hidden;
+}
+.nav.nav--categories {
+	width: auto;
+	max-width: 100%;
+	height: auto;
+	float: none;
+	display: inline-block;
+}
+.nav.nav--categories li {
+	float: left;
+}
+.nav.nav--categories li a {
+	font-size: 13px;
+	line-height: 44px;
+	margin-right: 28px;
+	white-space: nowrap;
+}
+.nav.nav--categories li:last-child a {
+	margin-right: 0;
+}
+
+/* 상단 메뉴 정렬 (활성/비활성 공통) */
+.main_nav_bar.nav-align-left .content2,
+.main_nav_bar.nav-align-left .content {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	flex-wrap: wrap;
+}
+.main_nav_bar.nav-align-center .content2,
+.main_nav_bar.nav-align-center .content {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+}
+.main_nav_bar.nav-align-right .content2,
+.main_nav_bar.nav-align-right .content {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	flex-wrap: wrap;
+}
+.main_nav_bar.nav-align-left .all_category,
+.main_nav_bar.nav-align-center .all_category,
+.main_nav_bar.nav-align-right .all_category {
+	float: none;
+	margin-right: 40px;
+}
+.main_nav_bar.nav-align-left .nav,
+.main_nav_bar.nav-align-center .nav,
+.main_nav_bar.nav-align-right .nav {
+	float: none;
+	width: auto;
+}
+.main_nav_bar.nav-align-center .nav li a,
+.main_nav_bar.nav-align-right .nav li a {
+	margin-right: 48px;
+}
+.main_nav_bar.nav-align-center .nav li:last-child a,
+.main_nav_bar.nav-align-right .nav li:last-child a,
+.main_nav_bar.nav-align-left .nav li:last-child a {
+	margin-right: 0;
+}
